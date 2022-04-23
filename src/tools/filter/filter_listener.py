@@ -27,5 +27,5 @@ class filterListener(ABC):
         pass
 
     @abstractmethod
-    def get_channels_selected(self, channels_selected):
+    def get_elements_selected(self, elements_selected):
         pass

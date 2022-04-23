@@ -42,5 +42,22 @@ def get_stylesheet():
         width: 10px; 
         margin: 0.5px;
     }
+    
+    #BoundariesGridLayoutLeft {
+        border: 1px solid black;
+        border-bottom: 0px solid black;
+    }
+    #BoundariesGridLayoutRight {
+        border: 1px solid black;
+        border-left: 0px solid black;
+        border-bottom: 0px solid black;
+    }
+    #BoundariesGridLayoutBottomLeft {
+        border: 1px solid black;
+    }
+    #BoundariesGridLayoutBottomRight {
+        border: 1px solid black;
+        border-left: 0px solid black;
+    }
     '''
     return stylesheet

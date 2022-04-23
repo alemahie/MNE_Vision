@@ -8,7 +8,7 @@ Filter view
 from PyQt6.QtGui import QDoubleValidator
 from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QGridLayout, QLabel
 
-from utils.channels_selector.channels_selector_controller import channelsSelectorController
+from utils.elements_selector.elements_selector_controller import multipleSelectorController
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2021"
@@ -74,7 +74,7 @@ class filterView(QWidget):
 
     def channels_selection_trigger(self):
         title = "Select the channels used for the filtering :"
-        self.channels_selector_controller = channelsSelectorController(self.all_channels_names, title, box_checked=True)
+        self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=True)
         self.channels_selector_controller.set_listener(self.filter_listener)
 
     """

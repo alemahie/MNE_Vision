@@ -7,7 +7,7 @@ Power spectral density view
 
 from PyQt6.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel
 
-from utils.channels_selector.channels_selector_controller import channelsSelectorController
+from utils.elements_selector.elements_selector_controller import multipleSelectorController
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2021"
@@ -54,7 +54,7 @@ class erpView(QWidget):
 
     def channels_selection_trigger(self):
         title = "Select the channels used for the ERP computation :"
-        self.channels_selector_controller = channelsSelectorController(self.all_channels_names, title, box_checked=True)
+        self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=True)
         self.channels_selector_controller.set_listener(self.erp_listener)
 
     """

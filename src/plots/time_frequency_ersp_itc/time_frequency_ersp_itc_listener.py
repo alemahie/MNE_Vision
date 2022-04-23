@@ -23,5 +23,5 @@ class timeFrequencyErspItcListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self):
+    def confirm_button_clicked(self, method_tfr, channel_selected, min_frequency, max_frequency):
         pass

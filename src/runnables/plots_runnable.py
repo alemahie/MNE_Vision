@@ -4,10 +4,10 @@
 """
 Plots runnable
 """
-
+import numpy as np
 from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
 
-from mne.time_frequency import psd_welch, psd_multitaper
+from mne.time_frequency import psd_welch, psd_multitaper, tfr_morlet, tfr_multitaper, tfr_stockwell
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2021"
@@ -47,3 +47,44 @@ class powerSpectralDensityRunnable(QRunnable):
 
     def get_freqs(self):
         return self.freqs
+
+
+class timeFrequencyWorkerSignals(QObject):
+    finished = pyqtSignal()
+
+
+class timeFrequencyRunnable(QRunnable):
+    def __init__(self, file_data, method_tfr, channel_selected, min_frequency, max_frequency):
+        super().__init__()
+        self.signals = timeFrequencyWorkerSignals()
+
+        self.file_data = file_data
+        self.method_tfr = method_tfr
+        self.channel_selected = channel_selected
+        self.min_frequency = min_frequency
+        self.max_frequency = max_frequency
+        self.power = None
+        self.itc = None
+
+    def run(self):
+        freqs = np.arange(self.min_frequency, self.max_frequency)
+        n_cycles = freqs
+        if self.method_tfr == "Morlet":
+            self.power, self.itc = tfr_morlet(self.file_data, freqs=freqs, n_cycles=n_cycles,
+                                              picks=self.channel_selected)
+        elif self.method_tfr == "Multitaper":
+            self.power, self.itc = tfr_multitaper(self.file_data, freqs=freqs, n_cycles=n_cycles,
+                                                  picks=self.channel_selected)
+        elif self.method_tfr == "Stockwell":
+            self.power, self.itc = tfr_stockwell(self.file_data, freqs=freqs, n_cycles=n_cycles,
+                                                 picks=self.channel_selected)
+        self.signals.finished.emit()
+
+    def get_channel_selected(self):
+        return self.channel_selected
+
+    def get_power(self):
+        return self.power
+
+    def get_itc(self):
+        return self.itc

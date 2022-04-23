@@ -30,14 +30,14 @@ class erpController(erpListener):
         self.erp_view.close()
 
     def confirm_button_clicked(self, channels_selected):
-        self.main_listener.plot_ERP_image_information(channels_selected)
         self.erp_view.close()
+        self.main_listener.plot_ERP_image_information(channels_selected)
 
     """
     Getters
     """
-    def get_channels_selected(self, channels_selected):
-        self.erp_view.set_channels_selected(channels_selected)
+    def get_elements_selected(self, elements_selected):
+        self.erp_view.set_channels_selected(elements_selected)
 
     """
     Setters

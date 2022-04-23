@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Re-referencing Listener
+Multiple selector Listener
 """
 
 from abc import ABC, abstractmethod
@@ -17,15 +17,11 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class reReferencingListener(ABC):
+class multipleSelectorListener(ABC):
     @abstractmethod
     def cancel_button_clicked(self):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, references):
-        pass
-
-    @abstractmethod
-    def get_elements_selected(self, elements_selected):
+    def confirm_button_clicked(self, elements_selected):
         pass

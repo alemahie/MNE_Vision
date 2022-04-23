@@ -28,6 +28,8 @@ from plots.power_spectral_density.power_spectral_density_controller import power
 from plots.erp.erp_controller import erpController
 from plots.time_frequency_ersp_itc.time_frequency_ersp_itc_controller import timeFrequencyErspItcController
 
+from classification.classify.classify_controller import classifyController
+
 from utils.stylesheet import get_stylesheet
 from utils.waiting_while_processing.waiting_while_processing_controller import waitingWhileProcessingController
 
@@ -70,6 +72,8 @@ class mainController(mainListener):
         self.power_spectral_density_controller = None
         self.erp_controller = None
         self.time_frequency_ersp_itc_controller = None
+
+        self.classify_controller = None
 
         self.waiting_while_processing_controller = None
 
@@ -158,25 +162,51 @@ class mainController(mainListener):
     """
     Tools menu
     """
+    # Filtering
     def filter_clicked(self):
         all_channels_names = self.main_model.get_all_channels_names()
         self.filter_controller = filterController(all_channels_names)
         self.filter_controller.set_listener(self)
 
     def filter_information(self, low_frequency, high_frequency, channels_selected):
+        processing_title = "Filtering running, please wait."
+        finish_method = "filtering"
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller.set_listener(self)
         self.main_model.filter(low_frequency, high_frequency, channels_selected)
-        self.main_view.update_dataset_size(self.main_model.get_dataset_size())
 
+    def filter_computation_finished(self):
+        processing_title_finished = "Filtering finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def filter_finished(self):
+        dataset_size = self.main_model.get_dataset_size()
+        self.main_view.update_dataset_size(dataset_size)
+
+    # Resampling
     def resampling_clicked(self):
         frequency = self.main_model.get_sampling_frequency()
         self.resampling_controller = resamplingController(frequency)
         self.resampling_controller.set_listener(self)
 
     def resampling_information(self, frequency):
+        processing_title = "Resampling running, please wait."
+        finish_method = "resampling"
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller.set_listener(self)
         self.main_model.resampling(frequency)
-        self.main_view.update_sampling_frequency(frequency)
-        self.main_view.update_dataset_size(self.main_model.get_dataset_size())
 
+    def resampling_computation_finished(self):
+        processing_title_finished = "Resampling finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def resampling_finished(self):
+        frequency = self.main_model.get_sampling_frequency()
+        dataset_size = self.main_model.get_dataset_size()
+        self.main_view.update_sampling_frequency(frequency)
+        self.main_view.update_dataset_size(dataset_size)
+
+    # Re-referencing
     def re_referencing_clicked(self):
         reference = self.main_model.get_reference()
         all_channels_names = self.main_model.get_all_channels_names()
@@ -184,12 +214,25 @@ class mainController(mainListener):
         self.re_referencing_controller.set_listener(self)
 
     def re_referencing_information(self, references):
+        processing_title = "Re-referencing running, please wait."
+        finish_method = "re-referencing"
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller.set_listener(self)
         self.main_model.re_referencing(references)
+
+    def re_referencing_computation_finished(self):
+        processing_title_finished = "Re-referencing finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def re_referencing_finished(self):
+        references = self.main_model.get_reference()
         self.main_view.update_reference(references)
 
+    # Reject data
     def inspect_reject_data_clicked(self):
         pass
 
+    # ICA decomposition
     def ica_decomposition_clicked(self):
         self.ica_decomposition_controller = icaDecompositionController()
         self.ica_decomposition_controller.set_listener(self)
@@ -209,6 +252,7 @@ class mainController(mainListener):
         ica_status = self.main_model.get_ica()
         self.main_view.update_ica_decomposition(ica_status)
 
+    # Source Estimation
     def source_estimation_clicked(self):
         self.source_estimation_controller = sourceEstimationController()
         self.source_estimation_controller.set_listener(self)
@@ -240,6 +284,7 @@ class mainController(mainListener):
         file_type = self.main_model.get_file_type()
         self.main_view.plot_data(file_data, file_type)
 
+    # Spectra maps
     def plot_spectra_maps_clicked(self):
         self.power_spectral_density_controller = powerSpectralDensityController()
         self.power_spectral_density_controller.set_listener(self)
@@ -269,9 +314,49 @@ class mainController(mainListener):
         file_data = self.main_model.get_file_data()
         self.main_view.plot_erps(file_data, channels_selected)
 
+    # Time frequency
     def plot_time_frequency_clicked(self):
-        self.time_frequency_ersp_itc_controller = timeFrequencyErspItcController()
+        all_channels_names = self.main_model.get_all_channels_names()
+        self.time_frequency_ersp_itc_controller = timeFrequencyErspItcController(all_channels_names)
         self.time_frequency_ersp_itc_controller.set_listener(self)
+
+    def plot_time_frequency_information(self, method_tfr, channel_selected, min_frequency, max_frequency):
+        processing_title = "Time frequency analysis running, please wait."
+        finish_method = "time_frequency"
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.main_model.time_frequency(method_tfr, channel_selected, min_frequency, max_frequency)
+
+    def plot_time_frequency_computation_finished(self):
+        processing_title_finished = "Time frequency analysis finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def plot_time_frequency_finished(self):
+        channel_selected = self.main_model.get_tfr_channel_selected()
+        power = self.main_model.get_power()
+        itc = self.main_model.get_itc()
+        self.time_frequency_ersp_itc_controller.plot_ersp_itc(channel_selected, power, itc)
+
+    """
+    Classification menu
+    """
+    def classify_clicked(self):
+        self.classify_controller = classifyController()
+        self.classify_controller.set_listener(self)
+
+    def classify_information(self, pipeline_selected):
+        processing_title = "Classification running, please wait."
+        finish_method = "classify"
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.main_model.classify(pipeline_selected)
+
+    def classify_computation_finished(self):
+        processing_title_finished = "Classification finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def classify_finished(self):
+        print("Ouai c'est fini quoi")
 
     """
     Others
@@ -281,12 +366,22 @@ class mainController(mainListener):
             self.open_cnt_file_finished()
         elif finish_method == "open_set_file":
             self.open_set_file_finished()
+        elif finish_method == "filtering":
+            self.filter_finished()
+        elif finish_method == "resampling":
+            self.resampling_finished()
+        elif finish_method == "re-referencing":
+            self.re_referencing_finished()
         elif finish_method == "ica_decomposition":
             self.ica_decomposition_finished()
         elif finish_method == "source_estimation":
             self.source_estimation_finished()
         elif finish_method == "plot_spectra_maps":
             self.plot_spectra_maps_finished()
+        elif finish_method == "time_frequency":
+            self.plot_time_frequency_finished()
+        elif finish_method == "classify":
+            self.classify_finished()
 
     """
     Getters
@@ -294,5 +389,4 @@ class mainController(mainListener):
     def get_screen_geometry(self):
         screen = self.app.primaryScreen()
         size = screen.size()
-        # rect = screen.availableGeometry()
         return size

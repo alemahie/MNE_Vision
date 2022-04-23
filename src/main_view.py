@@ -33,10 +33,22 @@ class mainView(QMainWindow):
         self.grid_layout = QGridLayout(self)
         self.central_widget.setLayout(self.grid_layout)
 
+        self.grid_layout.setSpacing(0)
+
         for i, info in enumerate(self.info_labels):
-            self.grid_layout.addWidget(QLabel(info), i, 0)
+            label = QLabel(info)
+            if i != 12:
+                label.setObjectName("BoundariesGridLayoutLeft")
+            else:
+                label.setObjectName("BoundariesGridLayoutBottomLeft")
+            self.grid_layout.addWidget(label, i, 0)
         for i in range(13):
-            self.grid_layout.addWidget(QLabel("/"), i, 1)
+            label = QLabel("/")
+            if i != 12:
+                label.setObjectName("BoundariesGridLayoutRight")
+            else:
+                label.setObjectName("BoundariesGridLayoutBottomRight")
+            self.grid_layout.addWidget(label, i, 1)
 
         self.setCentralWidget(self.central_widget)
         self.setWindowTitle("MNE Vision")
@@ -50,8 +62,7 @@ class mainView(QMainWindow):
     Plot
     """
     def plot_channel_locations(self, file_data):
-        plot_sensors(file_data.info)
-        # file_data.plot_sensors(show_names=True)
+        plot_sensors(file_data.info, show_names=True)
 
     def plot_data(self, file_data, file_type):
         if file_type == "Raw":

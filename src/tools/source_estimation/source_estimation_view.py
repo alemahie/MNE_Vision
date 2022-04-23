@@ -11,6 +11,10 @@ from PyQt6.QtWidgets import QWidget, QComboBox, QPushButton, QLabel, QCheckBox, 
     QHBoxLayout, QSlider
 from PyQt6.QtCore import Qt
 
+from mne.viz import plot_source_estimates
+
+from utils.file_path_search import get_project_freesurfer_path
+
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2021"
 __credits__ = ["Lemahieu Antoine"]
@@ -26,7 +30,7 @@ class sourceEstimationView(QWidget):
         super().__init__()
         self.source_estimation_listener = None
         self.subject = "fsaverage"
-        self.subjects_dir = "../../data/freesurfer/subjects/"
+        self.subjects_dir = get_project_freesurfer_path()
 
         self.global_layout = QVBoxLayout()
         self.setLayout(self.global_layout)
@@ -87,8 +91,8 @@ class sourceEstimationView(QWidget):
         self.global_layout.addWidget(self.cancel_confirm_widget)
 
     def plot_source_estimation(self, source_estimation_data):
-        source_estimation_data.plot(subject=self.subject, subjects_dir=self.subjects_dir, hemi="both",
-                                    backend="matplotlib")
+        plot_source_estimates(source_estimation_data, subject=self.subject, subjects_dir=self.subjects_dir,
+                              hemi="both", backend="pyvista")
 
     """
     Triggers

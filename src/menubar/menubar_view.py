@@ -49,6 +49,12 @@ class menubarView(QMenuBar):
         self.create_plot_menu()
         self.plot_menu.setEnabled(False)
 
+        # Classification menu
+        self.classification_menu = QMenu("&Classification", self)
+        self.addMenu(self.classification_menu)
+        self.create_classification_menu()
+        self.classification_menu.setEnabled(False)
+
         # Help menu
         self.help_menu = QMenu("&Help", self)
         self.addMenu(self.help_menu)
@@ -146,6 +152,11 @@ class menubarView(QMenuBar):
         plot_time_frequency_action.triggered.connect(self.plot_time_frequency_trigger)
         self.plot_menu.addAction(plot_time_frequency_action)
 
+    def create_classification_menu(self):
+        classify_action = QAction("&Classify", self)
+        classify_action.triggered.connect(self.classify_trigger)
+        self.classification_menu.addAction(classify_action)
+
     def create_help_menu(self):
         help_action = QAction("&Help", self)
         help_action.triggered.connect(self.help_trigger)
@@ -163,6 +174,7 @@ class menubarView(QMenuBar):
         self.edit_menu.setEnabled(True)
         self.tools_menu.setEnabled(True)
         self.plot_menu.setEnabled(True)
+        self.classification_menu.setEnabled(True)
 
     """
     Triggers
@@ -242,6 +254,10 @@ class menubarView(QMenuBar):
 
     def plot_time_frequency_trigger(self):
         self.menubarListener.plot_time_frequency_clicked()
+
+    # Classification menu triggers
+    def classify_trigger(self):
+        self.menubarListener.classify_clicked()
 
     # Help menu triggers
     def help_trigger(self):

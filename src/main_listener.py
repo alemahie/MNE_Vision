@@ -86,6 +86,14 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def filter_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def filter_finished(self):
+        pass
+
+    @abstractmethod
     def resampling_clicked(self):
         pass
 
@@ -94,11 +102,27 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def resampling_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def resampling_finished(self):
+        pass
+
+    @abstractmethod
     def re_referencing_clicked(self):
         pass
 
     @abstractmethod
     def re_referencing_information(self, references):
+        pass
+
+    @abstractmethod
+    def re_referencing_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def re_referencing_finished(self):
         pass
 
     @abstractmethod
@@ -172,6 +196,35 @@ class mainListener(ABC):
 
     @abstractmethod
     def plot_time_frequency_clicked(self):
+        pass
+
+    @abstractmethod
+    def plot_time_frequency_information(self, method_tfr, channel_selected, min_frequency, max_frequency):
+        pass
+
+    @abstractmethod
+    def plot_time_frequency_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def plot_time_frequency_finished(self):
+        pass
+
+    # Classification menu
+    @abstractmethod
+    def classify_clicked(self):
+        pass
+
+    @abstractmethod
+    def classify_information(self, pipeline_selected):
+        pass
+
+    @abstractmethod
+    def classify_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def classify_finished(self):
         pass
 
     # Others

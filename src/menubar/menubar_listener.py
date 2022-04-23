@@ -110,6 +110,11 @@ class menubarListener(ABC):
     def plot_time_frequency_clicked(self):
         pass
 
+    # Classification menu
+    @abstractmethod
+    def classify_clicked(self):
+        pass
+
     # Help menu
     @abstractmethod
     def help_clicked(self):

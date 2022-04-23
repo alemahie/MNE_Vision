@@ -33,8 +33,8 @@ class reReferencingController(reReferencingListener):
         self.main_listener.re_referencing_information(references)
         self.re_referencing_view.close()
 
-    def get_channels_selected(self, channels_selected):
-        self.re_referencing_view.set_channels_selected(channels_selected)
+    def get_elements_selected(self, elements_selected):
+        self.re_referencing_view.set_channels_selected(elements_selected)
 
     """
     Setters

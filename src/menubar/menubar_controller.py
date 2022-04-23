@@ -102,6 +102,10 @@ class menubarController(menubarListener):
     def plot_time_frequency_clicked(self):
         self.main_listener.plot_time_frequency_clicked()
 
+    # Classification menu
+    def classify_clicked(self):
+        self.main_listener.classify_clicked()
+
     # Help menu
     def help_clicked(self):
         print("Help")

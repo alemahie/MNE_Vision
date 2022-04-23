@@ -13,6 +13,8 @@ from mne.minimum_norm import read_inverse_operator, make_inverse_operator, apply
                              write_inverse_operator
 from mne.preprocessing import ICA
 
+from utils.file_path_search import get_project_freesurfer_path
+
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2021"
 __credits__ = ["Lemahieu Antoine"]
@@ -21,6 +23,68 @@ __version__ = "0.1"
 __maintainer__ = "Lemahieu Antoine"
 __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
+
+
+class filterWorkerSignals(QObject):
+    finished = pyqtSignal()
+
+
+class filterRunnable(QRunnable):
+    def __init__(self, low_frequency, high_frequency, channels_selected, file_data):
+        super().__init__()
+        self.signals = filterWorkerSignals()
+        self.low_frequency = low_frequency
+        self.high_frequency = high_frequency
+        self.channels_selected = channels_selected
+        self.file_data = file_data
+
+    def run(self):
+        self.file_data.filter(l_freq=self.low_frequency, h_freq=self.high_frequency, picks=self.channels_selected)
+        self.signals.finished.emit()
+
+    def get_file_data(self):
+        return self.file_data
+
+
+class resamplingWorkerSignals(QObject):
+    finished = pyqtSignal()
+
+
+class resamplingRunnable(QRunnable):
+    def __init__(self, frequency, file_data):
+        super().__init__()
+        self.signals = filterWorkerSignals()
+        self.frequency = frequency
+        self.file_data = file_data
+
+    def run(self):
+        self.file_data.resample(self.frequency)
+        self.signals.finished.emit()
+
+    def get_file_data(self):
+        return self.file_data
+
+
+class reReferencingWorkerSignals(QObject):
+    finished = pyqtSignal()
+
+
+class reReferencingRunnable(QRunnable):
+    def __init__(self, references, file_data):
+        super().__init__()
+        self.signals = filterWorkerSignals()
+        self.references = references
+        self.file_data = file_data
+
+    def run(self):
+        self.file_data.set_eeg_reference(ref_channels=self.references)
+        self.signals.finished.emit()
+
+    def get_file_data(self):
+        return self.file_data
+
+    def get_references(self):
+        return self.references
 
 
 class icaWorkerSignals(QObject):
@@ -58,7 +122,7 @@ class sourceEstimationRunnable(QRunnable):
         self.write_files = write_files
         self.n_jobs = n_jobs
         self.subject = "fsaverage"
-        self.subjects_dir = "../../data/freesurfer/subjects/"
+        self.subjects_dir = get_project_freesurfer_path()
 
         self.source_estimation_data = None
 

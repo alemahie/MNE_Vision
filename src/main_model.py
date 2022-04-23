@@ -11,9 +11,11 @@ from PyQt6.QtCore import QThreadPool
 from mne import read_epochs
 from mne.io import read_raw_fif
 
-from runnables.tools_runnable import icaRunnable, sourceEstimationRunnable
+from runnables.tools_runnable import filterRunnable, icaRunnable, sourceEstimationRunnable, resamplingRunnable, \
+    reReferencingRunnable
 from runnables.files_runnable import openCntFileRunnable, openSetFileRunnable
-from runnables.plots_runnable import powerSpectralDensityRunnable
+from runnables.plots_runnable import powerSpectralDensityRunnable, timeFrequencyRunnable
+from runnables.classification_runnable import classifyRunnable
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2021"
@@ -38,9 +40,17 @@ class mainModel:
 
         self.open_cnt_file_runnable = None
         self.open_set_file_runnable = None
+
+        self.filter_runnable = None
+        self.resampling_runnable = None
+        self.re_referencing_runnable = None
         self.ica_data_decomposition_runnable = None
         self.source_estimation_runnable = None
+
         self.power_spectral_density_runnable = None
+        self.time_frequency_runnable = None
+
+        self.classify_runnable = None
 
     """
     Useful methods
@@ -109,14 +119,35 @@ class mainModel:
     Tools menu
     """
     def filter(self, low_frequency, high_frequency, channels_selected):
-        self.file_data.filter(l_freq=low_frequency, h_freq=high_frequency, picks=channels_selected)
+        pool = QThreadPool.globalInstance()
+        self.filter_runnable = filterRunnable(low_frequency, high_frequency, channels_selected, self.file_data)
+        pool.start(self.filter_runnable)
+        self.filter_runnable.signals.finished.connect(self.filter_computation_finished)
+
+    def filter_computation_finished(self):
+        self.file_data = self.filter_runnable.get_file_data()
+        self.main_listener.filter_computation_finished()
 
     def resampling(self, new_frequency):
-        self.file_data.resample(new_frequency)
+        pool = QThreadPool.globalInstance()
+        self.resampling_runnable = resamplingRunnable(new_frequency, self.file_data)
+        pool.start(self.resampling_runnable)
+        self.resampling_runnable.signals.finished.connect(self.resampling_computation_finished)
+
+    def resampling_computation_finished(self):
+        self.file_data = self.resampling_runnable.get_file_data()
+        self.main_listener.resampling_computation_finished()
 
     def re_referencing(self, references):
-        self.file_data.set_eeg_reference(ref_channels=references)
-        self.references = references
+        pool = QThreadPool.globalInstance()
+        self.re_referencing_runnable = reReferencingRunnable(references, self.file_data)
+        pool.start(self.re_referencing_runnable)
+        self.re_referencing_runnable.signals.finished.connect(self.re_referencing_computation_finished)
+
+    def re_referencing_computation_finished(self):
+        self.file_data = self.re_referencing_runnable.get_file_data()
+        self.references = self.re_referencing_runnable.get_references()
+        self.main_listener.re_referencing_computation_finished()
 
     def ica_data_decomposition(self, ica_method):
         pool = QThreadPool.globalInstance()
@@ -145,12 +176,35 @@ class mainModel:
     """
     def power_spectral_density(self, method_psd, minimum_frequency, maximum_frequency):
         pool = QThreadPool.globalInstance()
-        self.power_spectral_density_runnable = powerSpectralDensityRunnable(self.file_data, method_psd, minimum_frequency, maximum_frequency)
+        self.power_spectral_density_runnable = powerSpectralDensityRunnable(self.file_data, method_psd,
+                                                                            minimum_frequency, maximum_frequency)
         pool.start(self.power_spectral_density_runnable)
         self.power_spectral_density_runnable.signals.finished.connect(self.power_spectral_density_computation_finished)
 
     def power_spectral_density_computation_finished(self):
         self.main_listener.plot_spectra_maps_computation_finished()
+
+    def time_frequency(self, method_tfr, channel_selected, min_frequency, max_frequency):
+        pool = QThreadPool.globalInstance()
+        self.time_frequency_runnable = timeFrequencyRunnable(self.file_data, method_tfr, channel_selected,
+                                                             min_frequency, max_frequency)
+        pool.start(self.time_frequency_runnable)
+        self.time_frequency_runnable.signals.finished.connect(self.time_frequency_computation_finished)
+
+    def time_frequency_computation_finished(self):
+        self.main_listener.plot_time_frequency_computation_finished()
+
+    """
+    Classification menu
+    """
+    def classify(self, pipeline_selected):
+        pool = QThreadPool.globalInstance()
+        self.classify_runnable = classifyRunnable(pipeline_selected)
+        pool.start(self.classify_runnable)
+        self.classify_runnable.signals.finished.connect(self.classify_computation_finished)
+
+    def classify_computation_finished(self):
+        self.main_listener.classify_computation_finished()
 
     """
     Getters
@@ -225,6 +279,9 @@ class mainModel:
     def get_file_data(self):
         return self.file_data
 
+    """
+    Runnable getters
+    """
     def get_source_estimation_data(self):
         return self.source_estimation_runnable.get_source_estimation_data()
 
@@ -233,6 +290,15 @@ class mainModel:
 
     def get_freqs(self):
         return self.power_spectral_density_runnable.get_freqs()
+
+    def get_tfr_channel_selected(self):
+        return self.time_frequency_runnable.get_channel_selected()
+
+    def get_power(self):
+        return self.time_frequency_runnable.get_power()
+
+    def get_itc(self):
+        return self.time_frequency_runnable.get_itc()
 
     """
     Setters

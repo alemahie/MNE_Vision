@@ -1,0 +1,119 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Multiple selector View
+"""
+
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea, QLabel, QCheckBox, QButtonGroup
+
+__author__ = "Lemahieu Antoine"
+__copyright__ = "Copyright 2021"
+__credits__ = ["Lemahieu Antoine"]
+__license__ = ""
+__version__ = "0.1"
+__maintainer__ = "Lemahieu Antoine"
+__email__ = "Antoine.Lemahieu@ulb.be"
+__status__ = "Dev"
+
+
+class multipleSelectorView(QWidget):
+    def __init__(self, all_elements_names, title, box_checked, unique_box):
+        super().__init__()
+        self.multiple_selector_listener = None
+
+        self.vertical_layout = QVBoxLayout()
+        self.setLayout(self.vertical_layout)
+
+        # Elements
+        self.elements_widget = QWidget()
+        self.elements_vbox_layout = QVBoxLayout()
+
+        self.elements_button = QButtonGroup()
+        if not unique_box:
+            self.create_select_unselect_buttons()
+        self.create_check_boxes(all_elements_names, box_checked, unique_box)
+        self.elements_widget.setLayout(self.elements_vbox_layout)
+
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setWidget(self.elements_widget)
+
+        # Cancel & Confirm buttons
+        self.cancel_confirm_widget = QWidget()
+        self.cancel_confirm_layout = QHBoxLayout()
+        self.cancel = QPushButton("&Cancel", self)
+        self.cancel.clicked.connect(self.cancel_trigger)
+        self.confirm = QPushButton("&Confirm", self)
+        self.confirm.clicked.connect(self.confirm_trigger)
+        self.cancel_confirm_layout.addWidget(self.cancel)
+        self.cancel_confirm_layout.addWidget(self.confirm)
+        self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
+
+        self.vertical_layout.addWidget(QLabel(title))
+        self.vertical_layout.addWidget(self.scroll_area)
+        self.vertical_layout.addWidget(self.cancel_confirm_widget)
+
+    def create_select_unselect_buttons(self):
+        self.select_unselect_widget = QWidget()
+        self.select_unselect_hbox_layout = QHBoxLayout()
+        self.select_all_elements = QPushButton("&Select All", self)
+        self.select_all_elements.clicked.connect(self.select_all_elements_trigger)
+        self.unselect_all_elements = QPushButton("&Unselect All", self)
+        self.unselect_all_elements.clicked.connect(self.unselect_all_elements_trigger)
+        self.select_unselect_hbox_layout.addWidget(self.select_all_elements)
+        self.select_unselect_hbox_layout.addWidget(self.unselect_all_elements)
+        self.select_unselect_widget.setLayout(self.select_unselect_hbox_layout)
+        self.elements_vbox_layout.addWidget(self.select_unselect_widget)
+
+    def create_check_boxes(self, all_elements_names, box_checked, unique_box):
+        unique_box_not_checked = True
+        if not unique_box:
+            self.elements_button.setExclusive(False)
+        for i, element in enumerate(all_elements_names):
+            check_box = QCheckBox()
+            check_box.setText(element)
+            if box_checked and not unique_box:
+                check_box.setChecked(box_checked)
+            elif unique_box_not_checked:
+                check_box.setChecked(True)
+                unique_box_not_checked = False
+            self.elements_vbox_layout.addWidget(check_box)
+            self.elements_button.addButton(check_box, i)
+
+    """
+    Triggers
+    """
+    def cancel_trigger(self):
+        self.multiple_selector_listener.cancel_button_clicked()
+
+    def confirm_trigger(self):
+        elements_selected = self.get_all_elements_selected()
+        self.multiple_selector_listener.confirm_button_clicked(elements_selected)
+
+    def select_all_elements_trigger(self):
+        for i in range(1, self.elements_vbox_layout.count()):
+            check_box = self.elements_vbox_layout.itemAt(i).widget()
+            check_box.setChecked(True)
+
+    def unselect_all_elements_trigger(self):
+        for i in range(1, self.elements_vbox_layout.count()):
+            check_box = self.elements_vbox_layout.itemAt(i).widget()
+            check_box.setChecked(False)
+
+    """
+    Setters
+    """
+    def set_listener(self, listener):
+        self.multiple_selector_listener = listener
+
+    """
+    Getters
+    """
+    def get_all_elements_selected(self):
+        all_elements = []
+        for i in range(1, self.elements_vbox_layout.count()):
+            check_box = self.elements_vbox_layout.itemAt(i).widget()
+            if check_box.isChecked():
+                all_elements.append(check_box.text())
+        return all_elements

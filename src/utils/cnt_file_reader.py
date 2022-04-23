@@ -44,7 +44,6 @@ def get_all_channels_names(cnt):
     channel_names = []
     channel_types = []
     for i in range(cnt.get_channel_count()):
-        #TODO : Check encoding error in libeep
         channel = cnt.get_channel_info(i)[0]
         channel_names.append(channel)
         if channel == 'EOGv' or channel == 'EOGh' or channel == 'Sync' or channel[:3] == 'BIP':
