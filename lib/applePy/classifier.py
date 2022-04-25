@@ -11,7 +11,7 @@ from copy import deepcopy
 
 from scipy.stats import randint
 
-from mne import Epochs
+from mne import Epochs, concatenate_epochs
 from mne.io import read_raw_eeglab, read_epochs_eeglab
 from mne.channels import make_standard_montage
 from mne.event import find_events
@@ -84,7 +84,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         self.labels_sources = None
         self.electrodes = None
         self.groups = None
-        self.nb_subj = None
+        self.nb_subj = 1
         self.nb_paradigms = None
         self.vertices = None
 
@@ -92,6 +92,9 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         self.test_labels = []
         self.test_groups = []
 
+    """
+    Pipelines
+    """
     def modify_add_pipeline(self, name, pipeline, parameters):
         """
         Modifies or adds a new pipeline to the catalogue. \n
@@ -166,6 +169,9 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         self.recalls = {key: [] for key in list(self.catalogue.keys())}
         self.roc_infos = {key: [] for key in list(self.catalogue.keys())}
 
+    """
+    File reading
+    """
     def read_one_file(self, file_path, file_name, destination, bads=None, picks=None, filtering=(1, 45), tmin=0,
                       tmax=0.5, ICA=False, resample=False, baseline=None, event_ids=None, reference=None):
         """
@@ -636,7 +642,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
                             np.concatenate(epoched_raw_eeg_dataset[subject_i + subject_j + 1][label]))
                         labels[subject_i + subject_j + 1][label] = np.asarray(
                             np.concatenate(labels[subject_i + subject_j + 1][label]))
-                        epoched_raw_eeg_sources[subject_i + subject_j + 1][label] = mne.concatenate_epochs(
+                        epoched_raw_eeg_sources[subject_i + subject_j + 1][label] = concatenate_epochs(
                             epoched_raw_eeg_sources[subject_i + subject_j + 1][label])
                     else:
                         epoched_raw_eeg_dataset[subject_i + subject_j + 1][label] = np.asarray(
@@ -760,17 +766,9 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
                                            filtering, tmin, tmax, ICA=ICA, resample=resample, baseline=baseline,
                                            event_ids=event_id, projection=projection)
 
-    def create_folder(self, k):
-        """
-        Creates the k-folds folder for the data. \n
-        Parameters \n
-        ---------- \n
-        k : int \n
-            number of folds \n
-        """
-        folder = KFold(k, shuffle=True, random_state=42)
-        return folder
-
+    """
+    Computation
+    """
     def estimate_sources(self, raw_dataset, info, tmin_noise, tmax_noise, trans=None, sourceSpaces=None,
                          bemSolution=None, mixedSourceSpaces=None, loose=1, snr=3, fixed=False):
         """
@@ -882,51 +880,6 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
             self.dataset[person_idx] = self.dataset[person_idx][:, selected_feats_idx, :]
         return self.dataset
 
-    def score_func_independent_feat_selection(self, estimator, x_test, y_test):
-        """
-        Scoing function for the independent feature selection. The previously trained pipeline is used to predict the test dataset. \n
-        At the end, the predicted data are compared to the correct answers, and the percentage of correctly classified data is considered the score. \n
-        Parameters \n
-        ---------- \n
-        estimator : the estimator that predicts and scores \n
-        x_test : the test dataset \n
-        y_test : the correct answers to the dataset \n
-        """
-        x_test = estimator.transform(x_test)
-        score = 0
-        pipeline = estimator.pipeline
-        predictions = pipeline.predict(x_test)
-        for i in range(y_test.shape[0]):
-            if predictions[i] == y_test[i]:
-                score += 1
-        score = score / y_test.shape[0]
-        return score
-
-    def score_func(self, estimator, x_test, y_test):
-        """
-        Scoing function for the independent feature selection. The previously trained pipeline is used to predict the test dataset.
-        At the end, the predicted data are compared to the correct answers, and the percentage of correctly classified data is considered the score. \n
-        Parameters \n
-        ---------- \n
-        estimator : the estimator that predicts and scores \n
-        x_test : the test dataset \n
-        y_test : the correct answers to the dataset \n
-        """
-        estimator_steps = estimator.named_steps.keys()
-        i = 0
-        for step in estimator_steps:
-            i += 1
-            if i == len(estimator_steps):
-                break
-            x_test = estimator.named_steps[step].transform(x_test)
-        score = 0
-        predictions = estimator.named_steps[step].predict(x_test)
-        for i in range(y_test.shape[0]):
-            if predictions[i] == y_test[i]:
-                score += 1
-        score = score / y_test.shape[0]
-        return score
-
     def tune_hyperparameters(self, cv, use_sources=False, use_groups=True, factor=None):
         """
         Tune the hyperparameters for the different pipelines and replace the pipelines by their improved versions. \n
@@ -1003,7 +956,6 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
                 random_searches[pipeline] = RandomizedSearchCV(self.catalogue[pipeline],
                                                                param_distributions=self.parameters[pipeline][1],
                                                                n_iter=self.parameters[pipeline][2], cv=cv, n_jobs=-1)
-
         for gs in grid_searches:
             if use_groups:
                 grid_searches[gs].fit(dataset, labels, groups=self.groups)
@@ -1090,6 +1042,9 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
             pipeline_counter += 1
         return round_predictions
 
+    """
+    Scores
+    """
     def final_score(self):
         """
         Final scoring function. For each pipeline, a score, confusion matrix, precision, recall, and ROC curve is created.
@@ -1098,55 +1053,59 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         pipelines = list(self.catalogue.keys())
         pipelines.sort()
         expected = self.expected_answers
-        if self.nb_subj != 1:
-            labels = np.concatenate(labels)
-        for pipeline_name in pipelines:
-            predictions_pipeline = self.predictions[pipeline_name]
-            score = 0
-            precision = 0
-            recall = 0
 
-            confusion_matrix = [[0 for _ in range(self.nb_paradigms)] for _ in range(self.nb_paradigms)]
-            for pred_idx in range(len(predictions_pipeline)):
-                confusion_matrix[expected[pred_idx]][predictions_pipeline[pred_idx]] += 1
-            corrects = np.sum([confusion_matrix[i][i] for i in range(self.nb_paradigms)])
-            score = corrects / np.sum(confusion_matrix)
+        try:
+            if self.nb_subj != 1:
+                labels = np.concatenate(labels)
+            for pipeline_name in pipelines:
+                predictions_pipeline = self.predictions[pipeline_name]
+                score = 0
+                precision = 0
+                recall = 0
+
+                confusion_matrix = [[0 for _ in range(self.nb_paradigms)] for _ in range(self.nb_paradigms)]
+                for pred_idx in range(len(predictions_pipeline)):
+                    confusion_matrix[expected[pred_idx]][predictions_pipeline[pred_idx]] += 1
+                corrects = np.sum([confusion_matrix[i][i] for i in range(self.nb_paradigms)])
+                score = corrects / np.sum(confusion_matrix)
+                if self.nb_paradigms == 2:
+                    if confusion_matrix[1][1] + confusion_matrix[0][1] != 0:
+                        precision = confusion_matrix[1][1] / (confusion_matrix[1][1] + confusion_matrix[0][1])
+                    else:
+                        precision = 0
+                    if confusion_matrix[1][1] + confusion_matrix[1][0] != 0:
+                        recall = confusion_matrix[1][1] / (confusion_matrix[1][1] + confusion_matrix[1][0])
+                    else:
+                        recall = 0
+
+                    self.precisions[pipeline_name] = precision
+                    self.recalls[pipeline_name] = recall
+
+                self.scores[pipeline_name] = score
+                self.confusion_matrices[pipeline_name] = confusion_matrix
+
+                if self.nb_paradigms == 2:
+                    # ROC curve
+                    preds_proba = self.predictions_proba[pipeline_name]
+                    positive_proba = []
+                    for j in range(len(preds_proba)):
+                        positive_proba.append(preds_proba[j][1])
+                    fpr, tpr, threshold = metrics.roc_curve(expected, positive_proba)
+                    roc_auc = metrics.auc(fpr, tpr)
+                    self.roc_infos[pipeline_name] = [fpr, tpr, roc_auc]
             if self.nb_paradigms == 2:
-                if confusion_matrix[1][1] + confusion_matrix[0][1] != 0:
-                    precision = confusion_matrix[1][1] / (confusion_matrix[1][1] + confusion_matrix[0][1])
-                else:
-                    precision = 0
-                if confusion_matrix[1][1] + confusion_matrix[1][0] != 0:
-                    recall = confusion_matrix[1][1] / (confusion_matrix[1][1] + confusion_matrix[1][0])
-                else:
-                    recall = 0
-
-                self.precisions[pipeline_name] = precision
-                self.recalls[pipeline_name] = recall
-
-            self.scores[pipeline_name] = score
-            self.confusion_matrices[pipeline_name] = confusion_matrix
-
+                auc_scores = deepcopy(self.roc_infos)
+                for pipeline in self.roc_infos:
+                    auc_scores[pipeline] = auc_scores[pipeline][2]
+            self.classifier_log.append(('pipelines : ', list(self.catalogue.keys())))
+            self.classifier_log.append(("scores", self.scores))
             if self.nb_paradigms == 2:
-                # ROC curve
-                preds_proba = self.predictions_proba[pipeline_name]
-                positive_proba = []
-                for j in range(len(preds_proba)):
-                    positive_proba.append(preds_proba[j][1])
-                fpr, tpr, threshold = metrics.roc_curve(expected, positive_proba)
-                roc_auc = metrics.auc(fpr, tpr)
-                self.roc_infos[pipeline_name] = [fpr, tpr, roc_auc]
-
-        if self.nb_paradigms == 2:
-            auc_scores = deepcopy(self.roc_infos)
-            for pipeline in self.roc_infos:
-                auc_scores[pipeline] = auc_scores[pipeline][2]
-        self.classifier_log.append(('pipelines : ', list(self.catalogue.keys())))
-        self.classifier_log.append(("scores", self.scores))
-        if self.nb_paradigms == 2:
-            self.classifier_log.append(("scores auc", auc_scores))
-            self.classifier_log.append(("recalls", self.recalls))
-            self.classifier_log.append(("precisions", self.precisions))
+                self.classifier_log.append(("scores auc", auc_scores))
+                self.classifier_log.append(("recalls", self.recalls))
+                self.classifier_log.append(("precisions", self.precisions))
+        except Exception as e:
+            print(e)
+            exit()
 
     def score(self, x, y):
         """
@@ -1184,6 +1143,73 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
             scores[pipeline] = scores[pipeline] / len(x[pipeline])
         return scores
 
+    def predict_test_dataset(self):
+        """
+        Predicts the left out test dataset, computes the score and shows the results.
+        """
+        self.restore()
+
+        self.dataset = self.test_dataset
+        self.labels = self.test_labels
+
+        dataset = np.concatenate(self.dataset)
+        labels = np.concatenate(self.labels)
+        self.expected_answers = labels
+
+        self.predict_proba(dataset)
+
+        self.final_score()
+        print(self.scores)
+        self.show_results(4)
+
+    def score_func_independent_feat_selection(self, estimator, x_test, y_test):
+        """
+        Scoing function for the independent feature selection. The previously trained pipeline is used to predict the test dataset. \n
+        At the end, the predicted data are compared to the correct answers, and the percentage of correctly classified data is considered the score. \n
+        Parameters \n
+        ---------- \n
+        estimator : the estimator that predicts and scores \n
+        x_test : the test dataset \n
+        y_test : the correct answers to the dataset \n
+        """
+        x_test = estimator.transform(x_test)
+        score = 0
+        pipeline = estimator.pipeline
+        predictions = pipeline.predict(x_test)
+        for i in range(y_test.shape[0]):
+            if predictions[i] == y_test[i]:
+                score += 1
+        score = score / y_test.shape[0]
+        return score
+
+    def score_func(self, estimator, x_test, y_test):
+        """
+        Scoing function for the independent feature selection. The previously trained pipeline is used to predict the test dataset.
+        At the end, the predicted data are compared to the correct answers, and the percentage of correctly classified data is considered the score. \n
+        Parameters \n
+        ---------- \n
+        estimator : the estimator that predicts and scores \n
+        x_test : the test dataset \n
+        y_test : the correct answers to the dataset \n
+        """
+        estimator_steps = estimator.named_steps.keys()
+        i = 0
+        for step in estimator_steps:
+            i += 1
+            if i == len(estimator_steps):
+                break
+            x_test = estimator.named_steps[step].transform(x_test)
+        score = 0
+        predictions = estimator.named_steps[step].predict(x_test)
+        for i in range(y_test.shape[0]):
+            if predictions[i] == y_test[i]:
+                score += 1
+        score = score / y_test.shape[0]
+        return score
+
+    """
+    Plot
+    """
     def plot_ROC(self, nb_lines, nb_columns):
         """
         Plots the ROC curves for all the pipelines from the catalogue. \n
@@ -1197,7 +1223,6 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         pipeline_counter = 0
         for pipeline_name in pipelines:
             fpr, tpr, auc = self.roc_infos[pipeline_name]
-
             plt.subplot(nb_lines, nb_columns, pipeline_counter + 1)
             # title = pipeline_name + " : " + str(self.scores[pipeline_name])
             plt.title(pipeline_name)
@@ -1226,13 +1251,13 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         pipeline_counter = 0
         for pipeline_name in pipelines:
             confusion_matrix = self.confusion_matrices[pipeline_name]
-            c1 = confusion_matrix[0][0] / (confusion_matrix[0][0] + confusion_matrix[0][1])
-            c2 = confusion_matrix[1][1] / (confusion_matrix[1][1] + confusion_matrix[1][0])
-            df_cm = pd.DataFrame([[c1, 1.0 - c1], [1.0 - c2, c2]], index=names,
-                                 columns=names)
+            plotted_confusion_matrix = [[] for _ in range(len(confusion_matrix))]
+            for i in range(len(confusion_matrix)):
+                for j in range(len(confusion_matrix)):
+                    plotted_confusion_matrix[i].append(confusion_matrix[i][j]/np.sum(confusion_matrix[i]))
             plt.subplot(nb_lines, nb_columns, pipeline_counter + 1)
             plt.title(pipeline_name)
-            sn.heatmap(df_cm, annot=True, cmap="YlGnBu", vmin=0, vmax=1)
+            sn.heatmap(plotted_confusion_matrix, annot=True, cmap="YlGnBu", vmin=0, vmax=1)
             pipeline_counter += 1
         plt.show()
 
@@ -1247,45 +1272,16 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         pipelines = list(self.catalogue.keys())
         pipelines.sort()
         nb_lines = math.ceil(len(pipelines) / nb_columns)
-        # ROC 
-        self.plot_ROC(nb_lines, nb_columns)
+        # ROC
+        if self.nb_paradigms == 2:
+            self.plot_ROC(nb_lines, nb_columns)
         # Confusion
         self.plot_confusion(nb_lines, nb_columns, names)
 
-    def count_subjects(self, directory):
-        """
-        Count the number of subjects in the dataset. \n
-        Parameters \n
-        ---------- \n
-        directory : the path to the dataset \n
-        """
-        subfolders = os.listdir(directory)
-        if subfolders[0] != "epoched":
-            folder = subfolders[0]
-        else:
-            folder = subfolders[1]
-        list_of_files = []
-        path = os.path.join(directory, folder)
-        for raw_eeg_file in os.listdir(path):
-            if (".set" in raw_eeg_file) or ("directory" in raw_eeg_file) or (".txt" in raw_eeg_file):
-                list_of_files.append(raw_eeg_file)
-        self.nb_subj = len(list_of_files)
-        return len(list_of_files)
-
-    def save_program_log(self, path):
-        """
-        Saves the program log in a file. \n
-        Parameters \n
-        ---------- \n
-        path : string; path to the place where the file will be saved. \n
-        """
-        path = os.path.join(path, "program_log.txt")
-        file = open(path, "w")
-        for element in self.classifier_log:
-            text = str(element[0]) + " : " + str(element[1]) + "\n"
-            file.write(text)
-
-    def classify(self, dataset, test_dataset_size=5, cv_value=5, independent_features_selection=False,
+    """
+    Classification
+    """
+    def classify(self, dataset, dataset_path=None, test_dataset_size=5, cv_value=5, independent_features_selection=False,
                  channels_to_select=20, use_groups=True, tune_hypers=False, names=[0, 1], classify_test=False):
         """
         Global classification method of the library. (inter-subjects)\n
@@ -1311,13 +1307,20 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         names : list; names of the categories \n
         classify_test : boolean; whether or not there should be a separate test dataset \n
         """
-        dataset_path = dataset
+        self.dataset = dataset
+        self.labels = []
 
-        #TODO read data set
+        labels_dic = {}
+        labels_idx = 0
+        for event in self.dataset.events:
+            new_label = event[2]
+            if new_label not in labels_dic:
+                labels_dic[new_label] = labels_idx
+                labels_idx += 1
+            self.labels.append(labels_dic[new_label])
 
-        # self.read_all_files(dataset, nb_subj, divided_dataset=divided_dataset, tmin=tmin, tmax=tmax,
-                            # pre_epoched=pre_epoched, bads=bads, picks=picks, filtering=filtering, ICA=ICA,
-                            # resample=resample, baseline=baseline, event_ids=event_ids, reference=reference)
+        self.labels = np.asarray(self.labels)
+        self.nb_paradigms = len(self.dataset.event_id)
 
         if classify_test and test_dataset_size != 0:
             limit_dataset = self.dataset.shape[0] // test_dataset_size
@@ -1344,10 +1347,11 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         else:
             groups = None
 
-        dataset = self.dataset[0]
-        labels = self.labels[0]
+        dataset = np.asarray(self.dataset)
+        labels = self.labels
 
         for train_index, test_index in cv.split(dataset, labels, groups=groups):
+
             x_train = dataset[train_index]
             y_train = labels[train_index]
 
@@ -1363,10 +1367,8 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
             self.expected_answers.extend(y_test)
 
         self.final_score()
-
         pipelines = list(self.catalogue.keys())
         pipelines.sort()
-        self.show_results(4, names)
         print(self.classifier_log)
 
         self.classifier_log.append(('Predictions', "see 'predictions.npy' in dataset folder"))
@@ -1561,26 +1563,49 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         print(cnn.evaluate(x_test, y_test))
         cnn.show_results()
 
-    def predict_test_dataset(self):
+    """
+    Others
+    """
+    def count_subjects(self, directory):
         """
-        Predicts the left out test dataset, computes the score and shows the results.
+        Count the number of subjects in the dataset. \n
+        Parameters \n
+        ---------- \n
+        directory : the path to the dataset \n
         """
-        self.restore()
+        subfolders = os.listdir(directory)
+        if subfolders[0] != "epoched":
+            folder = subfolders[0]
+        else:
+            folder = subfolders[1]
+        list_of_files = []
+        path = os.path.join(directory, folder)
+        for raw_eeg_file in os.listdir(path):
+            if (".set" in raw_eeg_file) or ("directory" in raw_eeg_file) or (".txt" in raw_eeg_file):
+                list_of_files.append(raw_eeg_file)
+        self.nb_subj = len(list_of_files)
+        return len(list_of_files)
 
-        self.dataset = self.test_dataset
-        self.labels = self.test_labels
+    def save_program_log(self, path):
+        """
+        Saves the program log in a file. \n
+        Parameters \n
+        ---------- \n
+        path : string; path to the place where the file will be saved. \n
+        """
+        path = os.path.join(path, "program_log.txt")
+        file = open(path, "w")
+        for element in self.classifier_log:
+            text = str(element[0]) + " : " + str(element[1]) + "\n"
+            file.write(text)
 
-        dataset = np.concatenate(self.dataset)
-        labels = np.concatenate(self.labels)
-        self.expected_answers = labels
-
-        self.predict_proba(dataset)
-
-        self.final_score()
-        print(self.scores)
-        self.show_results(4)
-
-
-if __name__ == "__main__":
-    if "-h" in sys.argv or "--help" in sys.argv:
-        help_module()
+    def create_folder(self, k):
+        """
+        Creates the k-folds folder for the data. \n
+        Parameters \n
+        ---------- \n
+        k : int \n
+            number of folds \n
+        """
+        folder = KFold(k, shuffle=True, random_state=42)
+        return folder

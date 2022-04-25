@@ -52,6 +52,12 @@ class classifyView(QWidget):
         self.vertical_layout.addWidget(self.cancel_confirm_widget)
 
     """
+    Plot
+    """
+    def plot_results(self, classifier):
+        classifier.show_results(4)
+
+    """
     Triggers
     """
     def cancel_channel_location_trigger(self):

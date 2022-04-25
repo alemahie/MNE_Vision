@@ -24,16 +24,20 @@ class classifyWorkerSignals(QObject):
 
 
 class classifyRunnable(QRunnable):
-    def __init__(self, pipeline_selected):
+    def __init__(self, pipeline_selected, file_data, directory_path):
         super().__init__()
         self.signals = classifyWorkerSignals()
 
         self.classifier = None
         self.pipeline_selected = pipeline_selected
+        self.file_data = file_data
+        self.directory_path = directory_path
 
     def run(self):
         self.classifier = ApplePyClassifier(used_pipelines=self.pipeline_selected)
-        dataset_path = "D:\\Cours\\Memoire\\MNE_Vision\\data\\set\\docking\\nichita_test"
-        self.classifier.classify(dataset_path, names=[0, 1], classify_test=False, tune_hypers=False, use_groups=False,
+        self.classifier.classify(self.file_data, dataset_path=self.directory_path, names=[0, 1], classify_test=False, tune_hypers=False, use_groups=False,
                                  cv_value=2)
         self.signals.finished.emit()
+
+    def get_classifier(self):
+        return self.classifier

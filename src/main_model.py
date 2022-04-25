@@ -17,6 +17,8 @@ from runnables.files_runnable import openCntFileRunnable, openSetFileRunnable
 from runnables.plots_runnable import powerSpectralDensityRunnable, timeFrequencyRunnable
 from runnables.classification_runnable import classifyRunnable
 
+from utils.file_path_search import get_directory_path_from_file_path
+
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2021"
 __credits__ = ["Lemahieu Antoine"]
@@ -199,7 +201,8 @@ class mainModel:
     """
     def classify(self, pipeline_selected):
         pool = QThreadPool.globalInstance()
-        self.classify_runnable = classifyRunnable(pipeline_selected)
+        self.classify_runnable = classifyRunnable(pipeline_selected, self.file_data,
+                                                  self.get_directory_path_from_file_path())
         pool.start(self.classify_runnable)
         self.classify_runnable.signals.finished.connect(self.classify_computation_finished)
 
@@ -221,6 +224,9 @@ class mainModel:
 
     def get_file_path_name_without_extension(self):
         return splitext(self.file_path_name)[0]
+
+    def get_directory_path_from_file_path(self):
+        return get_directory_path_from_file_path(self.file_path_name)
 
     def get_file_type(self):
         return self.file_type
@@ -299,6 +305,9 @@ class mainModel:
 
     def get_itc(self):
         return self.time_frequency_runnable.get_itc()
+
+    def get_classifier(self):
+        return self.classify_runnable.get_classifier()
 
     """
     Setters

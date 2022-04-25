@@ -356,7 +356,8 @@ class mainController(mainListener):
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     def classify_finished(self):
-        print("Ouai c'est fini quoi")
+        classifier = self.main_model.get_classifier()
+        self.classify_controller.plot_results(classifier)
 
     """
     Others

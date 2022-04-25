@@ -33,6 +33,9 @@ class classifyController(classifyListener):
         self.classify_view.close()
         self.main_listener.classify_information(pipeline_selected)
 
+    def plot_results(self, classifier):
+        self.classify_view.plot_results(classifier)
+
     """
     Getters
     """

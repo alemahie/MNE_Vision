@@ -24,3 +24,8 @@ def get_project_root_path():
 
 def get_project_freesurfer_path():
     return get_project_root_path() + "/data/freesurfer/subjects/"
+
+
+def get_directory_path_from_file_path(file_path):
+    path = Path(file_path).parent
+    return str(path)
