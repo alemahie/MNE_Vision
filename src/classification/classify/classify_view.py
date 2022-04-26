@@ -5,7 +5,8 @@
 Classify view
 """
 
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QGridLayout, QCheckBox, \
+    QDoubleSpinBox
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
 
@@ -30,13 +31,27 @@ class classifyView(QWidget):
         self.vertical_layout = QVBoxLayout()
         self.setLayout(self.vertical_layout)
 
-        self.pipeline_selection_widget = QWidget()
-        self.pipeline_selection_layout = QHBoxLayout()
+        self.grid_widget = QWidget()
+        self.grid_layout = QGridLayout()
+
         self.pipeline_selection_button = QPushButton("&Pipelines ...", self)
         self.pipeline_selection_button.clicked.connect(self.pipeline_selection_trigger)
-        self.pipeline_selection_layout.addWidget(QLabel("Pipelines : "))
-        self.pipeline_selection_layout.addWidget(self.pipeline_selection_button)
-        self.pipeline_selection_widget.setLayout(self.pipeline_selection_layout)
+        self.feature_selection = QCheckBox()
+        self.hyper_tuning = QCheckBox()
+        self.cross_validation_number = QDoubleSpinBox()
+        self.cross_validation_number.setValue(5)
+        self.cross_validation_number.setMinimum(1)
+        self.cross_validation_number.setDecimals(0)
+
+        self.grid_layout.addWidget(QLabel("Feature selection : "), 0, 0)
+        self.grid_layout.addWidget(self.pipeline_selection_button, 0, 1)
+        self.grid_layout.addWidget(QLabel("Feature selection : "), 1, 0)
+        self.grid_layout.addWidget(self.feature_selection, 1, 1)
+        self.grid_layout.addWidget(QLabel("Hyper-parameters tuning : "), 2, 0)
+        self.grid_layout.addWidget(self.hyper_tuning, 2, 1)
+        self.grid_layout.addWidget(QLabel("Cross-validation k-fold : "), 3, 0)
+        self.grid_layout.addWidget(self.cross_validation_number, 3, 1)
+        self.grid_widget.setLayout(self.grid_layout)
 
         self.cancel_confirm_widget = QWidget()
         self.cancel_confirm_layout = QHBoxLayout()
@@ -48,7 +63,7 @@ class classifyView(QWidget):
         self.cancel_confirm_layout.addWidget(self.confirm)
         self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
 
-        self.vertical_layout.addWidget(self.pipeline_selection_widget)
+        self.vertical_layout.addWidget(self.grid_widget)
         self.vertical_layout.addWidget(self.cancel_confirm_widget)
 
     """
@@ -64,7 +79,11 @@ class classifyView(QWidget):
         self.classify_listener.cancel_button_clicked()
 
     def confirm_channel_location_trigger(self):
-        self.classify_listener.confirm_button_clicked(self.pipeline_selected)
+        feature_selection = self.feature_selection.isChecked()
+        hyper_tuning = self.hyper_tuning.isChecked()
+        cross_val_number = int(self.cross_validation_number.value())
+        self.classify_listener.confirm_button_clicked(self.pipeline_selected, feature_selection, hyper_tuning,
+                                                      cross_val_number)
 
     def pipeline_selection_trigger(self):
         title = "Select the pipelines used for the classification :"

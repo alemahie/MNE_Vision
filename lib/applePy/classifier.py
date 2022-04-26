@@ -5,7 +5,6 @@ import math
 import numpy as np
 import seaborn as sn
 import matplotlib.pyplot as plt
-import pandas as pd
 
 from copy import deepcopy
 
@@ -31,21 +30,6 @@ from lib.applePy.cnn import CNN
 CONST_MAX_1by1_ELECTRODES = 30
 CONST_MAX_5by5_ELECTRODES = 50
 CONST_DEFAULT_RANDOMIZEDSEARCH_NBITER = 10
-
-
-def help_module():
-    help(ApplePyClassifier)
-    print("Example of execution : ")
-    print("classifier.classify('..\\preprocessed dataset', nb_subj=None,  divided_dataset=True, pre_epoched=True, "
-          "tmin=0, tmax=0.5, bads=None, picks=None, filtering=[1, 45], baseline=None, cv_value=None, "
-          "independent_features_selection=False, tune_hypers=False, names=['Tunnel', 'Checkerboard'], "
-          "classify_test=False)")
-    classifier = ApplePyClassifier()
-    classifier.classify("..\\preprocessed dataset", nb_subj=None, divided_dataset=True, pre_epoched=True, tmin=0,
-                        tmax=0.5, bads=None, picks=None, filtering=[1, 45], baseline=None, cv_value=None,
-                        independent_features_selection=False, tune_hypers=False, names=["Tunnel", "Checkerboard"],
-                        classify_test=False)
-    sys.exit("Help menu over")
 
 
 class ApplePyClassifier(BaseEstimator, TransformerMixin):
@@ -87,6 +71,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         self.nb_subj = 1
         self.nb_paradigms = None
         self.vertices = None
+        self.event_names = None
 
         self.test_dataset = []
         self.test_labels = []
@@ -913,7 +898,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         cv = self.create_folder(cv)
 
         nb_subjects = self.nb_subj
-        nb_channels = dataset[0].shape[1]
+        nb_channels = len(self.electrodes)
 
         if nb_subjects == 1:
             dataset = dataset[0]
@@ -1237,7 +1222,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
             pipeline_counter += 1
         plt.show()
 
-    def plot_confusion(self, nb_lines, nb_columns, names=[0, 1]):
+    def plot_confusion(self, nb_lines, nb_columns, names):
         """
         Plots the confusion matrices for all the pipelines from the catalogue. \n
         Parameters \n
@@ -1257,11 +1242,12 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
                     plotted_confusion_matrix[i].append(confusion_matrix[i][j]/np.sum(confusion_matrix[i]))
             plt.subplot(nb_lines, nb_columns, pipeline_counter + 1)
             plt.title(pipeline_name)
-            sn.heatmap(plotted_confusion_matrix, annot=True, cmap="YlGnBu", vmin=0, vmax=1)
+            sn.heatmap(plotted_confusion_matrix, annot=True, cmap="YlGnBu", vmin=0, vmax=1, xticklabels=names,
+                       yticklabels=names)
             pipeline_counter += 1
         plt.show()
 
-    def show_results(self, nb_columns, names=[0, 1]):
+    def show_results(self, nb_columns):
         """
         Shows the ROC curves and the confusion matrices for all the pipelines. \n
         Parameters \n
@@ -1276,13 +1262,13 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         if self.nb_paradigms == 2:
             self.plot_ROC(nb_lines, nb_columns)
         # Confusion
-        self.plot_confusion(nb_lines, nb_columns, names)
+        self.plot_confusion(nb_lines, nb_columns, self.event_names)
 
     """
     Classification
     """
     def classify(self, dataset, dataset_path=None, test_dataset_size=5, cv_value=5, independent_features_selection=False,
-                 channels_to_select=20, use_groups=True, tune_hypers=False, names=[0, 1], classify_test=False):
+                 channels_to_select=20, use_groups=True, tune_hypers=False, classify_test=False):
         """
         Global classification method of the library. (inter-subjects)\n
         Reads the dataset, can apply independent features selection, can tune hyperparameters, fits, predicts, scores, and shows results.\n
@@ -1309,15 +1295,20 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         """
         self.dataset = dataset
         self.labels = []
+        self.event_names = []
+        self.electrodes = dataset.info["ch_names"]
 
         labels_dic = {}
         labels_idx = 0
         for event in self.dataset.events:
-            new_label = event[2]
-            if new_label not in labels_dic:
-                labels_dic[new_label] = labels_idx
+            event_label = event[2]
+            if event_label not in labels_dic:
+                labels_dic[event_label] = labels_idx
+                for key in dataset.event_id.keys():
+                    if dataset.event_id[key] == event_label:
+                        self.event_names.append(key)
                 labels_idx += 1
-            self.labels.append(labels_dic[new_label])
+            self.labels.append(labels_dic[event_label])
 
         self.labels = np.asarray(self.labels)
         self.nb_paradigms = len(self.dataset.event_id)
@@ -1338,10 +1329,17 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
             cv = KFold(cv_value, shuffle=True, random_state=42)
 
         if independent_features_selection:
-            self.independent_features_selection(False, cv=cv_value, channels_to_select=channels_to_select,
-                                                use_groups=use_groups)
+            try:
+                print("inde")
+                self.independent_features_selection(False, channels_to_select=channels_to_select, use_groups=use_groups)
+            except Exception as e:
+                print(e)
         if tune_hypers:
-            self.tune_hyperparameters(cv_value, use_sources=False, use_groups=use_groups)
+            try:
+                print("tune")
+                self.tune_hyperparameters(cv_value, use_sources=False, use_groups=use_groups)
+            except Exception as e:
+                print(e)
         if use_groups:
             groups = self.groups
         else:

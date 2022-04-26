@@ -24,19 +24,23 @@ class classifyWorkerSignals(QObject):
 
 
 class classifyRunnable(QRunnable):
-    def __init__(self, pipeline_selected, file_data, directory_path):
+    def __init__(self, file_data, directory_path, pipeline_selected, feature_selection, hyper_tuning, cross_val_number):
         super().__init__()
         self.signals = classifyWorkerSignals()
 
         self.classifier = None
-        self.pipeline_selected = pipeline_selected
         self.file_data = file_data
         self.directory_path = directory_path
+        self.pipeline_selected = pipeline_selected
+        self.feature_selection = feature_selection
+        self.hyper_tuning = hyper_tuning
+        self.cross_val_number = cross_val_number
 
     def run(self):
         self.classifier = ApplePyClassifier(used_pipelines=self.pipeline_selected)
-        self.classifier.classify(self.file_data, dataset_path=self.directory_path, names=[0, 1], classify_test=False, tune_hypers=False, use_groups=False,
-                                 cv_value=2)
+        self.classifier.classify(self.file_data, dataset_path=self.directory_path, classify_test=False,
+                                 independent_features_selection=self.feature_selection, tune_hypers=self.hyper_tuning,
+                                 use_groups=False, cv_value=self.cross_val_number)
         self.signals.finished.emit()
 
     def get_classifier(self):

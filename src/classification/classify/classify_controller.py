@@ -29,9 +29,9 @@ class classifyController(classifyListener):
     def cancel_button_clicked(self):
         self.classify_view.close()
 
-    def confirm_button_clicked(self, pipeline_selected):
+    def confirm_button_clicked(self, pipeline_selected, feature_selection, hyper_tuning, cross_val_number):
         self.classify_view.close()
-        self.main_listener.classify_information(pipeline_selected)
+        self.main_listener.classify_information(pipeline_selected, feature_selection, hyper_tuning, cross_val_number)
 
     def plot_results(self, classifier):
         self.classify_view.plot_results(classifier)

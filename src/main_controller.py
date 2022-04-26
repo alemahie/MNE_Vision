@@ -344,12 +344,12 @@ class mainController(mainListener):
         self.classify_controller = classifyController()
         self.classify_controller.set_listener(self)
 
-    def classify_information(self, pipeline_selected):
+    def classify_information(self, pipeline_selected, feature_selection, hyper_tuning, cross_val_number):
         processing_title = "Classification running, please wait."
         finish_method = "classify"
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.classify(pipeline_selected)
+        self.main_model.classify(pipeline_selected, feature_selection, hyper_tuning, cross_val_number)
 
     def classify_computation_finished(self):
         processing_title_finished = "Classification finished."

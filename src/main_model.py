@@ -199,10 +199,11 @@ class mainModel:
     """
     Classification menu
     """
-    def classify(self, pipeline_selected):
+    def classify(self, pipeline_selected, feature_selection, hyper_tuning, cross_val_number):
         pool = QThreadPool.globalInstance()
-        self.classify_runnable = classifyRunnable(pipeline_selected, self.file_data,
-                                                  self.get_directory_path_from_file_path())
+        self.classify_runnable = classifyRunnable(self.file_data, self.get_directory_path_from_file_path(),
+                                                  pipeline_selected, feature_selection, hyper_tuning,
+                                                  cross_val_number)
         pool.start(self.classify_runnable)
         self.classify_runnable.signals.finished.connect(self.classify_computation_finished)
 

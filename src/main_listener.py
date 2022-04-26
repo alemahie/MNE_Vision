@@ -216,7 +216,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def classify_information(self, pipeline_selected):
+    def classify_information(self, pipeline_selected, feature_selection, hyper_tuning, cross_val_number):
         pass
 
     @abstractmethod

@@ -23,5 +23,5 @@ class classifyListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, pipeline_selected):
+    def confirm_button_clicked(self, pipeline_selected, feature_selection, hyper_tuning, cross_val_number):
         pass
