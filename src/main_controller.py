@@ -16,6 +16,7 @@ from main_listener import mainListener
 from menubar.menubar_controller import menubarController
 
 from edit.dataset_info.dataset_info_controller import datasetInfoController
+from edit.event_values.event_values_controller import eventValuesController
 from edit.channel_location.channel_location_controller import channelLocationController
 
 from tools.filter.filter_controller import filterController
@@ -34,10 +35,9 @@ from utils.stylesheet import get_stylesheet
 from utils.waiting_while_processing.waiting_while_processing_controller import waitingWhileProcessingController
 
 __author__ = "Lemahieu Antoine"
-__copyright__ = "Copyright 2021"
+__copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
-__license__ = ""
-__version__ = "0.1"
+__license__ = "GNU General Public License v3.0"
 __maintainer__ = "Lemahieu Antoine"
 __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
@@ -61,6 +61,7 @@ class mainController(mainListener):
         self.main_view.setMenuBar(self.menubar_view)
 
         self.dataset_info_controller = None
+        self.event_values_controller = None
         self.channel_location_controller = None
 
         self.filter_controller = None
@@ -153,7 +154,10 @@ class mainController(mainListener):
         self.dataset_info_controller.set_listener(self)
 
     def event_values_clicked(self):
-        pass
+        event_values = self.main_model.get_event_values()
+        event_ids = self.main_model.get_event_ids()
+        self.event_values_controller = eventValuesController(event_values, event_ids)
+        self.event_values_controller.set_listener(self)
 
     def channel_location_clicked(self):
         channel_location = self.main_model.get_channels_locations()

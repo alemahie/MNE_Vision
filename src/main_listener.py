@@ -8,10 +8,9 @@ Main listener
 from abc import ABC, abstractmethod
 
 __author__ = "Lemahieu Antoine"
-__copyright__ = "Copyright 2021"
+__copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
-__license__ = ""
-__version__ = "0.1"
+__license__ = "GNU General Public License v3.0"
 __maintainer__ = "Lemahieu Antoine"
 __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
@@ -28,7 +27,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def open_fif_file_finished(self):
+    def open_cnt_file_finished(self):
         pass
 
     @abstractmethod

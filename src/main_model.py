@@ -18,10 +18,9 @@ from runnables.classification_runnable import classifyRunnable
 from utils.file_path_search import get_directory_path_from_file_path
 
 __author__ = "Lemahieu Antoine"
-__copyright__ = "Copyright 2021"
+__copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
-__license__ = ""
-__version__ = "0.1"
+__license__ = "GNU General Public License v3.0"
 __maintainer__ = "Lemahieu Antoine"
 __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
@@ -242,9 +241,15 @@ class mainModel:
 
     def get_number_of_events(self):
         if self.file_type == "Raw":
-            print("Raw")
+            return None
         else:
-            print("Epochs")
+            return len(self.file_data.events)
+
+    def get_event_values(self):
+        return self.file_data.events
+
+    def get_event_ids(self):
+        return self.file_data.event_id
 
     def get_number_of_epochs(self):
         if self.file_type == "Raw":

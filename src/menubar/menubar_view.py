@@ -95,7 +95,6 @@ class menubarView(QMenuBar):
         self.edit_menu.addAction(dataset_info_action)
         event_values_action = QAction("&Event values", self)
         event_values_action.triggered.connect(self.event_values_trigger)
-        event_values_action.setEnabled(False)
         self.edit_menu.addAction(event_values_action)
         channel_location_action = QAction("&Channel location", self)
         channel_location_action.triggered.connect(self.channel_location_trigger)
