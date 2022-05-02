@@ -7,6 +7,8 @@ Event Values Controller
 
 import numpy as np
 
+from copy import copy
+
 from edit.event_values.event_values_listener import eventValuesListener
 from edit.event_values.event_values_view import eventValuesView
 
@@ -29,8 +31,9 @@ class eventValuesController(eventValuesListener):
 
         self.event_values_view.show()
 
-        self.event_values = event_values
-        self.event_ids = event_ids
+        self.event_values = np.copy(event_values)
+        self.event_ids = copy(event_ids)
+
         self.number_of_epochs = number_of_epochs
         self.current_event_number = 0
         self.update_event_displayed()
@@ -39,7 +42,7 @@ class eventValuesController(eventValuesListener):
         self.event_values_view.close()
 
     def confirm_button_clicked(self, event_name, latency):
-        if len(self.event_values) != self.number_of_epochs:
+        if len(self.event_values) == self.number_of_epochs:
             self.update_event_data(event_name, latency)
             self.main_listener.event_values_finished(self.event_values, self.event_ids)
             self.event_values_view.close()

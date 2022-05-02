@@ -5,7 +5,10 @@
 Main model
 """
 
+import numpy as np
+
 from os.path import getsize, splitext
+from copy import copy
 
 from PyQt6.QtCore import QThreadPool
 
@@ -324,7 +327,7 @@ class mainModel:
         self.main_listener = listener
 
     def set_event_values(self, event_values):
-        self.file_data.events = event_values
+        self.file_data.events = np.copy(event_values)
 
     def set_event_ids(self, event_ids):
-        self.file_data.event_id = event_ids
+        self.file_data.event_id = copy(event_ids)
