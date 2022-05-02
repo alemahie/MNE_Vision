@@ -18,7 +18,7 @@ from mne.event import find_events
 from sklearn import metrics
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.model_selection import KFold, LeaveOneOut, LeaveOneGroupOut, GroupKFold
+from sklearn.model_selection import KFold, LeaveOneOut, GroupKFold
 
 from pyriemann.estimation import Covariances
 
@@ -788,8 +788,11 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         dataset : the dataset on which to estimate the covariance matrices. \n
         """
         covariance_matrices = []
-        for subject in dataset:
-            covariance_matrices.append(Covariances("oas").transform(subject))
+        if self.nb_subj == 1:
+            covariance_matrices.append(Covariances("oas").transform(dataset))
+        else:
+            for subject in dataset:
+                covariance_matrices.append(Covariances("oas").transform(subject))
         return np.asarray(covariance_matrices)
 
     def independent_features_selection(self, use_sources=False, channels_to_select=None, use_groups=True):
@@ -810,7 +813,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
             dataset = self.dataset_sources
             feats = self.vertices
 
-        dataset_cov = self.estimate_covariance_matrices(dataset)
+        dataset_cov = self.estimate_covariance_matrices(dataset.get_data())
         labels = self.labels
 
         nb_subjects = dataset_cov.shape[0]
@@ -818,7 +821,6 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
 
         if nb_subjects == 1:
             dataset_cov = dataset_cov[0]
-            labels = labels[0]
         else:
             dataset_cov = np.concatenate(dataset_cov)
             labels = np.concatenate(labels)
@@ -834,6 +836,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
             tries = [i for i in range(1, nb_channels + 1, 10)]
             if nb_channels % 10 != 0:
                 tries.append(nb_channels)
+
         if channels_to_select is None:
             es = GridSearchCV(ElectrodeSelection(), param_grid={"nelec": tries}, cv=cv,
                               scoring=self.score_func_independent_feat_selection, n_jobs=-1)
@@ -853,6 +856,8 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         else:
             print("You have chosen to select the best ", channels_to_select, " channels.")
             es = ElectrodeSelection(nelec=channels_to_select)
+            print(dataset_cov.shape)
+            print(labels.shape)
             es.fit(dataset_cov, labels)
             selected_feats_idx = es.subelec_
             selected_feats = [feats[i] for i in selected_feats_idx]
