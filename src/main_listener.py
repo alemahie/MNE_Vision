@@ -24,6 +24,14 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def open_fif_file_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def open_fif_file_finished(self):
+        pass
+
+    @abstractmethod
     def open_cnt_file_clicked(self, path_to_file):
         pass
 

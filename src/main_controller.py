@@ -81,24 +81,31 @@ class mainController(mainListener):
 
         sys.exit(self.app.exec())
 
-    def display_all_info(self):
-        all_info = self.main_model.get_all_displayed_info()
-        self.main_view.display_info(all_info)
-        self.menubar_controller.enable_menu_when_file_loaded()
-
     """
     File menu
     """
     def open_fif_file_clicked(self, path_to_file):
-        self.main_model.open_fif_file(path_to_file)
+        if path_to_file != '':
+            processing_title = "FIF file reading running, please wait."
+            finish_method = "open_fif_file"
+            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+            self.waiting_while_processing_controller.set_listener(self)
+            self.main_model.open_fif_file(path_to_file)
+
+    def open_fif_file_computation_finished(self):
+        processing_title_finished = "FIF file reading finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def open_fif_file_finished(self):
         self.display_all_info()
 
     def open_cnt_file_clicked(self, path_to_file):
-        processing_title = "CNT file reading running, please wait."
-        finish_method = "open_cnt_file"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
-        self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.open_cnt_file(path_to_file)
+        if path_to_file != '':
+            processing_title = "CNT file reading running, please wait."
+            finish_method = "open_cnt_file"
+            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+            self.waiting_while_processing_controller.set_listener(self)
+            self.main_model.open_cnt_file(path_to_file)
 
     def open_cnt_file_computation_finished(self):
         processing_title_finished = "CNT file reading finished."
@@ -108,11 +115,12 @@ class mainController(mainListener):
         self.display_all_info()
 
     def open_set_file_clicked(self, path_to_file):
-        processing_title = "SET file reading running, please wait."
-        finish_method = "open_set_file"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
-        self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.open_set_file(path_to_file)
+        if path_to_file != '':
+            processing_title = "SET file reading running, please wait."
+            finish_method = "open_set_file"
+            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+            self.waiting_while_processing_controller.set_listener(self)
+            self.main_model.open_set_file(path_to_file)
 
     def open_set_file_computation_finished(self):
         processing_title_finished = "SET file reading finished."
@@ -362,8 +370,15 @@ class mainController(mainListener):
     """
     Others
     """
+    def display_all_info(self):
+        all_info = self.main_model.get_all_displayed_info()
+        self.main_view.display_info(all_info)
+        self.menubar_controller.enable_menu_when_file_loaded()
+
     def waiting_while_processing_finished(self, finish_method):
-        if finish_method == "open_cnt_file":
+        if finish_method == "open_fif_file":
+            self.open_cnt_file_finished()
+        elif finish_method == "open_cnt_file":
             self.open_cnt_file_finished()
         elif finish_method == "open_set_file":
             self.open_set_file_finished()

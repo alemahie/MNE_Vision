@@ -8,12 +8,10 @@ Main model
 from os.path import getsize, splitext
 
 from PyQt6.QtCore import QThreadPool
-from mne import read_epochs
-from mne.io import read_raw_fif
 
 from runnables.tools_runnable import filterRunnable, icaRunnable, sourceEstimationRunnable, resamplingRunnable, \
     reReferencingRunnable
-from runnables.files_runnable import openCntFileRunnable, openSetFileRunnable
+from runnables.files_runnable import openCntFileRunnable, openSetFileRunnable, openFifFileRunnable
 from runnables.plots_runnable import powerSpectralDensityRunnable, timeFrequencyRunnable
 from runnables.classification_runnable import classifyRunnable
 
@@ -40,6 +38,7 @@ class mainModel:
         self.ica_decomposition = "No"
         self.references = "Unknown"
 
+        self.open_fif_file_runnable = None
         self.open_cnt_file_runnable = None
         self.open_set_file_runnable = None
 
@@ -69,25 +68,28 @@ class mainModel:
     File menu
     """
     def open_fif_file(self, path_to_file):
-        if path_to_file[-7:-4] == "raw":
-            self.file_type = "Raw"
-            self.file_data = read_raw_fif(path_to_file, preload=True)
-        else:
-            self.file_type = "Epochs"
-            self.file_data = read_epochs(path_to_file, preload=True)
-        self.file_path_name = path_to_file
+        pool = QThreadPool.globalInstance()
+        self.open_fif_file_runnable = openFifFileRunnable(path_to_file)
+        pool.start(self.open_fif_file_runnable)
+        self.open_fif_file_runnable.signals.finished.connect(self.open_fif_file_computation_finished)
+
+    def open_fif_file_computation_finished(self):
+        self.file_data = self.open_fif_file_runnable.get_file_data()
+        self.file_type = self.open_fif_file_runnable.get_file_type()
+        self.file_path_name = self.open_fif_file_runnable.get_path_to_file()
         self.create_channels_locations()
+        self.main_listener.open_fif_file_computation_finished()
 
     def open_cnt_file(self, path_to_file):
         pool = QThreadPool.globalInstance()
         self.open_cnt_file_runnable = openCntFileRunnable(path_to_file)
         pool.start(self.open_cnt_file_runnable)
         self.open_cnt_file_runnable.signals.finished.connect(self.open_cnt_file_computation_finished)
-        self.file_type = "Raw"
-        self.file_path_name = path_to_file
 
     def open_cnt_file_computation_finished(self):
         self.file_data = self.open_cnt_file_runnable.get_file_data()
+        self.file_type = self.open_cnt_file_runnable.get_file_type()
+        self.file_path_name = self.open_cnt_file_runnable.get_path_to_file()
         self.create_channels_locations()
         self.main_listener.open_cnt_file_computation_finished()
 
@@ -96,11 +98,11 @@ class mainModel:
         self.open_set_file_runnable = openSetFileRunnable(path_to_file)
         pool.start(self.open_set_file_runnable)
         self.open_set_file_runnable.signals.finished.connect(self.open_set_file_computation_finished)
-        self.file_path_name = path_to_file
 
     def open_set_file_computation_finished(self):
         self.file_data = self.open_set_file_runnable.get_file_data()
         self.file_type = self.open_set_file_runnable.get_file_type()
+        self.file_path_name = self.open_set_file_runnable.get_file_path_name()
         self.create_channels_locations()
         self.main_listener.open_set_file_computation_finished()
 
