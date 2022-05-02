@@ -228,8 +228,10 @@ class mainController(mainListener):
 
     def resampling_finished(self):
         frequency = self.main_model.get_sampling_frequency()
+        number_of_frames = self.main_model.get_number_of_frames()
         dataset_size = self.main_model.get_dataset_size()
         self.main_view.update_sampling_frequency(frequency)
+        self.main_view.update_number_of_frames(number_of_frames)
         self.main_view.update_dataset_size(dataset_size)
 
     # Re-referencing

@@ -92,6 +92,10 @@ class mainView(QMainWindow):
         label_item = self.grid_layout.itemAtPosition(4, 1).widget()
         label_item.setText(str(number_of_events))
 
+    def update_number_of_frames(self, number_of_frames):
+        label_item = self.grid_layout.itemAtPosition(8, 1).widget()
+        label_item.setText(str(number_of_frames))
+
     def update_reference(self, references):
         label_item = self.grid_layout.itemAtPosition(9, 1).widget()
         label_item.setText(str(references))
