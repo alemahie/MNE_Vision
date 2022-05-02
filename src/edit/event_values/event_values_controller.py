@@ -12,7 +12,7 @@ from copy import copy
 from edit.event_values.event_values_listener import eventValuesListener
 from edit.event_values.event_values_view import eventValuesView
 
-from utils.error_window.error_window_view import errorWindowView
+from utils.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -49,7 +49,7 @@ class eventValuesController(eventValuesListener):
         else:
             error_message = f"You must have a number of events that is equal to the number of epochs (1 event per " \
                             f"epoch).\n There are {self.number_of_epochs} in your dataset"
-            error_window_view = errorWindowView(error_message)
+            error_window_view = errorWindow(error_message)
             error_window_view.show()
 
     def previous_button_clicked(self, event_name, latency):
@@ -78,7 +78,7 @@ class eventValuesController(eventValuesListener):
             self.update_event_displayed()
         else:
             error_message = "You can not delete all the events."
-            error_window_view = errorWindowView(error_message)
+            error_window_view = errorWindow(error_message)
             error_window_view.show()
 
     def insert_button_clicked(self):

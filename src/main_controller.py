@@ -33,7 +33,7 @@ from classification.classify.classify_controller import classifyController
 
 from utils.stylesheet import get_stylesheet
 from utils.waiting_while_processing.waiting_while_processing_controller import waitingWhileProcessingController
-from utils.error_window.error_window_view import errorWindowView
+from utils.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -164,7 +164,7 @@ class mainController(mainListener):
             self.event_values_controller.set_listener(self)
         else:
             error_message = "You must be working with an epoched file to edit the events."
-            error_window_view = errorWindowView(error_message)
+            error_window_view = errorWindow(error_message)
             error_window_view.show()
 
     def event_values_finished(self, event_values, event_ids):

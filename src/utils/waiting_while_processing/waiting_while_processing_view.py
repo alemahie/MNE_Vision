@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
 from utils.progress_bar import ProgressBar
 
 __author__ = "Lemahieu Antoine"
-__copyright__ = "Copyright 2021"
+__copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
 __license__ = "GNU General Public License v3.0"
 __maintainer__ = "Lemahieu Antoine"
