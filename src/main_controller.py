@@ -33,6 +33,7 @@ from classification.classify.classify_controller import classifyController
 
 from utils.stylesheet import get_stylesheet
 from utils.waiting_while_processing.waiting_while_processing_controller import waitingWhileProcessingController
+from utils.error_window.error_window_view import errorWindowView
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -154,10 +155,23 @@ class mainController(mainListener):
         self.dataset_info_controller.set_listener(self)
 
     def event_values_clicked(self):
-        event_values = self.main_model.get_event_values()
-        event_ids = self.main_model.get_event_ids()
-        self.event_values_controller = eventValuesController(event_values, event_ids)
-        self.event_values_controller.set_listener(self)
+        file_type = self.main_model.get_file_type()
+        if file_type == "Epochs":
+            event_values = self.main_model.get_event_values()
+            event_ids = self.main_model.get_event_ids()
+            number_of_epochs = self.main_model.get_number_of_epochs()
+            self.event_values_controller = eventValuesController(event_values, event_ids, number_of_epochs)
+            self.event_values_controller.set_listener(self)
+        else:
+            error_message = "You must be working with an epoched file to edit the events."
+            error_window_view = errorWindowView(error_message)
+            error_window_view.show()
+
+    def event_values_finished(self, event_values, event_ids):
+        self.main_model.set_event_values(event_values)
+        self.main_model.set_event_ids(event_ids)
+        number_of_events = self.main_model.get_number_of_events()
+        self.main_view.update_number_of_events(number_of_events)
 
     def channel_location_clicked(self):
         channel_location = self.main_model.get_channels_locations()
@@ -294,7 +308,12 @@ class mainController(mainListener):
     def plot_data_clicked(self):
         file_data = self.main_model.get_file_data()
         file_type = self.main_model.get_file_type()
-        self.main_view.plot_data(file_data, file_type)
+        if file_type == "Raw":
+            self.main_view.plot_data(file_data, file_type)
+        else:
+            event_values = self.main_model.get_event_values()
+            event_ids = self.main_model.get_event_ids()
+            self.main_view.plot_data(file_data, file_type, events=event_values, event_id=event_ids)
 
     # Spectra maps
     def plot_spectra_maps_clicked(self):

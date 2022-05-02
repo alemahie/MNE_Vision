@@ -27,7 +27,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def open_cnt_file_finished(self):
+    def open_fif_file_finished(self):
         pass
 
     @abstractmethod
@@ -69,6 +69,10 @@ class mainListener(ABC):
 
     @abstractmethod
     def event_values_clicked(self):
+        pass
+
+    @abstractmethod
+    def event_values_finished(self, event_values, event_ids):
         pass
 
     @abstractmethod

@@ -322,3 +322,9 @@ class mainModel:
     """
     def set_listener(self, listener):
         self.main_listener = listener
+
+    def set_event_values(self, event_values):
+        self.file_data.events = event_values
+
+    def set_event_ids(self, event_ids):
+        self.file_data.event_id = event_ids

@@ -63,11 +63,15 @@ class mainView(QMainWindow):
     def plot_channel_locations(self, file_data):
         plot_sensors(file_data.info, show_names=True)
 
-    def plot_data(self, file_data, file_type):
-        if file_type == "Raw":
-            file_data.plot(scalings="auto", n_channels=10)
-        else:
-            file_data.plot(scalings="auto", n_epochs=5, n_channels=10)
+    def plot_data(self, file_data, file_type, events=None, event_id=None):
+        try:
+            if file_type == "Raw":
+                file_data.plot(scalings="auto", n_channels=10)
+            else:
+                file_data.plot(scalings="auto", n_epochs=5, n_channels=10, events=events, event_id=event_id)
+        except Exception as e:
+            print(type(e))
+            print(e)
 
     def plot_erps(self, file_data, channels_selected):
         erps = file_data.average()
@@ -83,6 +87,10 @@ class mainView(QMainWindow):
     def update_sampling_frequency(self, frequency):
         label_item = self.grid_layout.itemAtPosition(3, 1).widget()
         label_item.setText(str(frequency))
+
+    def update_number_of_events(self, number_of_events):
+        label_item = self.grid_layout.itemAtPosition(4, 1).widget()
+        label_item.setText(str(number_of_events))
 
     def update_reference(self, references):
         label_item = self.grid_layout.itemAtPosition(9, 1).widget()
