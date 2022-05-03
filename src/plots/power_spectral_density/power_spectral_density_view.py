@@ -21,7 +21,7 @@ __status__ = "Dev"
 
 
 class powerSpectralDensityView(QWidget):
-    def __init__(self):
+    def __init__(self, minimum_time, maximum_time):
         super().__init__()
         self.power_spectral_density_listener = None
 
@@ -33,10 +33,14 @@ class powerSpectralDensityView(QWidget):
         self.method_box = QComboBox()
         self.method_box.addItems(["Welch", "Multitaper"])
 
-        self.minimum_frequency = QLineEdit("2,0")
-        self.minimum_frequency.setValidator(QDoubleValidator())
-        self.maximum_frequency = QLineEdit("25,0")
-        self.maximum_frequency.setValidator(QDoubleValidator())
+        self.minimum_frequency_line = QLineEdit("2,0")
+        self.minimum_frequency_line.setValidator(QDoubleValidator())
+        self.maximum_frequency_line = QLineEdit("25,0")
+        self.maximum_frequency_line.setValidator(QDoubleValidator())
+        self.minimum_time_line = QLineEdit(str(minimum_time))
+        self.minimum_time_line.setValidator(QDoubleValidator(minimum_time, maximum_time, 3))
+        self.maximum_time_line = QLineEdit(str(maximum_time))
+        self.maximum_time_line.setValidator(QDoubleValidator(minimum_time, maximum_time, 3))
 
         self.cancel = QPushButton("&Cancel", self)
         self.cancel.clicked.connect(self.cancel_power_spectral_density_trigger)
@@ -46,13 +50,18 @@ class powerSpectralDensityView(QWidget):
         self.grid_layout.addWidget(QLabel("Method for PSD : "), 0, 0)
         self.grid_layout.addWidget(self.method_box, 0, 1)
         self.grid_layout.addWidget(QLabel("Minimum frequency of interest : "), 1, 0)
-        self.grid_layout.addWidget(self.minimum_frequency, 1, 1)
+        self.grid_layout.addWidget(self.minimum_frequency_line, 1, 1)
         self.grid_layout.addWidget(QLabel("Maximum frequency of interest : "), 2, 0)
-        self.grid_layout.addWidget(self.maximum_frequency, 2, 1)
-        self.grid_layout.addWidget(self.cancel, 3, 0)
-        self.grid_layout.addWidget(self.confirm, 3, 1)
+        self.grid_layout.addWidget(self.maximum_frequency_line, 2, 1)
+        self.grid_layout.addWidget(QLabel("Minimum time of interest : "), 3, 0)
+        self.grid_layout.addWidget(self.minimum_time_line, 3, 1)
+        self.grid_layout.addWidget(QLabel("Maximum time of interest : "), 4, 0)
+        self.grid_layout.addWidget(self.maximum_time_line, 4, 1)
+        self.grid_layout.addWidget(self.cancel, 5, 0)
+        self.grid_layout.addWidget(self.confirm, 5, 1)
 
-    def plot_psd(self, psds, freqs):
+    @staticmethod
+    def plot_psd(psds, freqs):
         psds_plot = 10 * np.log10(psds)
         psds_mean = psds_plot.mean(axis=(0, 1))
         psds_std = psds_plot.std(axis=(0, 1))
@@ -73,13 +82,14 @@ class powerSpectralDensityView(QWidget):
         method_psd = self.method_box.currentText()
         minimum_frequency = None
         maximum_frequency = None
-        if self.minimum_frequency.hasAcceptableInput():
-            minimum_frequency = self.minimum_frequency.text()
-            minimum_frequency = float(minimum_frequency.replace(',', '.'))
-        if self.maximum_frequency.hasAcceptableInput():
-            maximum_frequency = self.maximum_frequency.text()
-            maximum_frequency = float(maximum_frequency.replace(',', '.'))
-        self.power_spectral_density_listener.confirm_button_clicked(method_psd, minimum_frequency, maximum_frequency)
+        if self.minimum_frequency_line.hasAcceptableInput():
+            minimum_frequency = float(self.minimum_frequency_line.text().replace(',', '.'))
+        if self.maximum_frequency_line.hasAcceptableInput():
+            maximum_frequency = float(self.maximum_frequency_line.text().replace(',', '.'))
+        minimum_time = float(self.minimum_time_line.text().replace(',', '.'))
+        maximum_time = float(self.maximum_time_line.text().replace(',', '.'))
+        self.power_spectral_density_listener.confirm_button_clicked(method_psd, minimum_frequency, maximum_frequency,
+                                                                    minimum_time, maximum_time)
 
     """
     Setters

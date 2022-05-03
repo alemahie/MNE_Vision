@@ -169,10 +169,10 @@ class mainModel:
     """
     Plot menu
     """
-    def power_spectral_density(self, method_psd, minimum_frequency, maximum_frequency):
+    def power_spectral_density(self, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
         pool = QThreadPool.globalInstance()
-        self.power_spectral_density_runnable = powerSpectralDensityRunnable(self.file_data, method_psd,
-                                                                            minimum_frequency, maximum_frequency)
+        self.power_spectral_density_runnable = powerSpectralDensityRunnable(self.file_data, method_psd, minimum_frequency,
+                                                                            maximum_frequency, minimum_time, maximum_time)
         pool.start(self.power_spectral_density_runnable)
         self.power_spectral_density_runnable.signals.finished.connect(self.power_spectral_density_computation_finished)
 

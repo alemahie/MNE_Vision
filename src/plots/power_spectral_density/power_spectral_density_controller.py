@@ -18,9 +18,9 @@ __status__ = "Dev"
 
 
 class powerSpectralDensityController(powerSpectralDensityListener):
-    def __init__(self):
+    def __init__(self, minimum_time, maximum_time):
         self.main_listener = None
-        self.power_spectral_density_view = powerSpectralDensityView()
+        self.power_spectral_density_view = powerSpectralDensityView(minimum_time, maximum_time)
         self.power_spectral_density_view.set_listener(self)
 
         self.power_spectral_density_view.show()
@@ -28,8 +28,9 @@ class powerSpectralDensityController(powerSpectralDensityListener):
     def cancel_button_clicked(self):
         self.power_spectral_density_view.close()
 
-    def confirm_button_clicked(self, method_psd, minimum_frequency, maximum_frequency):
-        self.main_listener.plot_spectra_maps_information(method_psd, minimum_frequency, maximum_frequency)
+    def confirm_button_clicked(self, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
+        self.main_listener.plot_spectra_maps_information(method_psd, minimum_frequency, maximum_frequency, minimum_time,
+                                                         maximum_time)
         self.power_spectral_density_view.close()
 
     def plot_psd(self, psds, freqs):

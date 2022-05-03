@@ -26,7 +26,7 @@ class powerSpectralDensityWorkerSignals(QObject):
 
 
 class powerSpectralDensityRunnable(QRunnable):
-    def __init__(self, file_data, method_psd, minimum_frequency, maximum_frequency):
+    def __init__(self, file_data, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
         super().__init__()
         self.signals = powerSpectralDensityWorkerSignals()
 
@@ -34,14 +34,18 @@ class powerSpectralDensityRunnable(QRunnable):
         self.method_psd = method_psd
         self.minimum_frequency = minimum_frequency
         self.maximum_frequency = maximum_frequency
+        self.tmin = minimum_time
+        self.tmax = maximum_time
         self.psds = None
         self.freqs = None
 
     def run(self):
         if self.method_psd == "Welch":
-            self.psds, self.freqs = psd_welch(self.file_data, fmin=self.minimum_frequency, fmax=self.maximum_frequency)
+            self.psds, self.freqs = psd_welch(self.file_data, fmin=self.minimum_frequency, fmax=self.maximum_frequency,
+                                              tmin=self.tmin, tmax=self.tmax)
         elif self.method_psd == "Multitaper":
-            self.psds, self.freqs = psd_multitaper(self.file_data, fmin=self.minimum_frequency, fmax=self.maximum_frequency)
+            self.psds, self.freqs = psd_multitaper(self.file_data, fmin=self.minimum_frequency, fmax=self.maximum_frequency,
+                                                   tmin=self.tmin, tmax=self.tmax)
         self.signals.finished.emit()
 
     def get_psds(self):

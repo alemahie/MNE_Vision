@@ -198,7 +198,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def plot_spectra_maps_information(self, method_psd, minimum_frequency, maximum_frequency):
+    def plot_spectra_maps_information(self, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
         pass
 
     @abstractmethod

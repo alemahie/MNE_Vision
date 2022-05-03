@@ -325,15 +325,17 @@ class mainController(mainListener):
 
     # Spectra maps
     def plot_spectra_maps_clicked(self):
-        self.power_spectral_density_controller = powerSpectralDensityController()
+        minimum_time = self.main_model.get_epochs_start()
+        maximum_time = self.main_model.get_epochs_end()
+        self.power_spectral_density_controller = powerSpectralDensityController(minimum_time, maximum_time)
         self.power_spectral_density_controller.set_listener(self)
 
-    def plot_spectra_maps_information(self, method_psd, minimum_frequency, maximum_frequency):
+    def plot_spectra_maps_information(self, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
         processing_title = "PSD running, please wait."
         finish_method = "plot_spectra_maps"
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.power_spectral_density(method_psd, minimum_frequency, maximum_frequency)
+        self.main_model.power_spectral_density(method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time)
 
     def plot_spectra_maps_computation_finished(self):
         processing_title_finished = "PSD finished."
