@@ -81,7 +81,8 @@ class eventValuesController(eventValuesListener):
             error_window_view = errorWindow(error_message)
             error_window_view.show()
 
-    def insert_button_clicked(self):
+    def insert_button_clicked(self, event_name, latency):
+        self.update_event_data(event_name, latency)
         if "none" not in self.event_ids.keys():
             self.insert_new_event_id()
         event_to_insert = np.array([self.event_values[self.current_event_number][0], 0, self.event_ids["none"]])

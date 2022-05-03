@@ -22,15 +22,23 @@ class channelLocationListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self):
+    def confirm_button_clicked(self, channel_name, x_coordinate, y_coordinate, z_coordinate):
         pass
 
     @abstractmethod
-    def previous_button_clicked(self):
+    def previous_button_clicked(self, channel_name, x_coordinate, y_coordinate, z_coordinate):
         pass
 
     @abstractmethod
-    def next_button_clicked(self):
+    def next_button_clicked(self, channel_name, x_coordinate, y_coordinate, z_coordinate):
+        pass
+
+    @abstractmethod
+    def delete_button_clicked(self):
+        pass
+
+    @abstractmethod
+    def insert_button_clicked(self, channel_name, x_coordinate, y_coordinate, z_coordinate):
         pass
 
     @abstractmethod

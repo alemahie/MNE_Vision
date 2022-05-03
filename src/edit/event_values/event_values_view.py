@@ -119,7 +119,9 @@ class eventValuesView(QWidget):
         self.event_values_listener.delete_button_clicked()
 
     def insert_button_trigger(self):
-        self.event_values_listener.insert_button_clicked()
+        event_name = self.event_name_line.text()
+        latency = int(self.latency_line.text())
+        self.event_values_listener.insert_button_clicked(event_name, latency)
 
     def editing_finished_trigger(self):
         event_number = int(self.event_number_line.text())-1

@@ -38,7 +38,7 @@ class eventValuesListener(ABC):
         pass
 
     @abstractmethod
-    def insert_button_clicked(self):
+    def insert_button_clicked(self, event_name, latency):
         pass
 
     @abstractmethod

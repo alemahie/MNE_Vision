@@ -72,6 +72,10 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def dataset_info_finished(self, channel_locations, channel_names):
+        pass
+
+    @abstractmethod
     def event_values_clicked(self):
         pass
 

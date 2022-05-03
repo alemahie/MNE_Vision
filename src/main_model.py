@@ -56,17 +56,6 @@ class mainModel:
         self.classify_runnable = None
 
     """
-    Useful methods
-    """
-    def is_fif_file(self):
-        return self.file_path_name[-3:] == "fif"
-
-    def create_channels_locations(self):
-        channels_info = self.file_data.info.get("chs")
-        for channel in channels_info:
-            self.channels_locations[channel["ch_name"]] = channel["loc"][:3]
-
-    """
     File menu
     """
     def open_fif_file(self, path_to_file):
@@ -219,6 +208,17 @@ class mainModel:
         self.main_listener.classify_computation_finished()
 
     """
+    Others
+    """
+    def is_fif_file(self):
+        return self.file_path_name[-3:] == "fif"
+
+    def create_channels_locations(self):
+        channels_info = self.file_data.info.get("chs")
+        for channel in channels_info:
+            self.channels_locations[channel["ch_name"]] = channel["loc"][:3]
+
+    """
     Getters
     """
     def get_all_displayed_info(self):
@@ -335,3 +335,14 @@ class mainModel:
 
     def set_event_ids(self, event_ids):
         self.file_data.event_id = copy(event_ids)
+
+    def set_channel_locations(self, channel_locations, channel_names):
+        self.channels_locations = copy(channel_locations)
+        channels_info = self.file_data.info.get("chs")
+        for i, channel in enumerate(channels_info):
+            channel_location = self.channels_locations[channel_names[i]]
+            channel["loc"] = np.array([channel_location[0], channel_location[1], channel_location[2], 0.0, 0.0, 0.0,
+                                       np.NAN, np.NAN, np.NAN, np.NAN, np.NAN, np.NAN])
+
+    def set_channel_names(self, channel_names):
+        self.file_data.info.update({"ch_names": copy(channel_names)})

@@ -51,7 +51,8 @@ class channelLocationView(QWidget):
 
         self.channel_change_info_widget = QWidget()
         self.channel_change_info_layout = QHBoxLayout()
-        self.channel_change_info_layout.addWidget(QLabel(f"Channel number : (out of {number_of_channels} channels)"))
+        self.channel_number_label = QLabel(f"Channel number : (out of {number_of_channels} channels)")
+        self.channel_change_info_layout.addWidget(self.channel_number_label)
         self.channel_change_info_widget.setLayout(self.channel_change_info_layout)
 
         self.change_channel_widget = QWidget()
@@ -69,6 +70,16 @@ class channelLocationView(QWidget):
         self.change_channel_layout.addWidget(self.next_button)
         self.change_channel_widget.setLayout(self.change_channel_layout)
 
+        self.delete_insert_widget = QWidget()
+        self.delete_insert_layout = QHBoxLayout()
+        self.delete_button = QPushButton("&Delete event", self)
+        self.delete_button.clicked.connect(self.delete_button_trigger)
+        self.insert_button = QPushButton("&Insert event", self)
+        self.insert_button.clicked.connect(self.insert_button_trigger)
+        self.delete_insert_layout.addWidget(self.delete_button)
+        self.delete_insert_layout.addWidget(self.insert_button)
+        self.delete_insert_widget.setLayout(self.delete_insert_layout)
+
         self.cancel_confirm_widget = QWidget()
         self.cancel_confirm_layout = QHBoxLayout()
         self.cancel = QPushButton("&Cancel", self)
@@ -82,6 +93,7 @@ class channelLocationView(QWidget):
         self.vertical_layout.addWidget(self.info_widget)
         self.vertical_layout.addWidget(self.channel_change_info_widget)
         self.vertical_layout.addWidget(self.change_channel_widget)
+        self.vertical_layout.addWidget(self.delete_insert_widget)
         self.vertical_layout.addWidget(self.cancel_confirm_widget)
 
     """
@@ -92,13 +104,35 @@ class channelLocationView(QWidget):
         self.channel_location_listener.cancel_button_clicked()
 
     def confirm_channel_location_trigger(self):
-        self.channel_location_listener.confirm_button_clicked()
+        channel_name = self.channel_name_line.text()
+        x_coordinate = float(self.x_coordinate_line.text().replace(',', '.'))
+        y_coordinate = float(self.y_coordinate_line.text().replace(',', '.'))
+        z_coordinate = float(self.z_coordinate_line.text().replace(',', '.'))
+        self.channel_location_listener.confirm_button_clicked(channel_name, x_coordinate, y_coordinate, z_coordinate)
 
     def previous_button_trigger(self):
-        self.channel_location_listener.previous_button_clicked()
+        channel_name = self.channel_name_line.text()
+        x_coordinate = float(self.x_coordinate_line.text().replace(',', '.'))
+        y_coordinate = float(self.y_coordinate_line.text().replace(',', '.'))
+        z_coordinate = float(self.z_coordinate_line.text().replace(',', '.'))
+        self.channel_location_listener.previous_button_clicked(channel_name, x_coordinate, y_coordinate, z_coordinate)
 
     def next_button_trigger(self):
-        self.channel_location_listener.next_button_clicked()
+        channel_name = self.channel_name_line.text()
+        x_coordinate = float(self.x_coordinate_line.text().replace(',', '.'))
+        y_coordinate = float(self.y_coordinate_line.text().replace(',', '.'))
+        z_coordinate = float(self.z_coordinate_line.text().replace(',', '.'))
+        self.channel_location_listener.next_button_clicked(channel_name, x_coordinate, y_coordinate, z_coordinate)
+
+    def delete_button_trigger(self):
+        self.channel_location_listener.delete_button_clicked()
+
+    def insert_button_trigger(self):
+        channel_name = self.channel_name_line.text()
+        x_coordinate = float(self.x_coordinate_line.text())
+        y_coordinate = float(self.y_coordinate_line.text())
+        z_coordinate = float(self.z_coordinate_line.text())
+        self.channel_location_listener.insert_button_clicked(channel_name, x_coordinate, y_coordinate, z_coordinate)
 
     def editing_finished_trigger(self):
         channel_number = int(self.channel_number.text())-1
@@ -107,12 +141,14 @@ class channelLocationView(QWidget):
     """
     Updates
     """
-    def update_channel_displayed(self, channel_number, channel_name, x_coordinate, y_coordinate, z_coordinate):
+    def update_channel_displayed(self, channel_number, channel_name, x_coordinate, y_coordinate, z_coordinate,
+                                 number_of_channels):
         self.channel_name_line.setText(channel_name)
         self.x_coordinate_line.setText(str(round(x_coordinate, 3)))
         self.y_coordinate_line.setText(str(round(y_coordinate, 3)))
         self.z_coordinate_line.setText(str(round(z_coordinate, 3)))
         self.channel_number.setText(str(channel_number + 1))
+        self.channel_number_label.setText(f"Channel number : (out of {number_of_channels} channels)")
 
     """
     Setters

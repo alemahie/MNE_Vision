@@ -60,20 +60,19 @@ class mainView(QMainWindow):
     """
     Plot
     """
-    def plot_channel_locations(self, file_data):
+    @staticmethod
+    def plot_channel_locations(file_data):
         plot_sensors(file_data.info, show_names=True)
 
-    def plot_data(self, file_data, file_type, events=None, event_id=None):
-        try:
-            if file_type == "Raw":
-                file_data.plot(scalings="auto", n_channels=10)
-            else:
-                file_data.plot(scalings="auto", n_epochs=5, n_channels=10, events=events, event_id=event_id)
-        except Exception as e:
-            print(type(e))
-            print(e)
+    @staticmethod
+    def plot_data(file_data, file_type, events=None, event_id=None):
+        if file_type == "Raw":
+            file_data.plot(scalings="auto", n_channels=10)
+        else:
+            file_data.plot(scalings="auto", n_epochs=5, n_channels=10, events=events, event_id=event_id)
 
-    def plot_erps(self, file_data, channels_selected):
+    @staticmethod
+    def plot_erps(file_data, channels_selected):
         erps = file_data.average()
         erps.plot_joint(picks=channels_selected)
 

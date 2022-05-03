@@ -154,6 +154,10 @@ class mainController(mainListener):
         self.dataset_info_controller = datasetInfoController(sampling_rate, time_points_epochs, start_time)
         self.dataset_info_controller.set_listener(self)
 
+    def dataset_info_finished(self, channel_locations, channel_names):
+        self.main_model.set_channel_locations(channel_locations, channel_names)
+        self.main_model.set_channel_names(channel_names)
+
     def event_values_clicked(self):
         file_type = self.main_model.get_file_type()
         if file_type == "Epochs":
