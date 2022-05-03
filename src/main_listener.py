@@ -131,7 +131,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def re_referencing_information(self, references):
+    def re_referencing_information(self, references, n_jobs):
         pass
 
     @abstractmethod

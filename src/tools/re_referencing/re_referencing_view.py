@@ -5,9 +5,14 @@
 Re-referencing View
 """
 
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QButtonGroup, QCheckBox, QPushButton, QGridLayout, QHBoxLayout, QLabel
+from multiprocessing import cpu_count
+
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QButtonGroup, QCheckBox, QPushButton, QGridLayout, QHBoxLayout, \
+    QLabel, QSlider
+from PyQt6.QtCore import Qt
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
+from utils.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -53,6 +58,20 @@ class reReferencingView(QWidget):
         self.check_box_layout.addWidget(self.infinity_check_box, 2, 0)
         self.re_referencing_mode_widget.setLayout(self.check_box_layout)
 
+        self.n_jobs_widget = QWidget()
+        self.n_jobs_layout = QHBoxLayout()
+        self.n_jobs_slider = QSlider(Qt.Orientation.Horizontal, self)
+        self.n_jobs_slider.setMinimum(1)
+        self.n_jobs_slider.setMaximum(cpu_count())
+        self.n_jobs_slider.setValue(1)
+        self.n_jobs_slider.setSingleStep(1)
+        self.n_jobs_slider.valueChanged.connect(self.slider_value_changed_trigger)
+        self.n_jobs_label = QLabel("1")
+        self.n_jobs_layout.addWidget(QLabel("Number of threads : "))
+        self.n_jobs_layout.addWidget(self.n_jobs_slider)
+        self.n_jobs_layout.addWidget(self.n_jobs_label)
+        self.n_jobs_widget.setLayout(self.n_jobs_layout)
+
         # Cancel & Confirm buttons
         self.cancel_confirm_widget = QWidget()
         self.cancel_confirm_layout = QHBoxLayout()
@@ -67,6 +86,7 @@ class reReferencingView(QWidget):
         # Final layout
         self.vertical_layout.addWidget(QLabel("Current reference : " + str(reference)))
         self.vertical_layout.addWidget(self.re_referencing_mode_widget)
+        self.vertical_layout.addWidget(self.n_jobs_widget)
         self.vertical_layout.addWidget(self.cancel_confirm_widget)
 
     """
@@ -85,15 +105,23 @@ class reReferencingView(QWidget):
             references = self.channels_selected
         elif button_id == 3:
             references = "infinity"
-        if references is None:
-            print("No channels selected.")
+        if references is not None:
+            n_jobs = self.n_jobs_slider.value()
+            self.re_referencing_listener.confirm_button_clicked(references, n_jobs)
         else:
-            self.re_referencing_listener.confirm_button_clicked(references)
+            error_message = "Please select a channel in the 'channel selection' menu before starting the computation" \
+                            "with specific channels as references."
+            error_window = errorWindow(error_message)
+            error_window.show()
 
     def channels_selection_trigger(self):
         title = "Select the channels used for the re-referencing :"
         self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=False)
         self.channels_selector_controller.set_listener(self.re_referencing_listener)
+
+    def slider_value_changed_trigger(self):
+        slider_value = self.n_jobs_slider.value()
+        self.n_jobs_label.setText(str(slider_value))
 
     """
     Setters

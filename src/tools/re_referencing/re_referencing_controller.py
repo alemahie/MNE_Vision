@@ -28,8 +28,8 @@ class reReferencingController(reReferencingListener):
     def cancel_button_clicked(self):
         self.re_referencing_view.close()
 
-    def confirm_button_clicked(self, references):
-        self.main_listener.re_referencing_information(references)
+    def confirm_button_clicked(self, references, n_jobs):
+        self.main_listener.re_referencing_information(references, n_jobs)
         self.re_referencing_view.close()
 
     def get_elements_selected(self, elements_selected):

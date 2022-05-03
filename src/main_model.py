@@ -144,9 +144,9 @@ class mainModel:
         self.file_data = self.resampling_runnable.get_file_data()
         self.main_listener.resampling_computation_finished()
 
-    def re_referencing(self, references):
+    def re_referencing(self, references, n_jobs):
         pool = QThreadPool.globalInstance()
-        self.re_referencing_runnable = reReferencingRunnable(references, self.file_data)
+        self.re_referencing_runnable = reReferencingRunnable(references, self.file_data, n_jobs)
         pool.start(self.re_referencing_runnable)
         self.re_referencing_runnable.signals.finished.connect(self.re_referencing_computation_finished)
 

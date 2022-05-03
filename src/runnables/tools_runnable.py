@@ -8,7 +8,7 @@ Tools runnable
 from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne import make_forward_solution, write_forward_solution, compute_covariance, setup_source_space, \
-                write_source_spaces, make_bem_model, make_bem_solution, write_bem_solution
+    write_source_spaces, make_bem_model, make_bem_solution, write_bem_solution
 from mne.minimum_norm import read_inverse_operator, make_inverse_operator, apply_inverse, \
                              write_inverse_operator
 from mne.preprocessing import ICA
@@ -77,19 +77,48 @@ class reReferencingWorkerSignals(QObject):
 
 
 class reReferencingRunnable(QRunnable):
-    def __init__(self, references, file_data):
+    def __init__(self, references, file_data, n_jobs):
         super().__init__()
         self.signals = filterWorkerSignals()
         self.references = references
         self.file_data = file_data
+        self.n_jobs = n_jobs
+        self.subject = "fsaverage"
+        self.subjects_dir = get_project_freesurfer_path()
 
     def run(self):
         if self.references == "infinity":
-            print("infinity")
+            src = self.compute_source_space()
+            bem = self.compute_bem_solution()
+            fwd = self.compute_forward_solution(src, bem)
+            self.file_data.set_eeg_reference('REST', forward=fwd)
         else:
             self.file_data.set_eeg_reference(ref_channels=self.references)
         self.signals.finished.emit()
 
+    def compute_source_space(self):
+        print("Compute source space")
+        src = setup_source_space(subject=self.subject, spacing='oct6', add_dist='patch', subjects_dir=self.subjects_dir,
+                                 n_jobs=self.n_jobs, verbose=False)
+        return src
+
+    def compute_bem_solution(self):
+        print("Compute bem solution")
+        conductivity = (0.3, 0.006, 0.3)  # for three layers
+        model = make_bem_model(subject=self.subject, ico=4, conductivity=conductivity, subjects_dir=self.subjects_dir,
+                               verbose=False)
+        bem = make_bem_solution(model, verbose=False)
+        return bem
+
+    def compute_forward_solution(self, src, bem):
+        print("Compute forward solution")
+        fwd = make_forward_solution(self.file_data.info, trans='fsaverage', src=src, bem=bem, meg=False, eeg=True,
+                                    mindist=5.0, n_jobs=self.n_jobs, verbose=False)
+        return fwd
+
+    """
+    Getters
+    """
     def get_file_data(self):
         return self.file_data
 
@@ -113,6 +142,9 @@ class icaRunnable(QRunnable):
         ica.fit(self.file_data)
         self.signals.finished.emit()
 
+    """
+    Getters
+    """
     def get_file_data(self):
         return self.file_data
 
@@ -208,5 +240,8 @@ class sourceEstimationRunnable(QRunnable):
             write_inverse_operator(self.file_path + "-inv.fif", inverse_operator, verbose=False)
         return inverse_operator
 
+    """
+    Getters
+    """
     def get_source_estimation_data(self):
         return self.source_estimation_data

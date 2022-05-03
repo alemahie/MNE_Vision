@@ -241,12 +241,12 @@ class mainController(mainListener):
         self.re_referencing_controller = reReferencingController(reference, all_channels_names)
         self.re_referencing_controller.set_listener(self)
 
-    def re_referencing_information(self, references):
+    def re_referencing_information(self, references, n_jobs):
         processing_title = "Re-referencing running, please wait."
         finish_method = "re-referencing"
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.re_referencing(references)
+        self.main_model.re_referencing(references, n_jobs)
 
     def re_referencing_computation_finished(self):
         processing_title_finished = "Re-referencing finished."
