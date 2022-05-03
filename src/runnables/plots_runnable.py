@@ -10,6 +10,8 @@ from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne.time_frequency import psd_welch, psd_multitaper, tfr_morlet, tfr_multitaper, tfr_stockwell
 
+from utils.error_window import errorWindow
+
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
@@ -51,10 +53,11 @@ class powerSpectralDensityRunnable(QRunnable):
 
 class timeFrequencyWorkerSignals(QObject):
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class timeFrequencyRunnable(QRunnable):
-    def __init__(self, file_data, method_tfr, channel_selected, min_frequency, max_frequency):
+    def __init__(self, file_data, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
         super().__init__()
         self.signals = timeFrequencyWorkerSignals()
 
@@ -63,22 +66,29 @@ class timeFrequencyRunnable(QRunnable):
         self.channel_selected = channel_selected
         self.min_frequency = min_frequency
         self.max_frequency = max_frequency
+        self.n_cycles = n_cycles
         self.power = None
         self.itc = None
 
     def run(self):
-        freqs = np.arange(self.min_frequency, self.max_frequency)
-        n_cycles = freqs
-        if self.method_tfr == "Morlet":
-            self.power, self.itc = tfr_morlet(self.file_data, freqs=freqs, n_cycles=n_cycles,
-                                              picks=self.channel_selected)
-        elif self.method_tfr == "Multitaper":
-            self.power, self.itc = tfr_multitaper(self.file_data, freqs=freqs, n_cycles=n_cycles,
+        try:
+            freqs = np.arange(self.min_frequency, self.max_frequency)
+            if self.method_tfr == "Morlet":
+                self.power, self.itc = tfr_morlet(self.file_data, freqs=freqs, n_cycles=self.n_cycles,
                                                   picks=self.channel_selected)
-        elif self.method_tfr == "Stockwell":
-            self.power, self.itc = tfr_stockwell(self.file_data, freqs=freqs, n_cycles=n_cycles,
-                                                 picks=self.channel_selected)
-        self.signals.finished.emit()
+            elif self.method_tfr == "Multitaper":
+                self.power, self.itc = tfr_multitaper(self.file_data, freqs=freqs, n_cycles=self.n_cycles,
+                                                      picks=self.channel_selected)
+            elif self.method_tfr == "Stockwell":
+                self.power, self.itc = tfr_stockwell(self.file_data, freqs=freqs, n_cycles=self.n_cycles,
+                                                     picks=self.channel_selected)
+            self.signals.finished.emit()
+        except ValueError as error:
+            error_message = "An error as occurred during the computation of the time frequency analysis."
+            detailed_message = str(error)
+            error_window = errorWindow(error_message, detailed_message)
+            error_window.show()
+            self.signals.error.emit()
 
     def get_channel_selected(self):
         return self.channel_selected

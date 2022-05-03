@@ -353,15 +353,20 @@ class mainController(mainListener):
         self.time_frequency_ersp_itc_controller = timeFrequencyErspItcController(all_channels_names)
         self.time_frequency_ersp_itc_controller.set_listener(self)
 
-    def plot_time_frequency_information(self, method_tfr, channel_selected, min_frequency, max_frequency):
+    def plot_time_frequency_information(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
         processing_title = "Time frequency analysis running, please wait."
         finish_method = "time_frequency"
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.time_frequency(method_tfr, channel_selected, min_frequency, max_frequency)
+        self.main_model.time_frequency(method_tfr, channel_selected, min_frequency, max_frequency, n_cycles)
 
     def plot_time_frequency_computation_finished(self):
         processing_title_finished = "Time frequency analysis finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def plot_time_frequency_computation_error(self):
+        processing_title_finished = "An error as occurred during the time frequency analysis, please try again."
+        self.waiting_while_processing_controller.set_finish_method("error")
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     def plot_time_frequency_finished(self):

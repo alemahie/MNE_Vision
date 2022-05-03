@@ -190,15 +190,19 @@ class mainModel:
     def power_spectral_density_computation_finished(self):
         self.main_listener.plot_spectra_maps_computation_finished()
 
-    def time_frequency(self, method_tfr, channel_selected, min_frequency, max_frequency):
+    def time_frequency(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
         pool = QThreadPool.globalInstance()
         self.time_frequency_runnable = timeFrequencyRunnable(self.file_data, method_tfr, channel_selected,
-                                                             min_frequency, max_frequency)
+                                                             min_frequency, max_frequency, n_cycles)
         pool.start(self.time_frequency_runnable)
         self.time_frequency_runnable.signals.finished.connect(self.time_frequency_computation_finished)
+        self.time_frequency_runnable.signals.error.connect(self.time_frequency_computation_error)
 
     def time_frequency_computation_finished(self):
         self.main_listener.plot_time_frequency_computation_finished()
+
+    def time_frequency_computation_error(self):
+        self.main_listener.plot_time_frequency_computation_error()
 
     """
     Classification menu

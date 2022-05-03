@@ -38,3 +38,6 @@ class waitingWhileProcessingController(waitingWhileProcessingListener):
     """
     def set_listener(self, listener):
         self.main_listener = listener
+
+    def set_finish_method(self, finish_method):
+        self.finish_method = finish_method

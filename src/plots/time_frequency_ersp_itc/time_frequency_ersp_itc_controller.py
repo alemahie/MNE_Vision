@@ -29,9 +29,10 @@ class timeFrequencyErspItcController(timeFrequencyErspItcListener):
     def cancel_button_clicked(self):
         self.time_frequency_ersp_itc_view.close()
 
-    def confirm_button_clicked(self, method_tfr, channel_selected, min_frequency, max_frequency):
+    def confirm_button_clicked(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
         self.time_frequency_ersp_itc_view.close()
-        self.main_listener.plot_time_frequency_information(method_tfr, channel_selected, min_frequency, max_frequency)
+        self.main_listener.plot_time_frequency_information(method_tfr, channel_selected, min_frequency, max_frequency,
+                                                           n_cycles)
 
     def plot_ersp_itc(self, channel_selected, power, itc):
         self.time_frequency_ersp_itc_view.plot_ersp_itc(channel_selected, power, itc)

@@ -20,6 +20,7 @@ class multipleSelectorView(QWidget):
     def __init__(self, all_elements_names, title, box_checked, unique_box):
         super().__init__()
         self.multiple_selector_listener = None
+        self.unique_box = unique_box
 
         self.vertical_layout = QVBoxLayout()
         self.setLayout(self.vertical_layout)
@@ -111,7 +112,10 @@ class multipleSelectorView(QWidget):
     """
     def get_all_elements_selected(self):
         all_elements = []
-        for i in range(1, self.elements_vbox_layout.count()):
+        start_idx = 0
+        if not self.unique_box:
+            start_idx = 1       # Because we have the select and unselect buttons.
+        for i in range(start_idx, self.elements_vbox_layout.count()):
             check_box = self.elements_vbox_layout.itemAt(i).widget()
             if check_box.isChecked():
                 all_elements.append(check_box.text())

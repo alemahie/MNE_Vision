@@ -17,7 +17,9 @@ __status__ = "Dev"
 
 
 class mainListener(ABC):
-    # File menu
+    """
+    File Menu
+    """
     @abstractmethod
     def open_fif_file_clicked(self, path_to_file):
         pass
@@ -62,7 +64,9 @@ class mainListener(ABC):
     def save_file_as_clicked(self):
         pass
 
-    # Edit menu
+    """
+    Edit Menu
+    """
     @abstractmethod
     def dataset_info_clicked(self):
         pass
@@ -87,7 +91,9 @@ class mainListener(ABC):
     def select_data_events_clicked(self):
         pass
 
-    # Tools menu
+    """ 
+    Tools Menu
+    """
     @abstractmethod
     def filter_clicked(self):
         pass
@@ -172,7 +178,9 @@ class mainListener(ABC):
     def source_estimation_finished(self):
         pass
 
-    # Plot menu
+    """
+    Plot Menu
+    """
     @abstractmethod
     def plot_channel_locations_clicked(self):
         pass
@@ -210,7 +218,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def plot_time_frequency_information(self, method_tfr, channel_selected, min_frequency, max_frequency):
+    def plot_time_frequency_information(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
         pass
 
     @abstractmethod
@@ -218,10 +226,16 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def plot_time_frequency_computation_error(self):
+        pass
+
+    @abstractmethod
     def plot_time_frequency_finished(self):
         pass
 
-    # Classification menu
+    """
+    Classification Menu
+    """
     @abstractmethod
     def classify_clicked(self):
         pass
@@ -238,7 +252,9 @@ class mainListener(ABC):
     def classify_finished(self):
         pass
 
-    # Others
+    """
+    Others 
+    """
     @abstractmethod
     def waiting_while_processing_finished(self, finish_method):
         pass

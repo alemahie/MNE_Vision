@@ -17,7 +17,7 @@ __status__ = "Dev"
 
 
 class errorWindow(QWidget):
-    def __init__(self, error_message):
+    def __init__(self, error_message, detailed_message=None):
         super().__init__()
 
         self.message_box = QMessageBox()
@@ -25,6 +25,8 @@ class errorWindow(QWidget):
         self.message_box.setText(error_message)
         self.message_box.setWindowTitle("An error has occurred.")
         self.message_box.setStandardButtons(QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+        if detailed_message is not None:
+            self.message_box.setInformativeText(detailed_message)
 
     def show(self):
         self.message_box.exec()
