@@ -84,7 +84,10 @@ class reReferencingRunnable(QRunnable):
         self.file_data = file_data
 
     def run(self):
-        self.file_data.set_eeg_reference(ref_channels=self.references)
+        if self.references == "infinity":
+            print("infinity")
+        else:
+            self.file_data.set_eeg_reference(ref_channels=self.references)
         self.signals.finished.emit()
 
     def get_file_data(self):

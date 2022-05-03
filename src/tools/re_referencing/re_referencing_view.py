@@ -42,11 +42,15 @@ class reReferencingView(QWidget):
         self.re_referencing_mode_buttons.addButton(self.channel_check_box, 2)  # Button with ID 2
         self.channels_selection_button = QPushButton("&Channels ...", self)
         self.channels_selection_button.clicked.connect(self.channels_selection_trigger)
+        self.infinity_check_box = QCheckBox()
+        self.infinity_check_box.setText("Compute point at infinity reference")
+        self.re_referencing_mode_buttons.addButton(self.infinity_check_box, 3)  # Button with ID 3
 
         self.check_box_layout = QGridLayout()
         self.check_box_layout.addWidget(self.average_check_box, 0, 0)
         self.check_box_layout.addWidget(self.channel_check_box, 1, 0)
         self.check_box_layout.addWidget(self.channels_selection_button, 1, 1)
+        self.check_box_layout.addWidget(self.infinity_check_box, 2, 0)
         self.re_referencing_mode_widget.setLayout(self.check_box_layout)
 
         # Cancel & Confirm buttons
@@ -61,7 +65,7 @@ class reReferencingView(QWidget):
         self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
 
         # Final layout
-        self.vertical_layout.addWidget(QLabel("Current reference : " + reference))
+        self.vertical_layout.addWidget(QLabel("Current reference : " + str(reference)))
         self.vertical_layout.addWidget(self.re_referencing_mode_widget)
         self.vertical_layout.addWidget(self.cancel_confirm_widget)
 
@@ -79,6 +83,8 @@ class reReferencingView(QWidget):
             references = "average"
         elif button_id == 2:    # Selected channel for reference
             references = self.channels_selected
+        elif button_id == 3:
+            references = "infinity"
         if references is None:
             print("No channels selected.")
         else:

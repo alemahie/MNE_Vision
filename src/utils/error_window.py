@@ -19,7 +19,6 @@ __status__ = "Dev"
 class errorWindow(QWidget):
     def __init__(self, error_message, detailed_message=None):
         super().__init__()
-
         self.message_box = QMessageBox()
         self.message_box.setIcon(QMessageBox.Icon.Information)
         self.message_box.setText(error_message)
