@@ -17,7 +17,7 @@ __status__ = "Dev"
 
 
 class eventValuesView(QWidget):
-    def __init__(self, event_values, event_ids):
+    def __init__(self, event_values, event_ids, number_of_epochs, number_of_frames):
         super().__init__()
         self.event_values_listener = None
         self.event_values = event_values
@@ -33,8 +33,9 @@ class eventValuesView(QWidget):
         self.only_int_epoch_number = QIntValidator()
         self.epoch_number_line = QLineEdit()
         self.epoch_number_line.setValidator(self.only_int_epoch_number)
+        self.only_int_latency = QIntValidator(0, number_of_epochs*number_of_frames, self)
         self.latency_line = QLineEdit()
-        self.latency_line.setValidator(self.only_int_epoch_number)
+        self.latency_line.setValidator(self.only_int_latency)
 
         self.info_widget = QWidget()
         self.info_grid_layout = QGridLayout()

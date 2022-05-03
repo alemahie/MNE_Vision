@@ -24,18 +24,19 @@ __status__ = "Dev"
 
 
 class eventValuesController(eventValuesListener):
-    def __init__(self, event_values, event_ids, number_of_epochs):
+    def __init__(self, event_values, event_ids, number_of_epochs, number_of_frames):
         self.main_listener = None
-        self.event_values_view = eventValuesView(event_values, event_ids)
+        self.event_values_view = eventValuesView(event_values, event_ids, number_of_epochs, number_of_frames)
         self.event_values_view.set_listener(self)
 
         self.event_values_view.show()
 
         self.event_values = np.copy(event_values)
         self.event_ids = copy(event_ids)
-
         self.number_of_epochs = number_of_epochs
+        self.number_of_frames = number_of_frames
         self.current_event_number = 0
+
         self.update_event_displayed()
 
     def cancel_button_clicked(self):
@@ -99,7 +100,8 @@ class eventValuesController(eventValuesListener):
     Updates
     """
     def update_event_displayed(self):
-        event_name, epoch_number, latency = self.get_event_info_from_number(self.current_event_number)
+        event_name, latency = self.get_event_info_from_number(self.current_event_number)
+        epoch_number = self.get_epoch_number_from_latency(latency)
         self.event_values_view.update_event_displayed(self.current_event_number, event_name, epoch_number, latency)
 
     def update_event_data(self, event_name, latency):
@@ -143,8 +145,7 @@ class eventValuesController(eventValuesListener):
             if self.event_ids[event_name] == current_event_id:
                 current_event_name = event_name
                 break
-        epoch_number = event_number
-        return current_event_name, epoch_number, latency
+        return current_event_name, latency
 
     def get_max_event_id(self):
         max_event_id = 0
@@ -153,6 +154,17 @@ class eventValuesController(eventValuesListener):
             if event_id > max_event_id:
                 max_event_id = event_id
         return max_event_id
+
+    def get_epoch_number_from_latency(self, latency):
+        epoch_number = 0
+        total_latency = 0
+        for i in range(self.number_of_epochs):
+            total_latency += self.number_of_frames
+            if total_latency > latency:
+                break
+            else:
+                epoch_number += 1
+        return epoch_number
 
     """
     Setters

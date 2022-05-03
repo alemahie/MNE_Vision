@@ -164,7 +164,9 @@ class mainController(mainListener):
             event_values = self.main_model.get_event_values()
             event_ids = self.main_model.get_event_ids()
             number_of_epochs = self.main_model.get_number_of_epochs()
-            self.event_values_controller = eventValuesController(event_values, event_ids, number_of_epochs)
+            number_of_frames = self.main_model.get_number_of_frames()
+            self.event_values_controller = eventValuesController(event_values, event_ids, number_of_epochs,
+                                                                 number_of_frames)
             self.event_values_controller.set_listener(self)
         else:
             error_message = "You must be working with an epoched file to edit the events."
