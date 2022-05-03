@@ -21,6 +21,8 @@ class resamplingView(QWidget):
         super().__init__()
         self.resampling_listener = None
 
+        self.setWindowTitle("Resampling")
+
         self.grid_layout = QGridLayout()
         self.setLayout(self.grid_layout)
 

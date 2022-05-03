@@ -21,6 +21,8 @@ class icaDecompositionView(QWidget):
         super().__init__()
         self.ica_decomposition_listener = None
 
+        self.setWindowTitle("ICA Decomposition")
+
         self.grid_layout = QGridLayout()
         self.setLayout(self.grid_layout)
 

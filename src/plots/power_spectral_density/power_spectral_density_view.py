@@ -25,6 +25,8 @@ class powerSpectralDensityView(QWidget):
         super().__init__()
         self.power_spectral_density_listener = None
 
+        self.setWindowTitle("Power Spectral Density")
+
         self.grid_layout = QGridLayout()
         self.setLayout(self.grid_layout)
 

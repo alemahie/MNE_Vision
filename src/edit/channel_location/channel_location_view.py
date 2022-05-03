@@ -22,6 +22,8 @@ class channelLocationView(QWidget):
         super().__init__()
         self.channel_location_listener = None
 
+        self.setWindowTitle("Channel Location")
+
         self.vertical_layout = QVBoxLayout()
         self.setLayout(self.vertical_layout)
 

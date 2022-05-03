@@ -24,6 +24,8 @@ class eventValuesView(QWidget):
         self.event_ids = event_ids
         self.number_of_events = len(self.event_values)
 
+        self.setWindowTitle("Event Values")
+
         self.vertical_layout = QVBoxLayout()
         self.setLayout(self.vertical_layout)
 

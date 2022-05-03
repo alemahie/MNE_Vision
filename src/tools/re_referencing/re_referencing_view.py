@@ -31,6 +31,8 @@ class reReferencingView(QWidget):
         self.all_channels_names = all_channels_names
         self.channels_selected = None
 
+        self.setWindowTitle("Re-referencing")
+
         self.vertical_layout = QVBoxLayout()
         self.setLayout(self.vertical_layout)
 

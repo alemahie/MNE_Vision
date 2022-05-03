@@ -23,9 +23,10 @@ class classifyView(QWidget):
     def __init__(self):
         super().__init__()
         self.classify_listener = None
-
         self.pipeline_selector_controller = None
         self.pipeline_selected = None
+
+        self.setWindowTitle("Classification")
 
         self.vertical_layout = QVBoxLayout()
         self.setLayout(self.vertical_layout)

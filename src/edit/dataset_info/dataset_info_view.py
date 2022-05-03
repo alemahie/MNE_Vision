@@ -22,6 +22,8 @@ class datasetInfoView(QWidget):
         super().__init__()
         self.dataset_info_listener = None
 
+        self.setWindowTitle("Dataset Information")
+
         self.grid_layout = QGridLayout()
         self.setLayout(self.grid_layout)
 

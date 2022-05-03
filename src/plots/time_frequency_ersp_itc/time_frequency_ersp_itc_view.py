@@ -33,6 +33,8 @@ class timeFrequencyErspItcView(QWidget):
         self.channels_selected = None
         self.channels_selection_opened = False
 
+        self.setWindowTitle("Time Frequency Analysis")
+
         self.grid_layout = QGridLayout()
         self.setLayout(self.grid_layout)
 

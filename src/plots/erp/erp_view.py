@@ -26,6 +26,8 @@ class erpView(QWidget):
         self.channels_selector_controller = None
         self.channels_selected = None
 
+        self.setWindowTitle("Event Related Potentials")
+
         self.grid_layout = QGridLayout()
         self.setLayout(self.grid_layout)
 

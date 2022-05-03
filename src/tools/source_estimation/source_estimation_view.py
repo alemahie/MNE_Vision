@@ -31,6 +31,8 @@ class sourceEstimationView(QWidget):
         self.subject = "fsaverage"
         self.subjects_dir = get_project_freesurfer_path()
 
+        self.setWindowTitle("Source Estimation")
+
         self.global_layout = QVBoxLayout()
         self.setLayout(self.global_layout)
 

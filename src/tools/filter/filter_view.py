@@ -27,6 +27,8 @@ class filterView(QWidget):
         self.channels_selector_controller = None
         self.channels_selected = None
 
+        self.setWindowTitle("Filtering")
+
         self.low_frequency_line = QLineEdit("0,1")
         self.low_frequency_line.setValidator(QDoubleValidator())
         self.high_frequency_line = QLineEdit("45,0")
