@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 """
-ERP controller
+ERP image controller
 """
 
-from plots.erp.erp_listener import erpListener
-from plots.erp.erp_view import erpView
+from plots.erp_image.erp_image_listener import erpImageListener
+from plots.erp_image.erp_image_view import erpImageView
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -17,26 +17,26 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class erpController(erpListener):
+class erpImageController(erpImageListener):
     def __init__(self, all_channels_names):
         self.main_listener = None
-        self.erp_view = erpView(all_channels_names)
-        self.erp_view.set_listener(self)
+        self.erp_image_view = erpImageView(all_channels_names)
+        self.erp_image_view.set_listener(self)
 
-        self.erp_view.show()
+        self.erp_image_view.show()
 
     def cancel_button_clicked(self):
-        self.erp_view.close()
+        self.erp_image_view.close()
 
-    def confirm_button_clicked(self, channels_selected):
-        self.erp_view.close()
-        self.main_listener.plot_ERPs_information(channels_selected)
+    def confirm_button_clicked(self, channel_selected):
+        self.erp_image_view.close()
+        self.main_listener.plot_ERP_image_information(channel_selected)
 
     """
     Getters
     """
     def get_elements_selected(self, elements_selected):
-        self.erp_view.set_channels_selected(elements_selected)
+        self.erp_image_view.set_channels_selected(elements_selected)
 
     """
     Setters

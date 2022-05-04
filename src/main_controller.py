@@ -26,6 +26,7 @@ from tools.ICA_decomposition.ICA_decomposition_controller import icaDecompositio
 from tools.source_estimation.source_estimation_controller import sourceEstimationController
 
 from plots.power_spectral_density.power_spectral_density_controller import powerSpectralDensityController
+from plots.erp_image.erp_image_controller import erpImageController
 from plots.erp.erp_controller import erpController
 from plots.time_frequency_ersp_itc.time_frequency_ersp_itc_controller import timeFrequencyErspItcController
 
@@ -72,6 +73,7 @@ class mainController(mainListener):
         self.source_estimation_controller = None
 
         self.power_spectral_density_controller = None
+        self.erp_image_controller = None
         self.erp_controller = None
         self.time_frequency_ersp_itc_controller = None
 
@@ -323,6 +325,14 @@ class mainController(mainListener):
             event_ids = self.main_model.get_event_ids()
             self.main_view.plot_data(file_data, file_type, events=event_values, event_id=event_ids)
 
+    def plot_topographies_clicked(self):
+        try:
+            file_data = self.main_model.get_file_data()
+            file_data.plot_image()
+        except Exception as e:
+            print(type(e))
+            print(e)
+
     # Spectra maps
     def plot_spectra_maps_clicked(self):
         minimum_time = self.main_model.get_epochs_start()
@@ -348,10 +358,19 @@ class mainController(mainListener):
 
     def plot_ERP_image_clicked(self):
         all_channels_names = self.main_model.get_all_channels_names()
+        self.erp_image_controller = erpImageController(all_channels_names)
+        self.erp_image_controller.set_listener(self)
+
+    def plot_ERP_image_information(self, channel_selected):
+        file_data = self.main_model.get_file_data()
+        self.main_view.plot_erp_image(file_data, channel_selected)
+
+    def plot_ERPs_clicked(self):
+        all_channels_names = self.main_model.get_all_channels_names()
         self.erp_controller = erpController(all_channels_names)
         self.erp_controller.set_listener(self)
 
-    def plot_ERP_image_information(self, channels_selected):
+    def plot_ERPs_information(self, channels_selected):
         file_data = self.main_model.get_file_data()
         self.main_view.plot_erps(file_data, channels_selected)
 

@@ -140,12 +140,18 @@ class menubarView(QMenuBar):
         plot_data_action = QAction("&Channel data", self)
         plot_data_action.triggered.connect(self.plot_data_trigger)
         self.plot_menu.addAction(plot_data_action)
+        plot_topographies_action = QAction("&Channel topographies", self)
+        plot_topographies_action.triggered.connect(self.plot_topographies_trigger)
+        self.plot_menu.addAction(plot_topographies_action)
         plot_channel_spectra_maps_action = QAction("&Channel spectra (PSD)", self)
         plot_channel_spectra_maps_action.triggered.connect(self.plot_spectra_maps_trigger)
         self.plot_menu.addAction(plot_channel_spectra_maps_action)
         plot_ERP_image_action = QAction("&Channel ERP image", self)
         plot_ERP_image_action.triggered.connect(self.plot_ERP_image_trigger)
         self.plot_menu.addAction(plot_ERP_image_action)
+        plot_ERPs_action = QAction("&Channel ERPs", self)
+        plot_ERPs_action.triggered.connect(self.plot_ERPs_trigger)
+        self.plot_menu.addAction(plot_ERPs_action)
         plot_time_frequency_action = QAction("&Channel time-frequency (ERSP/ITC)", self)
         plot_time_frequency_action.triggered.connect(self.plot_time_frequency_trigger)
         self.plot_menu.addAction(plot_time_frequency_action)
@@ -241,6 +247,9 @@ class menubarView(QMenuBar):
     def plot_data_trigger(self):
         self.menubarListener.plot_data_clicked()
 
+    def plot_topographies_trigger(self):
+        self.menubarListener.plot_topographies_clicked()
+
     def plot_spectra_maps_trigger(self):
         self.menubarListener.plot_spectra_maps_clicked()
 
@@ -249,6 +258,9 @@ class menubarView(QMenuBar):
 
     def plot_ERP_image_trigger(self):
         self.menubarListener.plot_ERP_image_clicked()
+
+    def plot_ERPs_trigger(self):
+        self.menubarListener.plot_ERPs_clicked()
 
     def plot_time_frequency_trigger(self):
         self.menubarListener.plot_time_frequency_clicked()

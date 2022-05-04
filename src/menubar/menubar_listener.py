@@ -98,11 +98,19 @@ class menubarListener(ABC):
         pass
 
     @abstractmethod
+    def plot_topographies_clicked(self):
+        pass
+
+    @abstractmethod
     def plot_spectra_maps_clicked(self):
         pass
 
     @abstractmethod
     def plot_ERP_image_clicked(self):
+        pass
+
+    @abstractmethod
+    def plot_ERPs_clicked(self):
         pass
 
     @abstractmethod

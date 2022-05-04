@@ -92,11 +92,17 @@ class menubarController(menubarListener):
     def plot_data_clicked(self):
         self.main_listener.plot_data_clicked()
 
+    def plot_topographies_clicked(self):
+        self.main_listener.plot_topographies_clicked()
+
     def plot_spectra_maps_clicked(self):
         self.main_listener.plot_spectra_maps_clicked()
 
     def plot_ERP_image_clicked(self):
         self.main_listener.plot_ERP_image_clicked()
+
+    def plot_ERPs_clicked(self):
+        self.main_listener.plot_ERPs_clicked()
 
     def plot_time_frequency_clicked(self):
         self.main_listener.plot_time_frequency_clicked()

@@ -72,6 +72,10 @@ class mainView(QMainWindow):
             file_data.plot(scalings="auto", n_epochs=5, n_channels=10, events=events, event_id=event_id)
 
     @staticmethod
+    def plot_erp_image(file_data, channel_selected):
+        file_data.plot_image(picks=channel_selected)
+
+    @staticmethod
     def plot_erps(file_data, channels_selected):
         erps = file_data.average()
         erps.plot_joint(picks=channels_selected)

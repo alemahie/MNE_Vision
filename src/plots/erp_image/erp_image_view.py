@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-ERP view
+ERP image view
 """
 
 from PyQt6.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel
@@ -18,15 +18,15 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class erpView(QWidget):
+class erpImageView(QWidget):
     def __init__(self, all_channels_names):
         super().__init__()
-        self.erp_listener = None
+        self.erp_image_listener = None
         self.all_channels_names = all_channels_names
         self.channels_selector_controller = None
-        self.channels_selected = None
+        self.channel_selected = None
 
-        self.setWindowTitle("Event Related Potentials")
+        self.setWindowTitle("Event Related Potentials Image")
 
         self.grid_layout = QGridLayout()
         self.setLayout(self.grid_layout)
@@ -35,9 +35,9 @@ class erpView(QWidget):
         self.channels_selection_button.clicked.connect(self.channels_selection_trigger)
 
         self.cancel = QPushButton("&Cancel", self)
-        self.cancel.clicked.connect(self.cancel_erp_trigger)
+        self.cancel.clicked.connect(self.cancel_erp_image_trigger)
         self.confirm = QPushButton("&Confirm", self)
-        self.confirm.clicked.connect(self.confirm_erp_trigger)
+        self.confirm.clicked.connect(self.confirm_erp_image_trigger)
 
         self.grid_layout.addWidget(QLabel("Channels : "), 0, 0)
         self.grid_layout.addWidget(self.channels_selection_button, 0, 1)
@@ -47,22 +47,23 @@ class erpView(QWidget):
     """
     Triggers
     """
-    def cancel_erp_trigger(self):
-        self.erp_listener.cancel_button_clicked()
+    def cancel_erp_image_trigger(self):
+        self.erp_image_listener.cancel_button_clicked()
 
-    def confirm_erp_trigger(self):
-        self.erp_listener.confirm_button_clicked(self.channels_selected)
+    def confirm_erp_image_trigger(self):
+        self.erp_image_listener.confirm_button_clicked(self.channel_selected)
 
     def channels_selection_trigger(self):
-        title = "Select the channels used for the ERP computation :"
-        self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=True)
-        self.channels_selector_controller.set_listener(self.erp_listener)
+        title = "Select the channels used for the ERP image computation :"
+        self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=False,
+                                                                       unique_box=True)
+        self.channels_selector_controller.set_listener(self.erp_image_listener)
 
     """
     Setters
     """
     def set_listener(self, listener):
-        self.erp_listener = listener
+        self.erp_image_listener = listener
 
-    def set_channels_selected(self, channels_selected):
-        self.channels_selected = channels_selected
+    def set_channels_selected(self, channel_selected):
+        self.channel_selected = channel_selected

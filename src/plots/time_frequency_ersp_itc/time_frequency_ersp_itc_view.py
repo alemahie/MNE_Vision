@@ -60,16 +60,17 @@ class timeFrequencyErspItcView(QWidget):
         self.grid_layout.addWidget(self.channels_selection_button, 0, 1)
         self.grid_layout.addWidget(QLabel("Method for Time-frequency computation : "), 1, 0)
         self.grid_layout.addWidget(self.method_box, 1, 1)
-        self.grid_layout.addWidget(QLabel("Low Frequency (Hz) : "), 2, 0)
+        self.grid_layout.addWidget(QLabel("Minimum Frequency of interest (Hz) : "), 2, 0)
         self.grid_layout.addWidget(self.low_frequency_line, 2, 1)
-        self.grid_layout.addWidget(QLabel("High Frequency (Hz) : "), 3, 0)
+        self.grid_layout.addWidget(QLabel("Maximum Frequency of interest (Hz) : "), 3, 0)
         self.grid_layout.addWidget(self.high_frequency_line, 3, 1)
         self.grid_layout.addWidget(QLabel("Number of cycles : "), 4, 0)
         self.grid_layout.addWidget(self.n_cycles_line, 4, 1)
         self.grid_layout.addWidget(self.cancel, 5, 0)
         self.grid_layout.addWidget(self.confirm, 5, 1)
 
-    def plot_ersp_itc(self, channel_selected, power, itc):
+    @staticmethod
+    def plot_ersp_itc(channel_selected, power, itc):
         fig, axis = plt.subplots(1, 2)
         power.plot(axes=axis[0], show=False)
         axis[0].set_title("ERSP")

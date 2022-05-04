@@ -194,6 +194,10 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def plot_topographies_clicked(self):
+        pass
+
+    @abstractmethod
     def plot_spectra_maps_clicked(self):
         pass
 
@@ -215,6 +219,14 @@ class mainListener(ABC):
 
     @abstractmethod
     def plot_ERP_image_information(self, channels_selected):
+        pass
+
+    @abstractmethod
+    def plot_ERPs_clicked(self):
+        pass
+
+    @abstractmethod
+    def plot_ERPs_information(self, channel_selected):
         pass
 
     @abstractmethod
