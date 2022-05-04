@@ -198,6 +198,10 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def plot_topographies_information(self, time_points, mode):
+        pass
+
+    @abstractmethod
     def plot_spectra_maps_clicked(self):
         pass
 

@@ -72,6 +72,18 @@ class mainView(QMainWindow):
             file_data.plot(scalings="auto", n_epochs=5, n_channels=10, events=events, event_id=event_id)
 
     @staticmethod
+    def plot_topographies(file_data, time_points, mode):
+        try:
+            evoked = file_data.average()
+            if mode == "separated":
+                evoked.plot_topomap(times=time_points)
+            elif mode == "animated":
+                evoked.animate_topomap(times=time_points, frame_rate=2)
+        except Exception as e:
+            print(type(e))
+            print(e)
+
+    @staticmethod
     def plot_erp_image(file_data, channel_selected):
         file_data.plot_image(picks=channel_selected)
 

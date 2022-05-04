@@ -26,6 +26,7 @@ from tools.ICA_decomposition.ICA_decomposition_controller import icaDecompositio
 from tools.source_estimation.source_estimation_controller import sourceEstimationController
 
 from plots.power_spectral_density.power_spectral_density_controller import powerSpectralDensityController
+from plots.topographies.topographies_controller import topographiesController
 from plots.erp_image.erp_image_controller import erpImageController
 from plots.erp.erp_controller import erpController
 from plots.time_frequency_ersp_itc.time_frequency_ersp_itc_controller import timeFrequencyErspItcController
@@ -73,6 +74,7 @@ class mainController(mainListener):
         self.source_estimation_controller = None
 
         self.power_spectral_density_controller = None
+        self.topographies_controller = None
         self.erp_image_controller = None
         self.erp_controller = None
         self.time_frequency_ersp_itc_controller = None
@@ -326,12 +328,12 @@ class mainController(mainListener):
             self.main_view.plot_data(file_data, file_type, events=event_values, event_id=event_ids)
 
     def plot_topographies_clicked(self):
-        try:
-            file_data = self.main_model.get_file_data()
-            file_data.plot_image()
-        except Exception as e:
-            print(type(e))
-            print(e)
+        self.topographies_controller = topographiesController()
+        self.topographies_controller.set_listener(self)
+
+    def plot_topographies_information(self, time_points, mode):
+        file_data = self.main_model.get_file_data()
+        self.main_view.plot_topographies(file_data, time_points, mode)
 
     # Spectra maps
     def plot_spectra_maps_clicked(self):
