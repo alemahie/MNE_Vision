@@ -8,6 +8,8 @@ Main controller
 import sys
 
 from PyQt6.QtWidgets import QApplication
+from mne.viz import plot_connectivity_circle
+from mne_connectivity import EpochConnectivity, envelope_correlation
 
 from main_model import mainModel
 from main_view import mainView
@@ -424,6 +426,17 @@ class mainController(mainListener):
 
     def connectivity_information(self):
         print("Connectivity")
+        try:
+            file_data = self.main_model.get_file_data()
+            channel_names = self.main_model.get_all_channels_names()
+            connectivity = envelope_correlation(file_data)
+            print("ok")
+            connectivity = connectivity.combine()
+            con_data = connectivity.get_data(output="dense")[:, :, 0]
+            plot_connectivity_circle(con_data, channel_names)
+        except Exception as e:
+            print(type(e))
+            print(e)
 
     def temporal_connectivity_clicked(self):
         self.temporal_connectivity_controller = temporalConnectivityController()
@@ -438,6 +451,7 @@ class mainController(mainListener):
 
     def spectral_connectivity_information(self):
         print("Spectral Connectivity")
+        # spectral_connectivity_epochs()
 
     def spectro_temporal_connectivity_clicked(self):
         self.spectro_temporal_connectivity_controller = spectroTemporalConnectivityController()
