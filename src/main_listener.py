@@ -254,6 +254,41 @@ class mainListener(ABC):
         pass
 
     """
+    Connectivity Menu
+    """
+    @abstractmethod
+    def connectivity_clicked(self):
+        pass
+
+    @abstractmethod
+    def connectivity_information(self):
+        pass
+
+    @abstractmethod
+    def temporal_connectivity_clicked(self):
+        pass
+
+    @abstractmethod
+    def temporal_connectivity_information(self):
+        pass
+
+    @abstractmethod
+    def spectral_connectivity_clicked(self):
+        pass
+
+    @abstractmethod
+    def spectral_connectivity_information(self):
+        pass
+
+    @abstractmethod
+    def spectro_temporal_connectivity_clicked(self):
+        pass
+
+    @abstractmethod
+    def spectro_temporal_connectivity_information(self):
+        pass
+
+    """
     Classification Menu
     """
     @abstractmethod

@@ -73,15 +73,11 @@ class mainView(QMainWindow):
 
     @staticmethod
     def plot_topographies(file_data, time_points, mode):
-        try:
-            evoked = file_data.average()
-            if mode == "separated":
-                evoked.plot_topomap(times=time_points)
-            elif mode == "animated":
-                evoked.animate_topomap(times=time_points, frame_rate=2)
-        except Exception as e:
-            print(type(e))
-            print(e)
+        evoked = file_data.average()
+        if mode == "separated":
+            evoked.plot_topomap(times=time_points)
+        elif mode == "animated":
+            evoked.animate_topomap(times=time_points, frame_rate=2)
 
     @staticmethod
     def plot_erp_image(file_data, channel_selected):

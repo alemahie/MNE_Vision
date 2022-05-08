@@ -107,6 +107,19 @@ class menubarController(menubarListener):
     def plot_time_frequency_clicked(self):
         self.main_listener.plot_time_frequency_clicked()
 
+    # Connectivity menu
+    def connectivity_clicked(self):
+        self.main_listener.connectivity_clicked()
+
+    def temporal_connectivity_clicked(self):
+        self.main_listener.temporal_connectivity_clicked()
+
+    def spectral_connectivity_clicked(self):
+        self.main_listener.spectral_connectivity_clicked()
+
+    def spectro_temporal_connectivity_clicked(self):
+        self.main_listener.spectro_temporal_connectivity_clicked()
+
     # Classification menu
     def classify_clicked(self):
         self.main_listener.classify_clicked()

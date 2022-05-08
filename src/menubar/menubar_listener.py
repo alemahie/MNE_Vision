@@ -117,6 +117,23 @@ class menubarListener(ABC):
     def plot_time_frequency_clicked(self):
         pass
 
+    # Connectivity menu
+    @abstractmethod
+    def connectivity_clicked(self):
+        pass
+
+    @abstractmethod
+    def temporal_connectivity_clicked(self):
+        pass
+
+    @abstractmethod
+    def spectral_connectivity_clicked(self):
+        pass
+
+    @abstractmethod
+    def spectro_temporal_connectivity_clicked(self):
+        pass
+
     # Classification menu
     @abstractmethod
     def classify_clicked(self):

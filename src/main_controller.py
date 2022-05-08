@@ -31,6 +31,12 @@ from plots.erp_image.erp_image_controller import erpImageController
 from plots.erp.erp_controller import erpController
 from plots.time_frequency_ersp_itc.time_frequency_ersp_itc_controller import timeFrequencyErspItcController
 
+from connectivity.connectivity.connectivity_controller import connectivityController
+from connectivity.temporal_connectivity.temporal_connectivity_controller import temporalConnectivityController
+from connectivity.spectral_connectivity.spectral_connectivity_controller import spectralConnectivityController
+from connectivity.spectro_temporal_connectivity.spectro_temporal_connectivity_controller import \
+    spectroTemporalConnectivityController
+
 from classification.classify.classify_controller import classifyController
 
 from utils.stylesheet import get_stylesheet
@@ -78,6 +84,11 @@ class mainController(mainListener):
         self.erp_image_controller = None
         self.erp_controller = None
         self.time_frequency_ersp_itc_controller = None
+
+        self.connectivity_controller = None
+        self.temporal_connectivity_controller = None
+        self.spectral_connectivity_controller = None
+        self.spectro_temporal_connectivity_controller = None
 
         self.classify_controller = None
 
@@ -403,6 +414,37 @@ class mainController(mainListener):
         power = self.main_model.get_power()
         itc = self.main_model.get_itc()
         self.time_frequency_ersp_itc_controller.plot_ersp_itc(channel_selected, power, itc)
+
+    """
+    Connectivity menu
+    """
+    def connectivity_clicked(self):
+        self.connectivity_controller = connectivityController()
+        self.connectivity_controller.set_listener(self)
+
+    def connectivity_information(self):
+        print("Connectivity")
+
+    def temporal_connectivity_clicked(self):
+        self.temporal_connectivity_controller = temporalConnectivityController()
+        self.temporal_connectivity_controller.set_listener(self)
+
+    def temporal_connectivity_information(self):
+        print("Temporal Connectivity")
+
+    def spectral_connectivity_clicked(self):
+        self.spectral_connectivity_controller = spectralConnectivityController()
+        self.spectral_connectivity_controller.set_listener(self)
+
+    def spectral_connectivity_information(self):
+        print("Spectral Connectivity")
+
+    def spectro_temporal_connectivity_clicked(self):
+        self.spectro_temporal_connectivity_controller = spectroTemporalConnectivityController()
+        self.spectro_temporal_connectivity_controller.set_listener(self)
+
+    def spectro_temporal_connectivity_information(self):
+        print("Spectro-Temporal Connectivity")
 
     """
     Classification menu
