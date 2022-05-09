@@ -25,13 +25,16 @@ __status__ = "Dev"
 
 
 class sourceEstimationView(QWidget):
-    def __init__(self):
+    def __init__(self, title=None):
         super().__init__()
         self.source_estimation_listener = None
         self.subject = "fsaverage"
         self.subjects_dir = get_project_freesurfer_path()
 
-        self.setWindowTitle("Source Estimation")
+        if title is None:
+            self.setWindowTitle("Source Estimation")
+        else:
+            self.setWindowTitle(title)
 
         self.global_layout = QVBoxLayout()
         self.setLayout(self.global_layout)

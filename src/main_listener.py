@@ -257,19 +257,35 @@ class mainListener(ABC):
     Connectivity Menu
     """
     @abstractmethod
-    def connectivity_clicked(self):
+    def envelope_correlation_clicked(self):
         pass
 
     @abstractmethod
-    def connectivity_information(self):
+    def envelope_correlation_information(self):
         pass
 
     @abstractmethod
-    def temporal_connectivity_clicked(self):
+    def envelope_correlation_computation_finished(self):
         pass
 
     @abstractmethod
-    def temporal_connectivity_information(self):
+    def envelope_correlation_finished(self):
+        pass
+
+    @abstractmethod
+    def source_space_connectivity_clicked(self):
+        pass
+
+    @abstractmethod
+    def source_space_connectivity_information(self, source_estimation_method, save_data, load_data, n_jobs):
+        pass
+
+    @abstractmethod
+    def source_space_connectivity_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def source_space_connectivity_finished(self):
         pass
 
     @abstractmethod

@@ -8,8 +8,6 @@ Main controller
 import sys
 
 from PyQt6.QtWidgets import QApplication
-from mne.viz import plot_connectivity_circle
-from mne_connectivity import EpochConnectivity, envelope_correlation
 
 from main_model import mainModel
 from main_view import mainView
@@ -33,8 +31,8 @@ from plots.erp_image.erp_image_controller import erpImageController
 from plots.erp.erp_controller import erpController
 from plots.time_frequency_ersp_itc.time_frequency_ersp_itc_controller import timeFrequencyErspItcController
 
-from connectivity.connectivity.connectivity_controller import connectivityController
-from connectivity.temporal_connectivity.temporal_connectivity_controller import temporalConnectivityController
+from connectivity.envelope_correlation.envelope_correlation_controller import envelopeCorrelationController
+from connectivity.source_space_connectivity.source_space_connectivity_controller import sourceSpaceConnectivityController
 from connectivity.spectral_connectivity.spectral_connectivity_controller import spectralConnectivityController
 from connectivity.spectro_temporal_connectivity.spectro_temporal_connectivity_controller import \
     spectroTemporalConnectivityController
@@ -87,8 +85,8 @@ class mainController(mainListener):
         self.erp_controller = None
         self.time_frequency_ersp_itc_controller = None
 
-        self.connectivity_controller = None
-        self.temporal_connectivity_controller = None
+        self.envelope_correlation_controller = None
+        self.source_space_connectivity_controller = None
         self.spectral_connectivity_controller = None
         self.spectro_temporal_connectivity_controller = None
 
@@ -319,6 +317,11 @@ class mainController(mainListener):
         processing_title_finished = "Source estimation finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
+    def source_estimation_computation_error(self):
+        processing_title_finished = "An error as occurred during the computation of the source estimation, please try again."
+        self.waiting_while_processing_controller.set_finish_method("error")
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
     def source_estimation_finished(self):
         source_estimation_data = self.main_model.get_source_estimation_data()
         self.source_estimation_controller.plot_source_estimation(source_estimation_data)
@@ -420,30 +423,54 @@ class mainController(mainListener):
     """
     Connectivity menu
     """
-    def connectivity_clicked(self):
-        self.connectivity_controller = connectivityController()
-        self.connectivity_controller.set_listener(self)
+    def envelope_correlation_clicked(self):
+        number_of_channels = self.main_model.get_number_of_channels()
+        self.envelope_correlation_controller = envelopeCorrelationController(number_of_channels)
+        self.envelope_correlation_controller.set_listener(self)
 
-    def connectivity_information(self):
-        print("Connectivity")
+    def envelope_correlation_information(self):
+        processing_title = "Envelope correlation running, please wait."
+        finish_method = "envelope_correlation"
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.main_model.envelope_correlation()
+
+    def envelope_correlation_computation_finished(self):
+        processing_title_finished = "Envelope correlation finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def envelope_correlation_finished(self):
+        envelope_correlation_data = self.main_model.get_envelope_correlation_data()
+        channel_names = self.main_model.get_all_channels_names()
+        self.envelope_correlation_controller.plot_envelope_correlation(envelope_correlation_data, channel_names)
+
+    def source_space_connectivity_clicked(self):
         try:
-            file_data = self.main_model.get_file_data()
-            channel_names = self.main_model.get_all_channels_names()
-            connectivity = envelope_correlation(file_data)
-            print("ok")
-            connectivity = connectivity.combine()
-            con_data = connectivity.get_data(output="dense")[:, :, 0]
-            plot_connectivity_circle(con_data, channel_names)
+            number_of_channels = self.main_model.get_number_of_channels()
+            self.source_space_connectivity_controller = sourceSpaceConnectivityController(number_of_channels)
+            self.source_space_connectivity_controller.set_listener(self)
         except Exception as e:
-            print(type(e))
             print(e)
 
-    def temporal_connectivity_clicked(self):
-        self.temporal_connectivity_controller = temporalConnectivityController()
-        self.temporal_connectivity_controller.set_listener(self)
+    def source_space_connectivity_information(self, source_estimation_method, save_data, load_data, n_jobs):
+        processing_title = "Source Space Connectivity running, please wait."
+        finish_method = "source_space_connectivity"
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.main_model.source_space_connectivity(source_estimation_method, save_data, load_data, n_jobs)
 
-    def temporal_connectivity_information(self):
-        print("Temporal Connectivity")
+    def source_space_connectivity_computation_finished(self):
+        processing_title_finished = "Source Space Connectivity finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def source_space_connectivity_computation_error(self):
+        processing_title_finished = "An error as occurred during the computation of the source space connectivity, please try again."
+        self.waiting_while_processing_controller.set_finish_method("error")
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def source_space_connectivity_finished(self):
+        source_space_connectivity_data = self.main_model.get_source_space_connectivity_data()
+        self.source_space_connectivity_controller.plot_source_space_connectivity(source_space_connectivity_data)
 
     def spectral_connectivity_clicked(self):
         self.spectral_connectivity_controller = spectralConnectivityController()
@@ -451,7 +478,6 @@ class mainController(mainListener):
 
     def spectral_connectivity_information(self):
         print("Spectral Connectivity")
-        # spectral_connectivity_epochs()
 
     def spectro_temporal_connectivity_clicked(self):
         self.spectro_temporal_connectivity_controller = spectroTemporalConnectivityController()
@@ -511,6 +537,10 @@ class mainController(mainListener):
             self.plot_spectra_maps_finished()
         elif finish_method == "time_frequency":
             self.plot_time_frequency_finished()
+        elif finish_method == "envelope_correlation":
+            self.envelope_correlation_finished()
+        elif finish_method == "source_space_connectivity":
+            self.source_space_connectivity_finished()
         elif finish_method == "classify":
             self.classify_finished()
 

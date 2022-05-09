@@ -18,9 +18,9 @@ __status__ = "Dev"
 
 
 class sourceEstimationController(sourceEstimationListener):
-    def __init__(self):
+    def __init__(self, title=None):
         self.main_listener = None
-        self.source_estimation_view = sourceEstimationView()
+        self.source_estimation_view = sourceEstimationView(title)
         self.source_estimation_view.set_listener(self)
 
         self.source_estimation_view.show()

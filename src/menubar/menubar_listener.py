@@ -119,11 +119,11 @@ class menubarListener(ABC):
 
     # Connectivity menu
     @abstractmethod
-    def connectivity_clicked(self):
+    def envelope_correlation_clicked(self):
         pass
 
     @abstractmethod
-    def temporal_connectivity_clicked(self):
+    def source_space_connectivity_clicked(self):
         pass
 
     @abstractmethod

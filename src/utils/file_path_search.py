@@ -7,6 +7,8 @@ File path search
 
 from pathlib import Path
 
+from mne import read_labels_from_annot
+
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
@@ -28,3 +30,12 @@ def get_project_freesurfer_path():
 def get_directory_path_from_file_path(file_path):
     path = Path(file_path).parent
     return str(path)
+
+
+def get_labels_from_subject(subject, subjects_dir):
+    labels = read_labels_from_annot(subject, parc='aparc', subjects_dir=subjects_dir)
+    for i in range(len(labels)):
+        if labels[i].name == "unknown-lh":
+            del labels[i]
+            break
+    return labels

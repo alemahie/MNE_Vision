@@ -163,17 +163,19 @@ class menubarView(QMenuBar):
         self.plot_menu.addAction(plot_time_frequency_action)
 
     def create_connectivity_menu(self):
-        connectivity_action = QAction("&Connectivity", self)
-        connectivity_action.triggered.connect(self.connectivity_trigger)
-        self.connectivity_menu.addAction(connectivity_action)
-        temporal_connectivity_action = QAction("&Temporal Connectivity", self)
-        temporal_connectivity_action.triggered.connect(self.temporal_connectivity_trigger)
-        self.connectivity_menu.addAction(temporal_connectivity_action)
+        envelope_correlation_action = QAction("&Envelope Correlation", self)
+        envelope_correlation_action.triggered.connect(self.envelope_correlation_trigger)
+        self.connectivity_menu.addAction(envelope_correlation_action)
+        source_space_connectivity_action = QAction("&Source Space Connectivity", self)
+        source_space_connectivity_action.triggered.connect(self.source_space_connectivity_trigger)
+        self.connectivity_menu.addAction(source_space_connectivity_action)
         spectral_connectivity_action = QAction("&Spectral Connectivity", self)
         spectral_connectivity_action.triggered.connect(self.spectral_connectivity_trigger)
+        spectral_connectivity_action.setEnabled(False)
         self.connectivity_menu.addAction(spectral_connectivity_action)
         spectro_temporal_connectivity_action = QAction("&Spectro-Temporal Connectivity", self)
         spectro_temporal_connectivity_action.triggered.connect(self.spectro_temporal_connectivity_trigger)
+        spectro_temporal_connectivity_action.setEnabled(False)
         self.connectivity_menu.addAction(spectro_temporal_connectivity_action)
 
     def create_classification_menu(self):
@@ -287,11 +289,11 @@ class menubarView(QMenuBar):
         self.menubarListener.plot_time_frequency_clicked()
 
     # Connectivity menu triggers
-    def connectivity_trigger(self):
-        self.menubarListener.connectivity_clicked()
+    def envelope_correlation_trigger(self):
+        self.menubarListener.envelope_correlation_clicked()
 
-    def temporal_connectivity_trigger(self):
-        self.menubarListener.temporal_connectivity_clicked()
+    def source_space_connectivity_trigger(self):
+        self.menubarListener.source_space_connectivity_clicked()
 
     def spectral_connectivity_trigger(self):
         self.menubarListener.spectral_connectivity_clicked()

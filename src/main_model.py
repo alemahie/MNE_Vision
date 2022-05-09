@@ -16,6 +16,7 @@ from runnables.tools_runnable import filterRunnable, icaRunnable, sourceEstimati
     reReferencingRunnable
 from runnables.files_runnable import openCntFileRunnable, openSetFileRunnable, openFifFileRunnable
 from runnables.plots_runnable import powerSpectralDensityRunnable, timeFrequencyRunnable
+from runnables.connectivity_runnable import envelopeCorrelationRunnable, sourceSpaceConnectivityRunnable
 from runnables.classification_runnable import classifyRunnable
 
 from utils.file_path_search import get_directory_path_from_file_path
@@ -52,6 +53,9 @@ class mainModel:
 
         self.power_spectral_density_runnable = None
         self.time_frequency_runnable = None
+
+        self.envelope_correlation_runnable = None
+        self.source_space_connectivity_runnable = None
 
         self.classify_runnable = None
 
@@ -162,9 +166,13 @@ class mainModel:
                                                                    save_data, load_data, n_jobs)
         pool.start(self.source_estimation_runnable)
         self.source_estimation_runnable.signals.finished.connect(self.source_estimation_computation_finished)
+        self.source_estimation_runnable.signals.error.connect(self.source_estimation_computation_error)
 
     def source_estimation_computation_finished(self):
         self.main_listener.source_estimation_computation_finished()
+
+    def source_estimation_computation_error(self):
+        self.main_listener.source_estimation_computation_error()
 
     """
     Plot menu
@@ -192,6 +200,33 @@ class mainModel:
 
     def time_frequency_computation_error(self):
         self.main_listener.plot_time_frequency_computation_error()
+
+    """
+    Connectivity menu
+    """
+    def envelope_correlation(self):
+        pool = QThreadPool.globalInstance()
+        self.envelope_correlation_runnable = envelopeCorrelationRunnable(self.file_data)
+        pool.start(self.envelope_correlation_runnable)
+        self.envelope_correlation_runnable.signals.finished.connect(self.envelope_correlation_computation_finished)
+
+    def envelope_correlation_computation_finished(self):
+        self.main_listener.envelope_correlation_computation_finished()
+
+    def source_space_connectivity(self, source_estimation_method, save_data, load_data, n_jobs):
+        pool = QThreadPool.globalInstance()
+        self.source_space_connectivity_runnable = sourceSpaceConnectivityRunnable(self.file_data, self.get_file_path_name_without_extension(),
+                                                                                  source_estimation_method, save_data,
+                                                                                  load_data, n_jobs)
+        pool.start(self.source_space_connectivity_runnable)
+        self.source_space_connectivity_runnable.signals.finished.connect(self.source_space_connectivity_computation_finished)
+        self.source_space_connectivity_runnable.signals.error.connect(self.source_space_connectivity_computation_error)
+
+    def source_space_connectivity_computation_finished(self):
+        self.main_listener.envelope_correlation_computation_finished()
+
+    def source_space_connectivity_computation_error(self):
+        self.main_listener.envelope_correlation_computation_error()
 
     """
     Classification menu
@@ -320,6 +355,12 @@ class mainModel:
 
     def get_itc(self):
         return self.time_frequency_runnable.get_itc()
+
+    def get_envelope_correlation_data(self):
+        return self.envelope_correlation_runnable.get_envelope_correlation_data()
+
+    def get_source_space_connectivity_data(self):
+        return self.source_space_connectivity_runnable.get_source_space_connectivity_data()
 
     def get_classifier(self):
         return self.classify_runnable.get_classifier()

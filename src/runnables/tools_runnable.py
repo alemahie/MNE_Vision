@@ -13,6 +13,7 @@ from mne.minimum_norm import read_inverse_operator, make_inverse_operator, apply
                              write_inverse_operator
 from mne.preprocessing import ICA
 
+from utils.error_window import errorWindow
 from utils.file_path_search import get_project_freesurfer_path
 
 __author__ = "Lemahieu Antoine"
@@ -151,6 +152,7 @@ class icaRunnable(QRunnable):
 
 class sourceEstimationWorkerSignals(QObject):
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class sourceEstimationRunnable(QRunnable):
@@ -169,8 +171,22 @@ class sourceEstimationRunnable(QRunnable):
         self.source_estimation_data = None
 
     def run(self):
-        self.source_estimation_data = self.mne_source_estimation_computation()
-        self.signals.finished.emit()
+        try:
+            self.source_estimation_data = self.mne_source_estimation_computation()
+            self.signals.finished.emit()
+        except FileNotFoundError as error:
+            error_message = "An error as occurred during the computation of the source estimation. \n" \
+                            "You can not load source estimation data if it has not been computed and saved earlier."
+            detailed_message = str(error)
+            error_window = errorWindow(error_message, detailed_message)
+            error_window.show()
+            self.signals.error.emit()
+        except Exception as error:
+            error_message = "An error as occurred during the computation of the source estimation."
+            detailed_message = str(error)
+            error_window = errorWindow(error_message, detailed_message)
+            error_window.show()
+            self.signals.error.emit()
 
     def mne_source_estimation_computation(self):
         self.file_data.apply_baseline()

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Connectivity Listener
+Source Space Connectivity Listener
 """
 
 from abc import ABC, abstractmethod
@@ -16,11 +16,11 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class connectivityListener(ABC):
+class sourceSpaceConnectivityListener(ABC):
     @abstractmethod
     def cancel_button_clicked(self):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self):
+    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, n_jobs):
         pass

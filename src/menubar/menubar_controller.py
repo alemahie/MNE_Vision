@@ -108,11 +108,11 @@ class menubarController(menubarListener):
         self.main_listener.plot_time_frequency_clicked()
 
     # Connectivity menu
-    def connectivity_clicked(self):
-        self.main_listener.connectivity_clicked()
+    def envelope_correlation_clicked(self):
+        self.main_listener.envelope_correlation_clicked()
 
-    def temporal_connectivity_clicked(self):
-        self.main_listener.temporal_connectivity_clicked()
+    def source_space_connectivity_clicked(self):
+        self.main_listener.source_space_connectivity_clicked()
 
     def spectral_connectivity_clicked(self):
         self.main_listener.spectral_connectivity_clicked()

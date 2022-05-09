@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Temporal Connectivity Listener
+Envelope Correlation Listener
 """
 
 from abc import ABC, abstractmethod
@@ -16,7 +16,7 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class temporalConnectivityListener(ABC):
+class envelopeCorrelationListener(ABC):
     @abstractmethod
     def cancel_button_clicked(self):
         pass

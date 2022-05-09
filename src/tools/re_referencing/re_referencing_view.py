@@ -39,7 +39,6 @@ class reReferencingView(QWidget):
         # Average of all channels & Select a specific channel
         self.re_referencing_mode_widget = QWidget()
         self.re_referencing_mode_buttons = QButtonGroup()
-
         self.average_check_box = QCheckBox()
         self.average_check_box.setChecked(True)
         self.average_check_box.setText("Compute average reference")
