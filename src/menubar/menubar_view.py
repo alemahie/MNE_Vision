@@ -169,10 +169,9 @@ class menubarView(QMenuBar):
         source_space_connectivity_action = QAction("&Source Space Connectivity", self)
         source_space_connectivity_action.triggered.connect(self.source_space_connectivity_trigger)
         self.connectivity_menu.addAction(source_space_connectivity_action)
-        spectral_connectivity_action = QAction("&Spectral Connectivity", self)
-        spectral_connectivity_action.triggered.connect(self.spectral_connectivity_trigger)
-        spectral_connectivity_action.setEnabled(False)
-        self.connectivity_menu.addAction(spectral_connectivity_action)
+        sensor_space_connectivity_action = QAction("&3D Sensor Space Connectivity", self)
+        sensor_space_connectivity_action.triggered.connect(self.sensor_space_connectivity_trigger)
+        self.connectivity_menu.addAction(sensor_space_connectivity_action)
         spectro_temporal_connectivity_action = QAction("&Spectro-Temporal Connectivity", self)
         spectro_temporal_connectivity_action.triggered.connect(self.spectro_temporal_connectivity_trigger)
         spectro_temporal_connectivity_action.setEnabled(False)
@@ -295,8 +294,8 @@ class menubarView(QMenuBar):
     def source_space_connectivity_trigger(self):
         self.menubarListener.source_space_connectivity_clicked()
 
-    def spectral_connectivity_trigger(self):
-        self.menubarListener.spectral_connectivity_clicked()
+    def sensor_space_connectivity_trigger(self):
+        self.menubarListener.sensor_space_connectivity_clicked()
 
     def spectro_temporal_connectivity_trigger(self):
         self.menubarListener.spectro_temporal_connectivity_clicked()

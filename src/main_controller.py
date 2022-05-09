@@ -33,7 +33,7 @@ from plots.time_frequency_ersp_itc.time_frequency_ersp_itc_controller import tim
 
 from connectivity.envelope_correlation.envelope_correlation_controller import envelopeCorrelationController
 from connectivity.source_space_connectivity.source_space_connectivity_controller import sourceSpaceConnectivityController
-from connectivity.spectral_connectivity.spectral_connectivity_controller import spectralConnectivityController
+from connectivity.sensor_space_connectivity.spectral_connectivity_controller import sensorSpaceConnectivityController
 from connectivity.spectro_temporal_connectivity.spectro_temporal_connectivity_controller import \
     spectroTemporalConnectivityController
 
@@ -87,7 +87,7 @@ class mainController(mainListener):
 
         self.envelope_correlation_controller = None
         self.source_space_connectivity_controller = None
-        self.spectral_connectivity_controller = None
+        self.sensor_space_connectivity_controller = None
         self.spectro_temporal_connectivity_controller = None
 
         self.classify_controller = None
@@ -471,12 +471,25 @@ class mainController(mainListener):
         source_space_connectivity_data = self.main_model.get_source_space_connectivity_data()
         self.source_space_connectivity_controller.plot_source_space_connectivity(source_space_connectivity_data)
 
-    def spectral_connectivity_clicked(self):
-        self.spectral_connectivity_controller = spectralConnectivityController()
-        self.spectral_connectivity_controller.set_listener(self)
+    def sensor_space_connectivity_clicked(self):
+        file_info = self.main_model.get_file_data().info
+        self.sensor_space_connectivity_controller = sensorSpaceConnectivityController(file_info)
+        self.sensor_space_connectivity_controller.set_listener(self)
 
-    def spectral_connectivity_information(self):
-        print("Spectral Connectivity")
+    def sensor_space_connectivity_information(self):
+        processing_title = "Sensor Space Connectivity running, please wait."
+        finish_method = "sensor_space_connectivity"
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.main_model.sensor_space_connectivity()
+
+    def sensor_space_connectivity_computation_finished(self):
+        processing_title_finished = "Sensor Space Connectivity finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def sensor_space_connectivity_finished(self):
+        sensor_space_connectivity_data = self.main_model.get_sensor_space_connectivity_data()
+        self.sensor_space_connectivity_controller.plot_sensor_space_connectivity(sensor_space_connectivity_data)
 
     def spectro_temporal_connectivity_clicked(self):
         self.spectro_temporal_connectivity_controller = spectroTemporalConnectivityController()
@@ -540,6 +553,8 @@ class mainController(mainListener):
             self.envelope_correlation_finished()
         elif finish_method == "source_space_connectivity":
             self.source_space_connectivity_finished()
+        elif finish_method == "sensor_space_connectivity":
+            self.sensor_space_connectivity_finished()
         elif finish_method == "classify":
             self.classify_finished()
 

@@ -176,3 +176,30 @@ class sourceSpaceConnectivityRunnable(QRunnable):
     """
     def get_source_space_connectivity_data(self):
         return self.source_space_connectivity_data
+
+
+class sensorSpaceConnectivityWorkerSignals(QObject):
+    finished = pyqtSignal()
+
+
+# noinspection PyUnresolvedReferences
+class sensorSpaceConnectivityRunnable(QRunnable):
+    def __init__(self, file_data):
+        super().__init__()
+        self.signals = sensorSpaceConnectivityWorkerSignals()
+
+        self.file_data = file_data
+        self.sensor_space_connectivity_data = None
+
+    def run(self):
+        sfreq = self.file_data.info["sfreq"]
+        connectivity_data = spectral_connectivity_epochs(self.file_data, method='pli', mode='multitaper', sfreq=sfreq,
+                                                         faverage=True,  mt_adaptive=False, n_jobs=1)
+        self.sensor_space_connectivity_data = connectivity_data.get_data(output='dense')[:, :, 0]
+        self.signals.finished.emit()
+
+    """
+    Getters
+    """
+    def get_sensor_space_connectivity_data(self):
+        return self.sensor_space_connectivity_data

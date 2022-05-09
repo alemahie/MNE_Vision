@@ -16,7 +16,8 @@ from runnables.tools_runnable import filterRunnable, icaRunnable, sourceEstimati
     reReferencingRunnable
 from runnables.files_runnable import openCntFileRunnable, openSetFileRunnable, openFifFileRunnable
 from runnables.plots_runnable import powerSpectralDensityRunnable, timeFrequencyRunnable
-from runnables.connectivity_runnable import envelopeCorrelationRunnable, sourceSpaceConnectivityRunnable
+from runnables.connectivity_runnable import envelopeCorrelationRunnable, sourceSpaceConnectivityRunnable, \
+    sensorSpaceConnectivityRunnable
 from runnables.classification_runnable import classifyRunnable
 
 from utils.file_path_search import get_directory_path_from_file_path
@@ -56,6 +57,7 @@ class mainModel:
 
         self.envelope_correlation_runnable = None
         self.source_space_connectivity_runnable = None
+        self.sensor_space_connectivity_runnable = None
 
         self.classify_runnable = None
 
@@ -230,6 +232,15 @@ class mainModel:
     def source_space_connectivity_computation_error(self):
         self.main_listener.source_estimation_computation_error()
 
+    def sensor_space_connectivity(self):
+        pool = QThreadPool.globalInstance()
+        self.sensor_space_connectivity_runnable = sensorSpaceConnectivityRunnable(self.file_data)
+        pool.start(self.sensor_space_connectivity_runnable)
+        self.sensor_space_connectivity_runnable.signals.finished.connect(self.sensor_space_connectivity_computation_finished)
+
+    def sensor_space_connectivity_computation_finished(self):
+        self.main_listener.sensor_space_connectivity_computation_finished()
+
     """
     Classification menu
     """
@@ -363,6 +374,9 @@ class mainModel:
 
     def get_source_space_connectivity_data(self):
         return self.source_space_connectivity_runnable.get_source_space_connectivity_data()
+
+    def get_sensor_space_connectivity_data(self):
+        return self.sensor_space_connectivity_runnable.get_sensor_space_connectivity_data()
 
     def get_classifier(self):
         return self.classify_runnable.get_classifier()

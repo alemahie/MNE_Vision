@@ -290,11 +290,19 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def spectral_connectivity_clicked(self):
+    def sensor_space_connectivity_clicked(self):
         pass
 
     @abstractmethod
-    def spectral_connectivity_information(self):
+    def sensor_space_connectivity_information(self):
+        pass
+
+    @abstractmethod
+    def sensor_space_connectivity_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def sensor_space_connectivity_finished(self):
         pass
 
     @abstractmethod

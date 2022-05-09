@@ -127,7 +127,7 @@ class menubarListener(ABC):
         pass
 
     @abstractmethod
-    def spectral_connectivity_clicked(self):
+    def sensor_space_connectivity_clicked(self):
         pass
 
     @abstractmethod

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Spectral Connectivity Listener
+Sensor Space Connectivity Listener
 """
 
 from abc import ABC, abstractmethod
@@ -16,7 +16,7 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class spectralConnectivityListener(ABC):
+class sensorSpaceConnectivityListener(ABC):
     @abstractmethod
     def cancel_button_clicked(self):
         pass

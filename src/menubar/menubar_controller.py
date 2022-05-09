@@ -114,8 +114,8 @@ class menubarController(menubarListener):
     def source_space_connectivity_clicked(self):
         self.main_listener.source_space_connectivity_clicked()
 
-    def spectral_connectivity_clicked(self):
-        self.main_listener.spectral_connectivity_clicked()
+    def sensor_space_connectivity_clicked(self):
+        self.main_listener.sensor_space_connectivity_clicked()
 
     def spectro_temporal_connectivity_clicked(self):
         self.main_listener.spectro_temporal_connectivity_clicked()

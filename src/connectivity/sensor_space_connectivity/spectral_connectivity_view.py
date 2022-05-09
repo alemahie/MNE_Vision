@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 """
-Spectral Connectivity View
+Sensor Space Connectivity View
 """
 
 from PyQt6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout
+
+from mne.viz import plot_sensors_connectivity
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -16,21 +18,23 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class spectralConnectivityView(QWidget):
-    def __init__(self):
+class sensorSpaceConnectivityView(QWidget):
+    def __init__(self, file_info):
         super().__init__()
-        self.spectral_connectivity_listener = None
+        self.sensor_space_connectivity_listener = None
 
-        self.setWindowTitle("Spectral Connectivity")
+        self.file_info = file_info
+
+        self.setWindowTitle("Sensor Space Connectivity")
 
         self.vertical_layout = QVBoxLayout()
 
         self.cancel_confirm_widget = QWidget()
         self.cancel_confirm_layout = QHBoxLayout()
         self.cancel = QPushButton("&Cancel", self)
-        self.cancel.clicked.connect(self.cancel_spectral_connectivity_trigger)
+        self.cancel.clicked.connect(self.cancel_sensor_space_connectivity_trigger)
         self.confirm = QPushButton("&Confirm", self)
-        self.confirm.clicked.connect(self.confirm_spectral_connectivity_trigger)
+        self.confirm.clicked.connect(self.confirm_sensor_space_connectivity_trigger)
         self.cancel_confirm_layout.addWidget(self.cancel)
         self.cancel_confirm_layout.addWidget(self.confirm)
         self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
@@ -39,15 +43,22 @@ class spectralConnectivityView(QWidget):
         self.setLayout(self.vertical_layout)
 
     """
+    Plot
+    """
+    def plot_sensor_space_connectivity(self, sensor_space_connectivity_data):
+        print(self.file_info)
+        plot_sensors_connectivity(self.file_info, sensor_space_connectivity_data, picks="all")
+
+    """
     Triggers
     """
-    def cancel_spectral_connectivity_trigger(self):
-        self.spectral_connectivity_listener.cancel_button_clicked()
+    def cancel_sensor_space_connectivity_trigger(self):
+        self.sensor_space_connectivity_listener.cancel_button_clicked()
 
-    def confirm_spectral_connectivity_trigger(self):
-        self.spectral_connectivity_listener.confirm_button_clicked()
+    def confirm_sensor_space_connectivity_trigger(self):
+        self.sensor_space_connectivity_listener.confirm_button_clicked()
     """
     Setters
     """
     def set_listener(self, listener):
-        self.spectral_connectivity_listener = listener
+        self.sensor_space_connectivity_listener = listener
