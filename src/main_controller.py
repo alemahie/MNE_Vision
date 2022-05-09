@@ -445,19 +445,18 @@ class mainController(mainListener):
         self.envelope_correlation_controller.plot_envelope_correlation(envelope_correlation_data, channel_names)
 
     def source_space_connectivity_clicked(self):
-        try:
-            number_of_channels = self.main_model.get_number_of_channels()
-            self.source_space_connectivity_controller = sourceSpaceConnectivityController(number_of_channels)
-            self.source_space_connectivity_controller.set_listener(self)
-        except Exception as e:
-            print(e)
+        number_of_channels = self.main_model.get_number_of_channels()
+        self.source_space_connectivity_controller = sourceSpaceConnectivityController(number_of_channels)
+        self.source_space_connectivity_controller.set_listener(self)
 
-    def source_space_connectivity_information(self, source_estimation_method, save_data, load_data, n_jobs):
+    def source_space_connectivity_information(self, connectivity_method, spectrum_estimation_method, source_estimation_method,
+                                              save_data, load_data, n_jobs):
         processing_title = "Source Space Connectivity running, please wait."
         finish_method = "source_space_connectivity"
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.source_space_connectivity(source_estimation_method, save_data, load_data, n_jobs)
+        self.main_model.source_space_connectivity(connectivity_method, spectrum_estimation_method, source_estimation_method,
+                                                  save_data, load_data, n_jobs)
 
     def source_space_connectivity_computation_finished(self):
         processing_title_finished = "Source Space Connectivity finished."

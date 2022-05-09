@@ -28,9 +28,11 @@ class sourceSpaceConnectivityController(sourceSpaceConnectivityListener):
     def cancel_button_clicked(self):
         self.source_space_connectivity_view.close()
 
-    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, n_jobs):
+    def confirm_button_clicked(self, connectivity_method, spectrum_estimation_method, source_estimation_method, save_data,
+                               load_data, n_jobs):
         self.source_space_connectivity_view.close()
-        self.main_listener.source_space_connectivity_information(source_estimation_method, save_data, load_data, n_jobs)
+        self.main_listener.source_space_connectivity_information(connectivity_method, spectrum_estimation_method, source_estimation_method,
+                                                                 save_data, load_data, n_jobs)
 
     def plot_source_space_connectivity(self, source_space_connectivity_data):
         self.source_space_connectivity_view.plot_source_space_connectivity(source_space_connectivity_data)

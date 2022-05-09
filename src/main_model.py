@@ -213,20 +213,22 @@ class mainModel:
     def envelope_correlation_computation_finished(self):
         self.main_listener.envelope_correlation_computation_finished()
 
-    def source_space_connectivity(self, source_estimation_method, save_data, load_data, n_jobs):
+    def source_space_connectivity(self, connectivity_method, spectrum_estimation_method, source_estimation_method, save_data,
+                                  load_data, n_jobs):
         pool = QThreadPool.globalInstance()
         self.source_space_connectivity_runnable = sourceSpaceConnectivityRunnable(self.file_data, self.get_file_path_name_without_extension(),
-                                                                                  source_estimation_method, save_data,
-                                                                                  load_data, n_jobs)
+                                                                                  connectivity_method, spectrum_estimation_method,
+                                                                                  source_estimation_method, save_data, load_data,
+                                                                                  n_jobs)
         pool.start(self.source_space_connectivity_runnable)
         self.source_space_connectivity_runnable.signals.finished.connect(self.source_space_connectivity_computation_finished)
         self.source_space_connectivity_runnable.signals.error.connect(self.source_space_connectivity_computation_error)
 
     def source_space_connectivity_computation_finished(self):
-        self.main_listener.envelope_correlation_computation_finished()
+        self.main_listener.source_estimation_computation_finished()
 
     def source_space_connectivity_computation_error(self):
-        self.main_listener.envelope_correlation_computation_error()
+        self.main_listener.source_estimation_computation_error()
 
     """
     Classification menu

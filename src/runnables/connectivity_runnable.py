@@ -55,12 +55,15 @@ class sourceSpaceConnectivityWorkerSignals(QObject):
 
 # noinspection PyUnresolvedReferences
 class sourceSpaceConnectivityRunnable(QRunnable):
-    def __init__(self, file_data, file_path, source_estimation_method, save_data, load_data, n_jobs):
+    def __init__(self, file_data, file_path, connectivity_method, spectrum_estimation_method, source_estimation_method,
+                 save_data, load_data, n_jobs):
         super().__init__()
         self.signals = sourceSpaceConnectivityWorkerSignals()
 
         self.file_data = file_data
         self.file_path = file_path
+        self.connectivity_method = connectivity_method
+        self.spectrum_estimation_method = spectrum_estimation_method
         self.source_estimation_method = source_estimation_method
         self.write_files = save_data
         self.read_files = load_data
@@ -103,8 +106,8 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         labels = get_labels_from_subject(self.subject, self.subjects_dir)
         label_ts = extract_label_time_course(stcs, labels, inv['src'], mode='mean_flip', return_generator=True)
         sfreq = self.file_data.info["sfreq"]
-        correlation_data = spectral_connectivity_epochs(label_ts, method="pli", mode='multitaper', sfreq=sfreq,
-                                                        faverage=True, mt_adaptive=True, n_jobs=self.n_jobs)
+        correlation_data = spectral_connectivity_epochs(label_ts, method=self.connectivity_method, mode=self.spectrum_estimation_method,
+                                                        sfreq=sfreq, faverage=True, mt_adaptive=True, n_jobs=self.n_jobs)
         return correlation_data
 
     """

@@ -22,5 +22,6 @@ class sourceSpaceConnectivityListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, n_jobs):
+    def confirm_button_clicked(self, connectivity_method, spectrum_estimation_method, source_estimation_method, save_data,
+                               load_data, n_jobs):
         pass

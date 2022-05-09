@@ -277,7 +277,8 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def source_space_connectivity_information(self, source_estimation_method, save_data, load_data, n_jobs):
+    def source_space_connectivity_information(self, connectivity_method, spectrum_estimation_method, source_estimation_method,
+                                              save_data, load_data, n_jobs):
         pass
 
     @abstractmethod

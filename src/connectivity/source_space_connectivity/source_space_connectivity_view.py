@@ -40,6 +40,22 @@ class sourceSpaceConnectivityView(QWidget):
         self.global_layout = QVBoxLayout()
         self.setLayout(self.global_layout)
 
+        self.connectivity_method_widget = QWidget()
+        self.connectivity_method_layout = QHBoxLayout()
+        self.connectivity_method_box = QComboBox()
+        self.connectivity_method_box.addItems(["coh", "cohy", "imcoh", "plv", "ciplv", "ppc", "pli", "wpli", "wpli2_debiased"])
+        self.connectivity_method_layout.addWidget(QLabel("Connectivity measure method : "))
+        self.connectivity_method_layout.addWidget(self.connectivity_method_box)
+        self.connectivity_method_widget.setLayout(self.connectivity_method_layout)
+
+        self.spectrum_estimation_method_widget = QWidget()
+        self.spectrum_estimation_method_layout = QHBoxLayout()
+        self.spectrum_estimation_method_box = QComboBox()
+        self.spectrum_estimation_method_box.addItems(["multitaper", "fourier", "cwt_morlet"])
+        self.spectrum_estimation_method_layout.addWidget(QLabel("Spectrum estimation method : "))
+        self.spectrum_estimation_method_layout.addWidget(self.spectrum_estimation_method_box)
+        self.spectrum_estimation_method_widget.setLayout(self.spectrum_estimation_method_layout)
+
         self.lines_widget = QWidget()
         self.lines_layout = QGridLayout()
         self.number_strongest_connections_line = QSpinBox()
@@ -57,7 +73,7 @@ class sourceSpaceConnectivityView(QWidget):
         self.method_layout = QHBoxLayout()
         self.method_box = QComboBox()
         self.method_box.addItems(["MNE", "dSPM", "sLORETA", "eLORETA"])
-        self.method_layout.addWidget(QLabel("Source estimation method : "))
+        self.method_layout.addWidget(QLabel("Source space computation method : "))
         self.method_layout.addWidget(self.method_box)
         self.method_widget.setLayout(self.method_layout)
 
@@ -103,6 +119,8 @@ class sourceSpaceConnectivityView(QWidget):
         self.cancel_confirm_layout.addWidget(self.confirm)
         self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
 
+        self.global_layout.addWidget(self.connectivity_method_widget)
+        # self.global_layout.addWidget(self.spectrum_estimation_method_widget)
         self.global_layout.addWidget(self.lines_widget)
         self.global_layout.addWidget(self.method_widget)
         self.global_layout.addWidget(self.save_load_widget)
@@ -133,9 +151,9 @@ class sourceSpaceConnectivityView(QWidget):
         node_order.extend(rh_labels)
         node_angles = circular_layout(label_names, node_order, start_pos=90,
                                       group_boundaries=[0, len(label_names) / 2])
-
+        title = "Source space connectivity"
         plot_connectivity_circle(source_space_connectivity_data, label_names, n_lines=self.number_strongest_connections,
-                                 node_angles=node_angles, node_colors=label_colors)
+                                 node_angles=node_angles, node_colors=label_colors, title=title)
 
     """
     Triggers
@@ -144,6 +162,8 @@ class sourceSpaceConnectivityView(QWidget):
         self.source_space_connectivity_listener.cancel_button_clicked()
 
     def confirm_source_space_connectivity_trigger(self):
+        connectivity_method = self.connectivity_method_box.currentText()
+        spectrum_estimation_method = self.spectrum_estimation_method_box.currentText()
         if self.all_connections_check_box.isChecked():
             self.number_strongest_connections = self.number_of_channels * self.number_of_channels
         else:
@@ -151,7 +171,8 @@ class sourceSpaceConnectivityView(QWidget):
         source_estimation_method = self.method_box.currentText()
         save_data, load_data = self.get_save_load_button_checked()
         n_jobs = self.n_jobs_slider.value()
-        self.source_space_connectivity_listener.confirm_button_clicked(source_estimation_method, save_data, load_data, n_jobs)
+        self.source_space_connectivity_listener.confirm_button_clicked(connectivity_method, spectrum_estimation_method,
+                                                                       source_estimation_method, save_data, load_data, n_jobs)
 
     def slider_value_changed_trigger(self):
         slider_value = self.n_jobs_slider.value()
