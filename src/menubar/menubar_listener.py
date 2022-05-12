@@ -101,6 +101,10 @@ class menubarListener(ABC):
         pass
 
     @abstractmethod
+    def extract_epochs_clicked(self):
+        pass
+
+    @abstractmethod
     def source_estimation_clicked(self):
         pass
 

@@ -95,6 +95,10 @@ class mainView(QMainWindow):
         label_item = self.grid_layout.itemAtPosition(0, 1).widget()
         label_item.setText(path_to_file)
 
+    def update_file_type(self, file_type):
+        label_item = self.grid_layout.itemAtPosition(1, 1).widget()
+        label_item.setText(file_type)
+
     def update_sampling_frequency(self, frequency):
         label_item = self.grid_layout.itemAtPosition(3, 1).widget()
         label_item.setText(str(frequency))
@@ -102,6 +106,18 @@ class mainView(QMainWindow):
     def update_number_of_events(self, number_of_events):
         label_item = self.grid_layout.itemAtPosition(4, 1).widget()
         label_item.setText(str(number_of_events))
+
+    def update_number_of_epochs(self, number_of_epochs):
+        label_item = self.grid_layout.itemAtPosition(5, 1).widget()
+        label_item.setText(str(number_of_epochs))
+
+    def update_epoch_start(self, epoch_start):
+        label_item = self.grid_layout.itemAtPosition(6, 1).widget()
+        label_item.setText(str(epoch_start))
+
+    def update_epoch_end(self, epoch_end):
+        label_item = self.grid_layout.itemAtPosition(7, 1).widget()
+        label_item.setText(str(epoch_end))
 
     def update_number_of_frames(self, number_of_frames):
         label_item = self.grid_layout.itemAtPosition(8, 1).widget()

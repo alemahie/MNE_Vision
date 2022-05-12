@@ -94,6 +94,9 @@ class menubarController(menubarListener):
     def ica_decomposition_clicked(self):
         self.main_listener.ica_decomposition_clicked()
 
+    def extract_epochs_clicked(self):
+        self.main_listener.extract_epochs_clicked()
+
     def source_estimation_clicked(self):
         self.main_listener.source_estimation_clicked()
 

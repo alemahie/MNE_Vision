@@ -25,6 +25,7 @@ from tools.filter.filter_controller import filterController
 from tools.resampling.resampling_controller import resamplingController
 from tools.re_referencing.re_referencing_controller import reReferencingController
 from tools.ICA_decomposition.ICA_decomposition_controller import icaDecompositionController
+from tools.extract_epochs.extract_epochs_controller import extractEpochsController
 from tools.source_estimation.source_estimation_controller import sourceEstimationController
 
 from plots.power_spectral_density.power_spectral_density_controller import powerSpectralDensityController
@@ -81,6 +82,7 @@ class mainController(mainListener):
         self.resampling_controller = None
         self.re_referencing_controller = None
         self.ica_decomposition_controller = None
+        self.extract_epochs_controller = None
         self.source_estimation_controller = None
 
         self.power_spectral_density_controller = None
@@ -353,6 +355,41 @@ class mainController(mainListener):
         ica_status = self.main_model.get_ica()
         self.main_view.update_ica_decomposition(ica_status)
 
+    # Extract Epochs
+    def extract_epochs_clicked(self):
+        self.extract_epochs_controller = extractEpochsController()
+        self.extract_epochs_controller.set_listener(self)
+
+    def extract_epochs_information(self, tmin, tmax):
+        processing_title = "Epochs extraction running, please wait."
+        finish_method = "extract_epochs"
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.main_model.extract_epochs(tmin, tmax)
+
+    def extract_epochs_computation_finished(self):
+        processing_title_finished = "Epochs extraction finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def extract_epochs_finished(self):
+        try:
+            file_type = self.main_model.get_file_type()
+            number_events = self.main_model.get_number_of_events()
+            number_epochs = self.main_model.get_number_of_epochs()
+            epoch_start = self.main_model.get_epochs_start()
+            epoch_end = self.main_model.get_epochs_end()
+            number_of_frames = self.main_model.get_number_of_frames()
+            self.main_view.update_file_type(file_type)
+            self.main_view.update_number_of_events(number_events)
+            self.main_view.update_number_of_epochs(number_epochs)
+            self.main_view.update_epoch_start(epoch_start)
+            self.main_view.update_epoch_end(epoch_end)
+            self.main_view.update_number_of_frames(number_of_frames)
+        except Exception as e:
+            print("azetrruu")
+            print(type(e))
+            print(e)
+
     # Source Estimation
     def source_estimation_clicked(self):
         self.source_estimation_controller = sourceEstimationController()
@@ -595,6 +632,8 @@ class mainController(mainListener):
             self.re_referencing_finished()
         elif finish_method == "ica_decomposition":
             self.ica_decomposition_finished()
+        elif finish_method == "extract_epochs":
+            self.extract_epochs_finished()
         elif finish_method == "source_estimation":
             self.source_estimation_finished()
         elif finish_method == "plot_spectra_maps":

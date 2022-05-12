@@ -15,7 +15,7 @@ from PyQt6.QtCore import QThreadPool
 from mne import read_events
 
 from runnables.tools_runnable import filterRunnable, icaRunnable, sourceEstimationRunnable, resamplingRunnable, \
-    reReferencingRunnable
+    reReferencingRunnable, extractEpochsRunnable
 from runnables.files_runnable import openCntFileRunnable, openSetFileRunnable, openFifFileRunnable, \
     findEventsFromChannelRunnable
 from runnables.plots_runnable import powerSpectralDensityRunnable, timeFrequencyRunnable
@@ -59,6 +59,7 @@ class mainModel:
         self.resampling_runnable = None
         self.re_referencing_runnable = None
         self.ica_data_decomposition_runnable = None
+        self.extract_epochs_runnable = None
         self.source_estimation_runnable = None
 
         self.power_spectral_density_runnable = None
@@ -168,6 +169,7 @@ class mainModel:
     """
     Tools menu
     """
+    # Filtering
     def filter(self, low_frequency, high_frequency, channels_selected):
         pool = QThreadPool.globalInstance()
         self.filter_runnable = filterRunnable(low_frequency, high_frequency, channels_selected, self.file_data)
@@ -178,6 +180,7 @@ class mainModel:
         self.file_data = self.filter_runnable.get_file_data()
         self.main_listener.filter_computation_finished()
 
+    # Resampling
     def resampling(self, new_frequency):
         pool = QThreadPool.globalInstance()
         self.resampling_runnable = resamplingRunnable(new_frequency, self.file_data)
@@ -188,6 +191,7 @@ class mainModel:
         self.file_data = self.resampling_runnable.get_file_data()
         self.main_listener.resampling_computation_finished()
 
+    # Re-referencing
     def re_referencing(self, references, n_jobs):
         pool = QThreadPool.globalInstance()
         self.re_referencing_runnable = reReferencingRunnable(references, self.file_data, n_jobs)
@@ -199,6 +203,7 @@ class mainModel:
         self.references = self.re_referencing_runnable.get_references()
         self.main_listener.re_referencing_computation_finished()
 
+    # ICA decomposition
     def ica_data_decomposition(self, ica_method):
         pool = QThreadPool.globalInstance()
         self.ica_data_decomposition_runnable = icaRunnable(ica_method, self.file_data)
@@ -210,6 +215,19 @@ class mainModel:
         self.ica_decomposition = "Yes"
         self.main_listener.ica_decomposition_computation_finished()
 
+    # Extract Epochs
+    def extract_epochs(self, tmin, tmax):
+        pool = QThreadPool.globalInstance()
+        self.extract_epochs_runnable = extractEpochsRunnable(self.file_data, self.read_events, tmin, tmax)
+        pool.start(self.extract_epochs_runnable)
+        self.extract_epochs_runnable.signals.finished.connect(self.extract_epochs_computation_finished)
+
+    def extract_epochs_computation_finished(self):
+        self.file_type = "Epochs"
+        self.file_data = self.extract_epochs_runnable.get_file_data()
+        self.main_listener.extract_epochs_computation_finished()
+
+    # Source Estimation
     def source_estimation(self, source_estimation_method, save_data, load_data, n_jobs):
         pool = QThreadPool.globalInstance()
         self.source_estimation_runnable = sourceEstimationRunnable(source_estimation_method, self.file_data,

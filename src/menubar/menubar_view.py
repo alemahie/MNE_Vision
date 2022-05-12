@@ -32,10 +32,10 @@ class menubarView(QMenuBar):
         self.create_events_menu()
         self.file_menu.addMenu(self.events_menu)
         self.events_menu.setEnabled(False)
-        self.export_menu = QMenu("Export", self)
-        self.create_export_menu()
-        self.file_menu.addMenu(self.export_menu)
-        self.export_menu.setEnabled(False)
+        # self.export_menu = QMenu("Export", self)
+        # self.create_export_menu()
+        # self.file_menu.addMenu(self.export_menu)
+        # self.export_menu.setEnabled(False)
         self.create_file_menu()
 
         # Edit menu
@@ -128,15 +128,15 @@ class menubarView(QMenuBar):
         channel_location_action = QAction("Channel location", self)
         channel_location_action.triggered.connect(self.channel_location_trigger)
         self.edit_menu.addAction(channel_location_action)
-        self.edit_menu.addSeparator()
-        select_data_action = QAction("Select data", self)
-        select_data_action.triggered.connect(self.select_data_trigger)
-        select_data_action.setEnabled(False)
-        self.edit_menu.addAction(select_data_action)
-        select_data_events_action = QAction("Select data using events", self)
-        select_data_events_action.triggered.connect(self.select_data_events_trigger)
-        select_data_events_action.setEnabled(False)
-        self.edit_menu.addAction(select_data_events_action)
+        # self.edit_menu.addSeparator()
+        # select_data_action = QAction("Select data", self)
+        # select_data_action.triggered.connect(self.select_data_trigger)
+        # select_data_action.setEnabled(False)
+        # self.edit_menu.addAction(select_data_action)
+        # select_data_events_action = QAction("Select data using events", self)
+        # select_data_events_action.triggered.connect(self.select_data_events_trigger)
+        # select_data_events_action.setEnabled(False)
+        # self.edit_menu.addAction(select_data_events_action)
 
     def create_tools_menu(self):
         filter_action = QAction("Filter", self)
@@ -149,14 +149,18 @@ class menubarView(QMenuBar):
         re_referencing_action.triggered.connect(self.re_referencing_trigger)
         self.tools_menu.addAction(re_referencing_action)
         self.tools_menu.addSeparator()
-        inspect_reject_data_action = QAction("Inspect/Reject data by eyes", self)
-        inspect_reject_data_action.triggered.connect(self.inspect_reject_data_trigger)
-        inspect_reject_data_action.setEnabled(False)
-        self.tools_menu.addAction(inspect_reject_data_action)
-        self.tools_menu.addSeparator()
+        # inspect_reject_data_action = QAction("Inspect/Reject data by eyes", self)
+        # inspect_reject_data_action.triggered.connect(self.inspect_reject_data_trigger)
+        # inspect_reject_data_action.setEnabled(False)
+        # self.tools_menu.addAction(inspect_reject_data_action)
+        # self.tools_menu.addSeparator()
         decompose_ICA_action = QAction("Decompose data with ICA", self)
         decompose_ICA_action.triggered.connect(self.ica_decomposition_trigger)
         self.tools_menu.addAction(decompose_ICA_action)
+        self.tools_menu.addSeparator()
+        extract_epochs_action = QAction("Extract epochs", self)
+        extract_epochs_action.triggered.connect(self.extract_epochs_trigger)
+        self.tools_menu.addAction(extract_epochs_action)
         self.tools_menu.addSeparator()
         source_estimation_action = QAction("Source estimation", self)
         source_estimation_action.triggered.connect(self.source_estimation_trigger)
@@ -196,10 +200,10 @@ class menubarView(QMenuBar):
         sensor_space_connectivity_action = QAction("3D Sensor Space Connectivity", self)
         sensor_space_connectivity_action.triggered.connect(self.sensor_space_connectivity_trigger)
         self.connectivity_menu.addAction(sensor_space_connectivity_action)
-        spectro_temporal_connectivity_action = QAction("Spectro-Temporal Connectivity", self)
-        spectro_temporal_connectivity_action.triggered.connect(self.spectro_temporal_connectivity_trigger)
-        spectro_temporal_connectivity_action.setEnabled(False)
-        self.connectivity_menu.addAction(spectro_temporal_connectivity_action)
+        # spectro_temporal_connectivity_action = QAction("Spectro-Temporal Connectivity", self)
+        # spectro_temporal_connectivity_action.triggered.connect(self.spectro_temporal_connectivity_trigger)
+        # spectro_temporal_connectivity_action.setEnabled(False)
+        # self.connectivity_menu.addAction(spectro_temporal_connectivity_action)
 
     def create_classification_menu(self):
         classify_action = QAction("Classify", self)
@@ -219,7 +223,7 @@ class menubarView(QMenuBar):
     def enable_menu_when_file_loaded(self):
         menu_actions = self.file_menu.actions()
         self.events_menu.setEnabled(True)
-        self.export_menu.setEnabled(True)
+        # self.export_menu.setEnabled(True)
         for action in menu_actions:
             if action.text() == "Save" or action.text() == "Save As":
                 action.setEnabled(True)
@@ -298,6 +302,9 @@ class menubarView(QMenuBar):
 
     def ica_decomposition_trigger(self):
         self.menubarListener.ica_decomposition_clicked()
+
+    def extract_epochs_trigger(self):
+        self.menubarListener.extract_epochs_clicked()
 
     def source_estimation_trigger(self):
         self.menubarListener.source_estimation_clicked()

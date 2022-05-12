@@ -195,6 +195,22 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def extract_epochs_clicked(self):
+        pass
+
+    @abstractmethod
+    def extract_epochs_information(self, tmin, tmax):
+        pass
+
+    @abstractmethod
+    def extract_epochs_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def extract_epochs_finished(self):
+        pass
+
+    @abstractmethod
     def source_estimation_clicked(self):
         pass
 

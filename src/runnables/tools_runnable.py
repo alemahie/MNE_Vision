@@ -8,7 +8,7 @@ Tools runnable
 from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne import make_forward_solution, write_forward_solution, compute_covariance, setup_source_space, \
-    write_source_spaces, make_bem_model, make_bem_solution, write_bem_solution
+    write_source_spaces, make_bem_model, make_bem_solution, write_bem_solution, Epochs
 from mne.minimum_norm import read_inverse_operator, make_inverse_operator, apply_inverse, \
                              write_inverse_operator
 from mne.preprocessing import ICA
@@ -141,6 +141,31 @@ class icaRunnable(QRunnable):
     def run(self):
         ica = ICA(method=self.ica_method)
         ica.fit(self.file_data)
+        self.signals.finished.emit()
+
+    """
+    Getters
+    """
+    def get_file_data(self):
+        return self.file_data
+
+
+class extractEpochsWorkerSignals(QObject):
+    finished = pyqtSignal()
+
+
+class extractEpochsRunnable(QRunnable):
+    def __init__(self, file_data, events, tmin, tmax):
+        super().__init__()
+        self.signals = extractEpochsWorkerSignals()
+
+        self.file_data = file_data
+        self.events = events
+        self.tmin = tmin
+        self.tmax = tmax
+
+    def run(self):
+        self.file_data = Epochs(self.file_data, self.events, tmin=self.tmin, tmax=self.tmax, preload=True)
         self.signals.finished.emit()
 
     """
