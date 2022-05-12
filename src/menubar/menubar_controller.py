@@ -41,6 +41,18 @@ class menubarController(menubarListener):
     def open_set_file_clicked(self, path_to_file):
         self.main_listener.open_set_file_clicked(path_to_file)
 
+    def read_events_file_clicked(self, path_to_file):
+        self.main_listener.read_events_file_clicked(path_to_file)
+
+    def find_events_from_channel_clicked(self):
+        self.main_listener.find_events_from_channel_clicked()
+
+    def export_data_to_file_clicked(self):
+        self.main_listener.export_data_to_file_clicked()
+
+    def export_events_to_file_clicked(self):
+        self.main_listener.export_events_to_file_clicked()
+
     def save_file_clicked(self):
         self.main_listener.save_file_clicked()
 

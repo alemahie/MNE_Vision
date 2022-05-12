@@ -15,6 +15,8 @@ from main_listener import mainListener
 
 from menubar.menubar_controller import menubarController
 
+from file.find_events_from_channel.find_events_from_channel_controller import findEventsFromChannelController
+
 from edit.dataset_info.dataset_info_controller import datasetInfoController
 from edit.event_values.event_values_controller import eventValuesController
 from edit.channel_location.channel_location_controller import channelLocationController
@@ -69,6 +71,8 @@ class mainController(mainListener):
         self.menubar_view = self.menubar_controller.get_view()
         self.main_view.setMenuBar(self.menubar_view)
 
+        self.find_events_from_channel_controller = None
+
         self.dataset_info_controller = None
         self.event_values_controller = None
         self.channel_location_controller = None
@@ -101,6 +105,7 @@ class mainController(mainListener):
     """
     File menu
     """
+    # Open FIF File
     def open_fif_file_clicked(self, path_to_file):
         if path_to_file != '':
             processing_title = "FIF file reading running, please wait."
@@ -116,6 +121,7 @@ class mainController(mainListener):
     def open_fif_file_finished(self):
         self.display_all_info()
 
+    # Open CNT file
     def open_cnt_file_clicked(self, path_to_file):
         if path_to_file != '':
             processing_title = "CNT file reading running, please wait."
@@ -131,6 +137,7 @@ class mainController(mainListener):
     def open_cnt_file_finished(self):
         self.display_all_info()
 
+    # Open SET file
     def open_set_file_clicked(self, path_to_file):
         if path_to_file != '':
             processing_title = "SET file reading running, please wait."
@@ -146,6 +153,51 @@ class mainController(mainListener):
     def open_set_file_finished(self):
         self.display_all_info()
 
+    # Read Events
+    def read_events_file_clicked(self, path_to_file):
+        if path_to_file != '':
+            file_type = self.main_model.get_file_type()
+            if file_type == "Raw":
+                self.main_model.read_events_file(path_to_file)
+            else:
+                error_message = "You can only find events when processing a raw file."
+                error_window = errorWindow(error_message)
+                error_window.show()
+
+    def find_events_from_channel_clicked(self):
+        file_type = self.main_model.get_file_type()
+        if file_type == "Raw":
+            all_channels_names = self.main_model.get_all_channels_names()
+            self.find_events_from_channel_controller = findEventsFromChannelController(all_channels_names)
+            self.find_events_from_channel_controller.set_listener(self)
+        else:
+            error_message = "You can only find events when processing a raw file."
+            error_window = errorWindow(error_message)
+            error_window.show()
+
+    def find_events_from_channel_information(self, stim_channel):
+        processing_title = "Finding events from the channel, please wait."
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.main_model.find_events_from_channel(stim_channel)
+
+    def find_events_from_channel_computation_finished(self):
+        processing_title_finished = "Finding events from the channel finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def find_events_from_channel_computation_error(self):
+        processing_title_finished = "An error as occurred when trying to find events from the provided channel, please try again."
+        self.waiting_while_processing_controller.set_finish_method("error")
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    # Export
+    def export_data_to_file_clicked(self):
+        print("export data")
+
+    def export_events_to_file_clicked(self):
+        print("export events")
+
+    # Save
     def save_file_clicked(self):
         if self.main_model.is_fif_file():
             path_to_file = self.main_model.get_file_path_name()

@@ -46,7 +46,6 @@ class sensorSpaceConnectivityView(QWidget):
     Plot
     """
     def plot_sensor_space_connectivity(self, sensor_space_connectivity_data):
-        print(self.file_info)
         plot_sensors_connectivity(self.file_info, sensor_space_connectivity_data, picks="all")
 
     """

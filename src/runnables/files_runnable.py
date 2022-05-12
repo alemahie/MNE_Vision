@@ -7,7 +7,7 @@ Files runnable
 
 from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
 
-from mne import read_epochs
+from mne import read_epochs, find_events
 from mne.io import read_raw_fif, read_raw_eeglab, read_epochs_eeglab
 
 from utils import cnt_file_reader
@@ -120,3 +120,29 @@ class openSetFileRunnable(QRunnable):
 
     def get_file_path_name(self):
         return self.path_to_file
+
+
+class findEventsFromChannelWorkerSignals(QObject):
+    finished = pyqtSignal()
+    error = pyqtSignal()
+
+
+class findEventsFromChannelRunnable(QRunnable):
+    def __init__(self, file_data, stim_channel):
+        super().__init__()
+        self.signals = findEventsFromChannelWorkerSignals()
+
+        self.file_data = file_data
+        self.stim_channel = stim_channel
+        self.read_events = None
+
+    def run(self):
+        try:
+            self.read_events = find_events(self.file_data, stim_channel=self.stim_channel)
+            self.signals.finished.emit()
+        except Exception as e:
+            print(e)
+            self.signals.error.emit()
+
+    def get_read_events(self):
+        return self.read_events

@@ -57,6 +57,34 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def read_events_file_clicked(self, path_to_file):
+        pass
+
+    @abstractmethod
+    def find_events_from_channel_clicked(self):
+        pass
+
+    @abstractmethod
+    def find_events_from_channel_information(self, stim_channel):
+        pass
+
+    @abstractmethod
+    def find_events_from_channel_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def find_events_from_channel_computation_error(self):
+        pass
+
+    @abstractmethod
+    def export_data_to_file_clicked(self):
+        pass
+
+    @abstractmethod
+    def export_events_to_file_clicked(self):
+        pass
+
+    @abstractmethod
     def save_file_clicked(self):
         pass
 

@@ -18,7 +18,7 @@ __status__ = "Dev"
 
 
 class waitingWhileProcessingController(waitingWhileProcessingListener):
-    def __init__(self, processing_title, finish_method):
+    def __init__(self, processing_title, finish_method=None):
         self.main_listener = None
         self.finish_method = finish_method
         self.waiting_while_processing_view = waitingWhileProcessingView(processing_title)

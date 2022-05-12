@@ -12,15 +12,21 @@ from copy import copy
 
 from PyQt6.QtCore import QThreadPool
 
+from mne import read_events
+
 from runnables.tools_runnable import filterRunnable, icaRunnable, sourceEstimationRunnable, resamplingRunnable, \
     reReferencingRunnable
-from runnables.files_runnable import openCntFileRunnable, openSetFileRunnable, openFifFileRunnable
+from runnables.files_runnable import openCntFileRunnable, openSetFileRunnable, openFifFileRunnable, \
+    findEventsFromChannelRunnable
 from runnables.plots_runnable import powerSpectralDensityRunnable, timeFrequencyRunnable
 from runnables.connectivity_runnable import envelopeCorrelationRunnable, sourceSpaceConnectivityRunnable, \
     sensorSpaceConnectivityRunnable
 from runnables.classification_runnable import classifyRunnable
 
+from exceptions.exceptions import EventFileError
+
 from utils.file_path_search import get_directory_path_from_file_path
+from utils.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -41,10 +47,13 @@ class mainModel:
         self.channels_locations = {}
         self.ica_decomposition = "No"
         self.references = "Unknown"
+        self.read_events = None     # Events info read from file or channel, used to transform raw to epochs
 
+        # Runnable
         self.open_fif_file_runnable = None
         self.open_cnt_file_runnable = None
         self.open_set_file_runnable = None
+        self.find_events_from_channel_runnable = None
 
         self.filter_runnable = None
         self.resampling_runnable = None
@@ -64,6 +73,7 @@ class mainModel:
     """
     File menu
     """
+    # Open FIF File
     def open_fif_file(self, path_to_file):
         pool = QThreadPool.globalInstance()
         self.open_fif_file_runnable = openFifFileRunnable(path_to_file)
@@ -77,6 +87,7 @@ class mainModel:
         self.create_channels_locations()
         self.main_listener.open_fif_file_computation_finished()
 
+    # Open CNT File
     def open_cnt_file(self, path_to_file):
         pool = QThreadPool.globalInstance()
         self.open_cnt_file_runnable = openCntFileRunnable(path_to_file)
@@ -90,6 +101,7 @@ class mainModel:
         self.create_channels_locations()
         self.main_listener.open_cnt_file_computation_finished()
 
+    # Open SET File
     def open_set_file(self, path_to_file):
         pool = QThreadPool.globalInstance()
         self.open_set_file_runnable = openSetFileRunnable(path_to_file)
@@ -103,6 +115,43 @@ class mainModel:
         self.create_channels_locations()
         self.main_listener.open_set_file_computation_finished()
 
+    # Events
+    def read_events_file(self, path_to_file):
+        try:
+            extension = path_to_file[-3:]
+            if extension == "txt" or extension == "fif":
+                events = read_events(path_to_file)
+                self.read_events = events
+            else:
+                raise EventFileError()
+        except EventFileError:
+            error_message = "The event file extension must be '.txt' or '.fif'."
+            error_window = errorWindow(error_message)
+            error_window.show()
+        except ValueError as error:
+            error_message = "Could not read the file, please check your event file."
+            detailed_message = str(error)
+            error_window = errorWindow(error_message, detailed_message)
+            error_window.show()
+        except Exception as e:
+            print(type(e))
+            print(e)
+
+    def find_events_from_channel(self, stim_channel):
+        pool = QThreadPool.globalInstance()
+        self.find_events_from_channel_runnable = findEventsFromChannelRunnable(self.file_data, stim_channel)
+        pool.start(self.find_events_from_channel_runnable)
+        self.find_events_from_channel_runnable.signals.finished.connect(self.find_events_from_channel_computation_finished)
+        self.find_events_from_channel_runnable.signals.error.connect(self.find_events_from_channel_computation_error)
+
+    def find_events_from_channel_computation_finished(self):
+        self.read_events = self.find_events_from_channel_runnable.get_read_events()
+        self.main_listener.find_events_from_channel_computation_finished()
+
+    def find_events_from_channel_computation_error(self):
+        self.main_listener.find_events_from_channel_computation_error()
+
+    # Save
     def save_file(self, path_to_file):
         if self.is_fif_file():
             self.file_data.save(path_to_file, overwrite=True)
