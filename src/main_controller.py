@@ -5,10 +5,6 @@
 Main controller
 """
 
-import sys
-
-from PyQt6.QtWidgets import QApplication
-
 from main_model import mainModel
 from main_view import mainView
 from main_listener import mainListener
@@ -42,7 +38,6 @@ from connectivity.spectro_temporal_connectivity.spectro_temporal_connectivity_co
 
 from classification.classify.classify_controller import classifyController
 
-from utils.stylesheet import get_stylesheet
 from utils.waiting_while_processing.waiting_while_processing_controller import waitingWhileProcessingController
 from utils.error_window import errorWindow
 
@@ -56,16 +51,12 @@ __status__ = "Dev"
 
 
 class mainController(mainListener):
-    def __init__(self):
+    def __init__(self, screen_size, splash_screen_runnable):
         self.main_model = mainModel()
         self.main_model.set_listener(self)
 
-        self.app = QApplication(sys.argv)
-        self.app.setStyleSheet(get_stylesheet())
-
         self.main_view = mainView()
-        self.screen_size = self.get_screen_geometry()
-        self.main_view.resize(0.8 * self.screen_size.width(), 0.8 * self.screen_size.height())
+        self.main_view.resize(0.8 * screen_size.width(), 0.8 * screen_size.height())
 
         self.menubar_controller = menubarController()
         self.menubar_controller.set_listener(self)
@@ -100,9 +91,8 @@ class mainController(mainListener):
 
         self.waiting_while_processing_controller = None
 
+        splash_screen_runnable.close()
         self.main_view.show()
-
-        sys.exit(self.app.exec())
 
     """
     File menu
@@ -648,11 +638,3 @@ class mainController(mainListener):
             self.sensor_space_connectivity_finished()
         elif finish_method == "classify":
             self.classify_finished()
-
-    """
-    Getters
-    """
-    def get_screen_geometry(self):
-        screen = self.app.primaryScreen()
-        size = screen.size()
-        return size

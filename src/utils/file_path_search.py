@@ -39,3 +39,7 @@ def get_labels_from_subject(subject, subjects_dir):
             del labels[i]
             break
     return labels
+
+
+def get_image_folder():
+    return get_project_root_path() + "/image/"

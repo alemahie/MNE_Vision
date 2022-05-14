@@ -5,7 +5,12 @@
 Main file launching the project.
 """
 
-from main_controller import mainController
+import sys
+
+from PyQt6.QtWidgets import QApplication
+
+from utils.splash_screen import splashScreen
+from utils.stylesheet import get_stylesheet
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -15,5 +20,16 @@ __maintainer__ = "Lemahieu Antoine"
 __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
+
 if __name__ == "__main__":
-    application = mainController()
+    app = QApplication(sys.argv)
+    app.setStyleSheet(get_stylesheet())
+
+    splash_screen = splashScreen()
+    splash_screen.show()
+    app.processEvents()     # Allow the splash screen to be displayed while loading the main window
+
+    from main_controller import mainController
+    screen_size = app.primaryScreen().size()
+    main_controller = mainController(screen_size, splash_screen)
+    sys.exit(app.exec())
