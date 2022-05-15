@@ -31,7 +31,7 @@ class splashScreen(QWidget):
         self.setLayout(self.vertical_layout)
 
         self.logo = QLabel("hello", self)
-        self.logo.setPixmap(QPixmap(get_image_folder()+"mne_vision_logo_transparent.png"))
+        self.logo.setPixmap(QPixmap(get_image_folder()+"mne_vision_logo.png"))
         self.logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.vertical_layout.addWidget(self.logo)
@@ -39,6 +39,10 @@ class splashScreen(QWidget):
 
     def center(self):
         coord = self.screen().availableGeometry().getCoords()
-        x = coord[2]//2 - 650   # 650 : Half width of logo
-        y = coord[3]//2 - 90    # 90 : Half height of logo
+        x = coord[2]//2 - 545   # 545 : Half width of logo
+        if x < 0:
+            x = 0
+        y = coord[3]//2 - 63    # 63 : Half height of logo
+        if y < 0:
+            y = 0
         self.move(x, y)

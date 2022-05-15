@@ -17,7 +17,7 @@ from mne import read_events
 from runnables.tools_runnable import filterRunnable, icaRunnable, sourceEstimationRunnable, resamplingRunnable, \
     reReferencingRunnable, extractEpochsRunnable
 from runnables.files_runnable import openCntFileRunnable, openSetFileRunnable, openFifFileRunnable, \
-    findEventsFromChannelRunnable
+    findEventsFromChannelRunnable, loadDataInfoRunnable
 from runnables.plots_runnable import powerSpectralDensityRunnable, timeFrequencyRunnable
 from runnables.connectivity_runnable import envelopeCorrelationRunnable, sourceSpaceConnectivityRunnable, \
     sensorSpaceConnectivityRunnable
@@ -53,6 +53,7 @@ class mainModel:
         self.open_fif_file_runnable = None
         self.open_cnt_file_runnable = None
         self.open_set_file_runnable = None
+        self.load_data_info_runnable = None
         self.find_events_from_channel_runnable = None
 
         self.filter_runnable = None
@@ -115,6 +116,17 @@ class mainModel:
         self.file_path_name = self.open_set_file_runnable.get_file_path_name()
         self.create_channels_locations()
         self.main_listener.open_set_file_computation_finished()
+
+    # Data Info
+    def load_data_info(self, montage, channels_selected, tmin, tmax):
+        pool = QThreadPool.globalInstance()
+        self.load_data_info_runnable = loadDataInfoRunnable(self.file_data, montage, channels_selected, tmin, tmax)
+        pool.start(self.load_data_info_runnable)
+        self.load_data_info_runnable.signals.finished.connect(self.load_data_info_computation_finished)
+
+    def load_data_info_computation_finished(self):
+        self.file_data = self.load_data_info_runnable.get_file_data()
+        self.main_listener.load_data_info_computation_finished()
 
     # Events
     def read_events_file(self, path_to_file):

@@ -20,6 +20,7 @@ class mainListener(ABC):
     """
     File Menu
     """
+    # Open FIF
     @abstractmethod
     def open_fif_file_clicked(self, path_to_file):
         pass
@@ -32,6 +33,7 @@ class mainListener(ABC):
     def open_fif_file_finished(self):
         pass
 
+    # Open CNT
     @abstractmethod
     def open_cnt_file_clicked(self, path_to_file):
         pass
@@ -44,6 +46,7 @@ class mainListener(ABC):
     def open_cnt_file_finished(self):
         pass
 
+    # Open SET
     @abstractmethod
     def open_set_file_clicked(self, path_to_file):
         pass
@@ -56,6 +59,16 @@ class mainListener(ABC):
     def open_set_file_finished(self):
         pass
 
+    # Load Data Info
+    @abstractmethod
+    def load_data_info_information(self, montage, channels_selected, tmin, tmax):
+        pass
+
+    @abstractmethod
+    def load_data_info_computation_finished(self):
+        pass
+
+    # Events
     @abstractmethod
     def read_events_file_clicked(self, path_to_file):
         pass
@@ -76,6 +89,7 @@ class mainListener(ABC):
     def find_events_from_channel_computation_error(self):
         pass
 
+    # Export
     @abstractmethod
     def export_data_to_file_clicked(self):
         pass
@@ -84,6 +98,7 @@ class mainListener(ABC):
     def export_events_to_file_clicked(self):
         pass
 
+    # Save
     @abstractmethod
     def save_file_clicked(self):
         pass

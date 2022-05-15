@@ -7,6 +7,8 @@ Find Events From Channel View
 
 from PyQt6.QtWidgets import QWidget, QGridLayout, QPushButton, QHBoxLayout, QLabel
 
+from utils.elements_selector.elements_selector_controller import multipleSelectorController
+
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
@@ -14,8 +16,6 @@ __license__ = "GNU General Public License v3.0"
 __maintainer__ = "Lemahieu Antoine"
 __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
-
-from utils.elements_selector.elements_selector_controller import multipleSelectorController
 
 
 class findEventsFromChannelView(QWidget):

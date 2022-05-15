@@ -8,6 +8,7 @@ Files runnable
 from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne import read_epochs, find_events
+from mne.channels import make_standard_montage
 from mne.io import read_raw_fif, read_raw_eeglab, read_epochs_eeglab
 
 from utils import cnt_file_reader
@@ -42,6 +43,7 @@ class openFifFileRunnable(QRunnable):
             else:
                 self.file_type = "Epochs"
                 self.file_data = read_epochs(self.path_to_file, preload=True)
+
         except TypeError:
             print("Error")
         self.signals.finished.emit()
@@ -122,6 +124,39 @@ class openSetFileRunnable(QRunnable):
         return self.path_to_file
 
 
+# Ask More Info Before Loading the Dataset
+class loadDataInfoWorkerSignals(QObject):
+    finished = pyqtSignal()
+
+
+class loadDataInfoRunnable(QRunnable):
+    def __init__(self, file_data, montage, channels_selected, tmin, tmax):
+        super().__init__()
+        self.signals = loadDataInfoWorkerSignals()
+
+        self.file_data = file_data
+        self.montage = montage
+        self.channels_selected = channels_selected
+        self.tmin = tmin
+        self.tmax = tmax
+
+    def run(self):
+        print(self.montage)
+        print(self.channels_selected)
+        print(self.tmin)
+        print(self.tmax)
+        if self.montage != "default":
+            montage = make_standard_montage(self.montage)
+            self.file_data.set_montage(montage)
+        self.file_data = self.file_data.pick_channels(self.channels_selected)
+        self.file_data = self.file_data.crop(tmin=self.tmin, tmax=self.tmax)
+        self.signals.finished.emit()
+
+    def get_file_data(self):
+        return self.file_data
+
+
+# Find Events
 class findEventsFromChannelWorkerSignals(QObject):
     finished = pyqtSignal()
     error = pyqtSignal()

@@ -11,6 +11,7 @@ from main_listener import mainListener
 
 from menubar.menubar_controller import menubarController
 
+from file.load_data_info.load_data_info_controller import loadDataInfoController
 from file.find_events_from_channel.find_events_from_channel_controller import findEventsFromChannelController
 
 from edit.dataset_info.dataset_info_controller import datasetInfoController
@@ -63,6 +64,7 @@ class mainController(mainListener):
         self.menubar_view = self.menubar_controller.get_view()
         self.main_view.setMenuBar(self.menubar_view)
 
+        self.load_data_info_controller = None
         self.find_events_from_channel_controller = None
 
         self.dataset_info_controller = None
@@ -111,7 +113,7 @@ class mainController(mainListener):
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     def open_fif_file_finished(self):
-        self.display_all_info()
+        self.load_data_info()
 
     # Open CNT file
     def open_cnt_file_clicked(self, path_to_file):
@@ -127,7 +129,7 @@ class mainController(mainListener):
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     def open_cnt_file_finished(self):
-        self.display_all_info()
+        self.load_data_info()
 
     # Open SET file
     def open_set_file_clicked(self, path_to_file):
@@ -143,6 +145,28 @@ class mainController(mainListener):
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     def open_set_file_finished(self):
+        self.load_data_info()
+
+    # Load Data Info
+    def load_data_info(self):
+        channel_names = self.main_model.get_all_channels_names()
+        tmin = self.main_model.get_epochs_start()
+        tmax = self.main_model.get_epochs_end()
+        self.load_data_info_controller = loadDataInfoController(channel_names, tmin, tmax)
+        self.load_data_info_controller.set_listener(self)
+
+    def load_data_info_information(self, montage, channels_selected, tmin, tmax):
+        processing_title = "Loading selected data info, please wait."
+        finish_method = "load_data_info"
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.main_model.load_data_info(montage, channels_selected, tmin, tmax)
+
+    def load_data_info_computation_finished(self):
+        processing_title_finished = "Selected data info loaded."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def load_data_info_finished(self):
         self.display_all_info()
 
     # Read Events
@@ -614,6 +638,8 @@ class mainController(mainListener):
             self.open_cnt_file_finished()
         elif finish_method == "open_set_file":
             self.open_set_file_finished()
+        elif finish_method == "load_data_info":
+            self.load_data_info_finished()
         elif finish_method == "filtering":
             self.filter_finished()
         elif finish_method == "resampling":
