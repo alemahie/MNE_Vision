@@ -17,6 +17,11 @@ __status__ = "Dev"
 
 
 class waitingWhileProcessingListener(ABC):
+    """
+    Listener doing the connection between the controller and the view for the waiting window
+    It retrieves the information from the view to send it to the controller.
+    """
+
     @abstractmethod
     def continue_button_clicked(self):
         pass

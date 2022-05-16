@@ -18,6 +18,13 @@ __status__ = "Dev"
 
 class errorWindow(QWidget):
     def __init__(self, error_message, detailed_message=None):
+        """
+        Window displaying an error message.
+        :param error_message: The error message.
+        :type error_message: str
+        :param detailed_message: A detailed message describing the error.
+        :type detailed_message: str
+        """
         super().__init__()
         self.message_box = QMessageBox()
         self.message_box.setIcon(QMessageBox.Icon.Information)
@@ -28,4 +35,7 @@ class errorWindow(QWidget):
             self.message_box.setInformativeText(detailed_message)
 
     def show(self):
+        """
+        Display the error message.
+        """
         self.message_box.exec()

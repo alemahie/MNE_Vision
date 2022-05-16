@@ -19,6 +19,14 @@ __status__ = "Dev"
 
 class waitingWhileProcessingController(waitingWhileProcessingListener):
     def __init__(self, processing_title, finish_method=None):
+        """
+        Controller for the waiting window.
+        Create a new window for the waiting time while the computation is done.
+        :param processing_title: The title displayed on the window.
+        :type processing_title: str
+        :param finish_method: The method to call when the computation is finished.
+        :type finish_method: str
+        """
         self.main_listener = None
         self.finish_method = finish_method
         self.waiting_while_processing_view = waitingWhileProcessingView(processing_title)
@@ -27,9 +35,17 @@ class waitingWhileProcessingController(waitingWhileProcessingListener):
         self.waiting_while_processing_view.show()
 
     def stop_progress_bar(self, processing_title_finished):
+        """
+        Stop the progress bar of the waiting window.
+        :param processing_title_finished: The title displayed on the window.
+        :type processing_title_finished: str
+        """
         self.waiting_while_processing_view.stop_progress_bar(processing_title_finished)
 
     def continue_button_clicked(self):
+        """
+        Close the window and send the information to the main controller.
+        """
         self.waiting_while_processing_view.close()
         self.main_listener.waiting_while_processing_finished(self.finish_method)
 
@@ -37,7 +53,17 @@ class waitingWhileProcessingController(waitingWhileProcessingListener):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the main listener so that the controller is able to communicate with the main controller.
+        :param listener: main listener
+        :type listener: mainController
+        """
         self.main_listener = listener
 
     def set_finish_method(self, finish_method):
+        """
+        Set the finish method.
+        :param finish_method: The method to call when the computation is finished.
+        :type finish_method: str
+        """
         self.finish_method = finish_method

@@ -15,6 +15,11 @@ __status__ = "Dev"
 
 
 def get_stylesheet():
+    """
+    Get the stylesheet of the project.
+    :return: The stylesheet.
+    :rtype: str
+    """
     stylesheet = '''
     #RedProgressBar {
         text-align: center;

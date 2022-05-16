@@ -18,6 +18,17 @@ __status__ = "Dev"
 
 class multipleSelectorView(QWidget):
     def __init__(self, all_elements_names, title, box_checked, unique_box):
+        """
+        Window displaying the multiple elements from which we can select some elements.
+        :param all_elements_names: All the elements' names
+        :type all_elements_names: list of str
+        :param title: Title for the multiple selector window.
+        :type title: str
+        :param box_checked: All the elements are selected by default.
+        :type box_checked: bool
+        :param unique_box: Can only check a single element from all the elements.
+        :type unique_box: bool
+        """
         super().__init__()
         self.multiple_selector_listener = None
         self.unique_box = unique_box
@@ -87,18 +98,30 @@ class multipleSelectorView(QWidget):
     Triggers
     """
     def cancel_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.multiple_selector_listener.cancel_button_clicked()
 
     def confirm_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         elements_selected = self.get_all_elements_selected()
         self.multiple_selector_listener.confirm_button_clicked(elements_selected)
 
     def select_all_elements_trigger(self):
+        """
+        Select all the elements of the window.
+        """
         for i in range(1, self.elements_vbox_layout.count()):
             check_box = self.elements_vbox_layout.itemAt(i).widget()
             check_box.setChecked(True)
 
     def unselect_all_elements_trigger(self):
+        """
+        Unselect all the elements of the window.
+        """
         for i in range(1, self.elements_vbox_layout.count()):
             check_box = self.elements_vbox_layout.itemAt(i).widget()
             check_box.setChecked(False)
@@ -107,12 +130,22 @@ class multipleSelectorView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: elementsSelectorController
+        """
         self.multiple_selector_listener = listener
 
     """
     Getters
     """
     def get_all_elements_selected(self):
+        """
+        Get the elements selected by the user in the multiple elements' selector.
+        :return: Elements selected in the multiple elements' selector.
+        :rtype: str/list of str
+        """
         all_elements = []
         start_idx = 0
         if not self.unique_box:

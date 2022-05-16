@@ -19,20 +19,46 @@ __status__ = "Dev"
 
 
 def get_project_root_path():
+    """
+    Get the project root path.
+    :return: The path to the project root directory.
+    :rtype: str
+    """
     path = Path(__file__).parent.parent.parent
     return str(path)
 
 
 def get_project_freesurfer_path():
+    """
+    Get the project freesurfer path, where the "fsaverage" data is present, used for the source space computations.
+    :return: The project freesurfer path.
+    :rtype: str
+    """
     return get_project_root_path() + "/data/freesurfer/subjects/"
 
 
 def get_directory_path_from_file_path(file_path):
+    """
+    Get the directory of the file given.
+    :param file_path: The path to the file.
+    :type file_path: str
+    :return: The directory.
+    :rtype: str
+    """
     path = Path(file_path).parent
     return str(path)
 
 
 def get_labels_from_subject(subject, subjects_dir):
+    """
+    Get the labels names from a specific subject.
+    :param subject: The subject used by the source space computations.
+    :type subject: str
+    :param subjects_dir: The directory of the subject used by the source space computations.
+    :type subjects_dir: str
+    :return: The labels.
+    :rtype: list of str
+    """
     labels = read_labels_from_annot(subject, parc='aparc', subjects_dir=subjects_dir)
     for i in range(len(labels)):
         if labels[i].name == "unknown-lh":
@@ -42,4 +68,9 @@ def get_labels_from_subject(subject, subjects_dir):
 
 
 def get_image_folder():
+    """
+    Get the image directory.
+    :return: The image directory.
+    :rtype: str
+    """
     return get_project_root_path() + "/image/"

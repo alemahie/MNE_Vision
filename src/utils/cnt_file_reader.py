@@ -23,6 +23,13 @@ __status__ = "Dev"
 
 
 def get_raw_from_cnt(path_to_file):
+    """
+    Get an MNE.Raw object from a CNT file
+    :param path_to_file: Path to the file.
+    :type path_to_file: str
+    :return: The MNE data of the dataset.
+    :rtype: MNE.Raw
+    """
     cnt = cnt_file(path_to_file)
 
     sample_count = cnt.get_sample_count()
@@ -40,6 +47,14 @@ def get_raw_from_cnt(path_to_file):
 
 
 def get_all_channels_names(cnt):
+    """
+    Get all the channels' names based on the CNT data
+    :param cnt: The CNT file read.
+    :type cnt: libeep.cnt_file
+    :return: channel_names: The channels' names.
+    channel_types: The channels' types.
+    :rtype: list of str, list of str
+    """
     channel_names = []
     channel_types = []
     for i in range(cnt.get_channel_count()):

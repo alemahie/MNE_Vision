@@ -22,6 +22,10 @@ __status__ = "Dev"
 
 class splashScreen(QWidget):
     def __init__(self):
+        """
+        Window displaying the splash screen at the launch of the software.
+        Displays the "MNE Vision" logo.
+        """
         super().__init__()
         self.setWindowTitle('MNE VISION')
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
@@ -38,6 +42,9 @@ class splashScreen(QWidget):
         self.center()
 
     def center(self):
+        """
+        Move the window to the center of the screen.
+        """
         coord = self.screen().availableGeometry().getCoords()
         x = coord[2]//2 - 545   # 545 : Half width of logo
         if x < 0:
