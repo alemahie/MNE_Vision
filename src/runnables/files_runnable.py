@@ -154,20 +154,12 @@ class loadDataInfoRunnable(QRunnable):
         self.tmax = tmax
 
     def run(self):
-        try:
-            print(self.montage)
-            print(self.channels_selected)
-            print(self.tmin)
-            print(self.tmax)
-            if self.montage != "default":
-                montage = make_standard_montage(self.montage)
-                self.file_data.set_montage(montage)
-            self.file_data = self.file_data.pick_channels(self.channels_selected)
-            self.file_data = self.file_data.crop(tmin=self.tmin, tmax=self.tmax)
-            self.signals.finished.emit()
-        except Exception as e:
-            print(e)
-            print(type(e))
+        if self.montage != "default":
+            montage = make_standard_montage(self.montage)
+            self.file_data.set_montage(montage)
+        self.file_data = self.file_data.pick_channels(self.channels_selected)
+        self.file_data = self.file_data.crop(tmin=self.tmin, tmax=self.tmax)
+        self.signals.finished.emit()
 
     def get_file_data(self):
         return self.file_data

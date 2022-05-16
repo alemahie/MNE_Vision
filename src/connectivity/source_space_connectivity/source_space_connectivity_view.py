@@ -29,6 +29,11 @@ __status__ = "Dev"
 
 class sourceSpaceConnectivityView(QWidget):
     def __init__(self, number_of_channels):
+        """
+        Window displaying the parameters for the computation of the source space connectivity on the dataset.
+        :param number_of_channels: The number of channels.
+        :type number_of_channels: int
+        """
         super().__init__()
         self.source_space_connectivity_listener = None
 
@@ -131,6 +136,11 @@ class sourceSpaceConnectivityView(QWidget):
     Plots
     """
     def plot_source_space_connectivity(self, source_space_connectivity_data):
+        """
+        Plot the source space connectivity data.
+        :param source_space_connectivity_data: The source space connectivity data.
+        :type source_space_connectivity_data: list of, list of float
+        """
         labels = get_labels_from_subject("fsaverage", get_project_freesurfer_path())
         label_colors = [label.color for label in labels]
         label_names = [label.name for label in labels]
@@ -159,9 +169,15 @@ class sourceSpaceConnectivityView(QWidget):
     Triggers
     """
     def cancel_source_space_connectivity_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.source_space_connectivity_listener.cancel_button_clicked()
 
     def confirm_source_space_connectivity_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         connectivity_method = self.connectivity_method_box.currentText()
         spectrum_estimation_method = self.spectrum_estimation_method_box.currentText()
         if self.all_connections_check_box.isChecked():
@@ -175,6 +191,9 @@ class sourceSpaceConnectivityView(QWidget):
                                                                        source_estimation_method, save_data, load_data, n_jobs)
 
     def slider_value_changed_trigger(self):
+        """
+        Change the value of the slider displayed on the window when the actual slider is moved.
+        """
         slider_value = self.n_jobs_slider.value()
         self.n_jobs_label.setText(str(slider_value))
 
@@ -182,12 +201,23 @@ class sourceSpaceConnectivityView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: sourceSpaceConnectivityController
+        """
         self.source_space_connectivity_listener = listener
 
     """
     Getters
     """
     def get_save_load_button_checked(self):
+        """
+        Get the values of the save and load buttons.
+        :return: save_data: True if the data must be saved. Otherwise, False.
+        load_data: True if the data must be loaded. Otherwise, False.
+        :rtype: boolean, boolean
+        """
         checked_button = self.save_load_buttons.checkedButton()
         button_id = self.save_load_buttons.id(checked_button)
         save_data = None

@@ -20,6 +20,11 @@ __status__ = "Dev"
 
 class envelopeCorrelationView(QWidget):
     def __init__(self, number_of_channels):
+        """
+        Window displaying the parameters for finding events from a stimulation channel.
+        :param number_of_channels: The number of channels.
+        :type number_of_channels: int
+        """
         super().__init__()
         self.envelope_correlation_listener = None
         self.number_strongest_connections = None
@@ -58,6 +63,13 @@ class envelopeCorrelationView(QWidget):
         self.setLayout(self.vertical_layout)
 
     def plot_envelope_correlation(self, envelope_correlation_data, channel_names):
+        """
+        Plot the envelope correlation computed.
+        :param envelope_correlation_data: The envelope correlation data to plot.
+        :type envelope_correlation_data: list of, list of float
+        :param channel_names: Channels' names
+        :type channel_names: list of str
+        """
         plot_connectivity_circle(envelope_correlation_data, channel_names, n_lines=self.number_strongest_connections,
                                  title="Envelope Correlation")
 
@@ -65,9 +77,15 @@ class envelopeCorrelationView(QWidget):
     Triggers
     """
     def cancel_envelope_correlation_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.envelope_correlation_listener.cancel_button_clicked()
 
     def confirm_envelope_correlation_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         if self.all_connections_check_box.isChecked():
             self.number_strongest_connections = self.number_of_channels * self.number_of_channels
         else:
@@ -78,4 +96,9 @@ class envelopeCorrelationView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: envelopeCorrelationController
+        """
         self.envelope_correlation_listener = listener

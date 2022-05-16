@@ -20,6 +20,11 @@ __status__ = "Dev"
 
 class sensorSpaceConnectivityView(QWidget):
     def __init__(self, file_info):
+        """
+        Window displaying the parameters for computing the sensor space connectivity on the dataset.
+        :param file_info: The information file of the MNE object.
+        :type file_info: MNE.Info
+        """
         super().__init__()
         self.sensor_space_connectivity_listener = None
 
@@ -46,18 +51,35 @@ class sensorSpaceConnectivityView(QWidget):
     Plot
     """
     def plot_sensor_space_connectivity(self, sensor_space_connectivity_data):
+        """
+        Plot the sensor space connecitivity data.
+        :param sensor_space_connectivity_data: The sensor space connectivity data.
+        :type sensor_space_connectivity_data: list of, list of float
+        """
         plot_sensors_connectivity(self.file_info, sensor_space_connectivity_data, picks="all")
 
     """
     Triggers
     """
     def cancel_sensor_space_connectivity_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.sensor_space_connectivity_listener.cancel_button_clicked()
 
     def confirm_sensor_space_connectivity_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         self.sensor_space_connectivity_listener.confirm_button_clicked()
+
     """
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: sensorSpaceConnectivityView
+        """
         self.sensor_space_connectivity_listener = listener

@@ -69,7 +69,7 @@ class findEventsFromChannelView(QWidget):
 
     def confirm_find_events_from_channel_trigger(self):
         """
-        Retrieve the stimulation channel and send the information to the controller.
+        Retrieve the parameters and send the information to the controller.
         """
         stim_channel = self.channel_selected
         self.find_events_from_channel_listener.confirm_button_clicked(stim_channel)

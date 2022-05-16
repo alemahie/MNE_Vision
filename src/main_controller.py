@@ -33,7 +33,7 @@ from plots.time_frequency_ersp_itc.time_frequency_ersp_itc_controller import tim
 
 from connectivity.envelope_correlation.envelope_correlation_controller import envelopeCorrelationController
 from connectivity.source_space_connectivity.source_space_connectivity_controller import sourceSpaceConnectivityController
-from connectivity.sensor_space_connectivity.spectral_connectivity_controller import sensorSpaceConnectivityController
+from connectivity.sensor_space_connectivity.sensor_space_connectivity_controller import sensorSpaceConnectivityController
 from connectivity.spectro_temporal_connectivity.spectro_temporal_connectivity_controller import \
     spectroTemporalConnectivityController
 
@@ -368,7 +368,7 @@ class mainController(mainListener):
 
     def channel_location_clicked(self):
         """
-        Create the controlelr for displaying information about the channel locations of the dataset.
+        Create the controller for displaying information about the channel locations of the dataset.
         """
         channel_location = self.main_model.get_channels_locations()
         channel_names = self.main_model.get_all_channels_names()
@@ -613,7 +613,7 @@ class mainController(mainListener):
         :type save_data: bool
         :param load_data: Boolean telling if the data used for the computation can be read from computer files.
         :type load_data: bool
-        :param n_jobs: Number of processes used to computed the source estimation
+        :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
         """
         processing_title = "Source estimation running, please wait."
@@ -881,7 +881,7 @@ class mainController(mainListener):
         :type save_data: bool
         :param load_data: Boolean telling if the data used for the computation can be read from computer files.
         :type load_data: bool
-        :param n_jobs: Number of processes used to computed the source estimation
+        :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
         """
         processing_title = "Source Space Connectivity running, please wait."
