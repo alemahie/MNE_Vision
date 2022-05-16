@@ -21,6 +21,9 @@ __status__ = "Dev"
 
 class classifyView(QWidget):
     def __init__(self):
+        """
+        Window displaying the parameters for performing the classification.
+        """
         super().__init__()
         self.classify_listener = None
         self.pipeline_selector_controller = None
@@ -56,9 +59,9 @@ class classifyView(QWidget):
         self.cancel_confirm_widget = QWidget()
         self.cancel_confirm_layout = QHBoxLayout()
         self.cancel = QPushButton("&Cancel", self)
-        self.cancel.clicked.connect(self.cancel_channel_location_trigger)
+        self.cancel.clicked.connect(self.cancel_classification_trigger)
         self.confirm = QPushButton("&Confirm", self)
-        self.confirm.clicked.connect(self.confirm_channel_location_trigger)
+        self.confirm.clicked.connect(self.confirm_classification_trigger)
         self.cancel_confirm_layout.addWidget(self.cancel)
         self.cancel_confirm_layout.addWidget(self.confirm)
         self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
@@ -69,16 +72,28 @@ class classifyView(QWidget):
     """
     Plot
     """
-    def plot_results(self, classifier):
+    @staticmethod
+    def plot_results(classifier):
+        """
+        Plot the classification results.
+        :param classifier: The classifier that did the classification.
+        :type classifier: ApplePyClassifier
+        """
         classifier.show_results(4)
 
     """
     Triggers
     """
-    def cancel_channel_location_trigger(self):
+    def cancel_classification_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.classify_listener.cancel_button_clicked()
 
-    def confirm_channel_location_trigger(self):
+    def confirm_classification_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         feature_selection = self.feature_selection.isChecked()
         hyper_tuning = self.hyper_tuning.isChecked()
         cross_val_number = int(self.cross_validation_number.value())
@@ -86,6 +101,10 @@ class classifyView(QWidget):
                                                       cross_val_number)
 
     def pipeline_selection_trigger(self):
+        """
+        Open the multiple selector window.
+        The user can select a multiple pipelines used for the classification.
+        """
         title = "Select the pipelines used for the classification :"
         all_pipelines = ['XdawnCovTSLR', 'XdawnCov', 'Xdawn', 'CSP', 'CSP2', 'cov', 'Cosp', 'HankelCov', 'CSSP', 'PSD',
                          'MDM', 'FgMDM']
@@ -96,7 +115,17 @@ class classifyView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: classifyController
+        """
         self.classify_listener = listener
 
     def set_pipeline_selected(self, pipeline):
+        """
+        Set the pipeliens selected in the multiple selector window.
+        :param pipeline: Pipelines selected
+        :type pipeline: list of str
+        """
         self.pipeline_selected = pipeline

@@ -81,7 +81,7 @@ class mainView(QMainWindow):
     @staticmethod
     def plot_data(file_data, file_type, events=None, event_id=None):
         """
-
+        plot the data of all channels.
         :param file_data: "Epochs" or "Raw" MNE file containing the information about the dataset.
         :type file_data: MNE_Epochs/MNE_Raw
         :param file_type: The type of the file, either "Epochs" or "Raw
@@ -224,7 +224,7 @@ class mainView(QMainWindow):
         """
         Update the ICA decomposition status on the main window.
         :param ica_status: The ICA decomposition status.
-        :type ica_status: str
+        :type ica_status: bool
         """
         label_item = self.grid_layout.itemAtPosition(11, 1).widget()
         label_item.setText(str(ica_status))

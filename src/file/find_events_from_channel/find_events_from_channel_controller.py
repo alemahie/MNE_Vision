@@ -39,7 +39,7 @@ class findEventsFromChannelController(findEventsFromChannelListener):
 
     def confirm_button_clicked(self, stim_channel):
         """
-        Close the window and send the information to the main controller
+        Close the window and send the information to the main controller.
         :param stim_channel: Stimulation channel.
         :type stim_channel: str
         """
