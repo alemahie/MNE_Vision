@@ -21,6 +21,15 @@ __status__ = "Dev"
 
 class loadDataInfoView(QWidget):
     def __init__(self, channel_names, tmin, tmax):
+        """
+        Window displaying the parameters for loading additional data information.
+        :param channel_names: Channels' names
+        :type channel_names: list of str
+        :param tmin: Start time of the epoch or raw file
+        :type tmin: float
+        :param tmax: End time of the epoch or raw file
+        :type tmax: float
+        """
         super().__init__()
         self.load_data_listener = None
 
@@ -70,9 +79,16 @@ class loadDataInfoView(QWidget):
     Triggers
     """
     def cancel_load_data_info_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.load_data_listener.cancel_button_clicked()
 
     def confirm_load_data_info_trigger(self):
+        """
+        Retrieve the all the additional information and send the information to the controller.
+        Check if the float input are in the acceptable range (between tmin and tmax).
+        """
         montage = self.montage_box.currentText()
         channels_selected = self.channels_selected
         tmin = None
@@ -88,6 +104,10 @@ class loadDataInfoView(QWidget):
         self.load_data_listener.confirm_button_clicked(montage, channels_selected, tmin, tmax)
 
     def channels_selection_trigger(self):
+        """
+        Open the multiple selector window.
+        The user can select multiple channels.
+        """
         title = "Select the channels to be loaded :"
         self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=True,
                                                                        unique_box=False)
@@ -97,7 +117,17 @@ class loadDataInfoView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: loadDataInfoController
+        """
         self.load_data_listener = listener
 
-    def set_channels_selected(self, channel_selected):
-        self.channels_selected = channel_selected
+    def set_channels_selected(self, channels_selected):
+        """
+        Set the channel selected in the multiple selector window.
+        :param channels_selected: Channels selected.
+        :type channels_selected: list of str
+        """
+        self.channels_selected = channels_selected

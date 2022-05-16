@@ -20,6 +20,11 @@ __status__ = "Dev"
 
 class findEventsFromChannelView(QWidget):
     def __init__(self, all_channels_names):
+        """
+        Window displaying the parameters for finding events from a stimulation channel.
+        :param all_channels_names: All the channels' names
+        :type all_channels_names: list of str
+        """
         super().__init__()
         self.find_events_from_channel_listener = None
         self.all_channels_names = all_channels_names
@@ -57,13 +62,23 @@ class findEventsFromChannelView(QWidget):
     Triggers
     """
     def cancel_find_events_from_channel_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.find_events_from_channel_listener.cancel_button_clicked()
 
     def confirm_find_events_from_channel_trigger(self):
+        """
+        Retrieve the stimulation channel and send the information to the controller.
+        """
         stim_channel = self.channel_selected
         self.find_events_from_channel_listener.confirm_button_clicked(stim_channel)
 
     def channels_selection_trigger(self):
+        """
+        Open the multiple selector window.
+        The user can select a single channel.
+        """
         title = "Select the channels used for finding the events :"
         self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=False,
                                                                        unique_box=True)
@@ -73,7 +88,17 @@ class findEventsFromChannelView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: findEventsFromChannelController
+        """
         self.find_events_from_channel_listener = listener
 
     def set_channels_selected(self, channel_selected):
+        """
+        Set the channel selected in the multiple selector window.
+        :param channel_selected: Channel selected.
+        :type channel_selected: str
+        """
         self.channel_selected = channel_selected

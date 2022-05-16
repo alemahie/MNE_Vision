@@ -17,6 +17,11 @@ __status__ = "Dev"
 
 
 class findEventsFromChannelListener(ABC):
+    """
+    Listener doing the connection between the controller and the view for finding events with a channel.
+    It retrieves the information from the view to send it to the controller.
+    """
+
     @abstractmethod
     def cancel_button_clicked(self):
         pass
