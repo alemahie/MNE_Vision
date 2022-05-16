@@ -110,7 +110,7 @@ class reReferencingView(QWidget):
             n_jobs = self.n_jobs_slider.value()
             self.re_referencing_listener.confirm_button_clicked(references, n_jobs)
         else:
-            error_message = "Please select a channel in the 'channel selection' menu before starting the computation" \
+            error_message = "Please select a channel in the 'channel selection' menu before starting the computation " \
                             "with specific channels as references."
             error_window = errorWindow(error_message)
             error_window.show()

@@ -77,6 +77,8 @@ class loadDataInfoView(QWidget):
         channels_selected = self.channels_selected
         tmin = None
         tmax = None
+        if channels_selected is None:   # The channel selection has not been opened, take all channels
+            channels_selected = self.all_channels_names
         if self.data_start_line.hasAcceptableInput():
             tmin = self.data_start_line.text()
             tmin = float(tmin.replace(',', '.'))

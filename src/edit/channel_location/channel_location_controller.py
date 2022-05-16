@@ -45,7 +45,7 @@ class channelLocationController(channelLocationListener):
         if self.channel_name_is_free(channel_name):
             self.update_channel_data(channel_name, x_coordinate, y_coordinate, z_coordinate)
             if self.number_of_channels_original == len(self.channel_names):
-                self.main_listener.dataset_info_finished(self.channel_locations, self.channel_names)
+                self.main_listener.channel_location_finished(self.channel_locations, self.channel_names)
                 self.dataset_info_view.close()
             else:
                 error_message = "You have a different number of channels than in your dataset. Please set up the correct " \

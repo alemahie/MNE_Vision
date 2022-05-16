@@ -18,6 +18,13 @@ __status__ = "Dev"
 
 class mainListener(ABC):
     """
+    The main listener is the link between the main view and the main controller, but also between most of the controllers.
+    When the controller wants to send the information back to the main controller (who created it) it passes through the
+    main listener, that will send the information to the main controller.
+    It is here to "listen" and send the information to the correct place.
+    """
+
+    """
     File Menu
     """
     # Open FIF
@@ -115,10 +122,6 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def dataset_info_finished(self, channel_locations, channel_names):
-        pass
-
-    @abstractmethod
     def event_values_clicked(self):
         pass
 
@@ -128,6 +131,10 @@ class mainListener(ABC):
 
     @abstractmethod
     def channel_location_clicked(self):
+        pass
+
+    @abstractmethod
+    def channel_location_finished(self, channel_locations, channel_names):
         pass
 
     @abstractmethod

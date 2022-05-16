@@ -5,8 +5,7 @@
 Topographies view
 """
 
-from PyQt6.QtWidgets import QWidget, QGridLayout, QPushButton, QCheckBox, QButtonGroup, QHBoxLayout, QVBoxLayout, \
-    QLineEdit, QLabel
+from PyQt6.QtWidgets import QWidget, QPushButton, QCheckBox, QButtonGroup, QHBoxLayout, QVBoxLayout, QLineEdit, QLabel
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

@@ -36,7 +36,7 @@ class topographiesController(topographiesListener):
     Getters
     """
     def get_elements_selected(self, elements_selected):
-        self.erp_view.set_channels_selected(elements_selected)
+        self.topographies_view.set_channels_selected(elements_selected)
 
     """
     Setters

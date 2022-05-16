@@ -131,6 +131,19 @@ class loadDataInfoWorkerSignals(QObject):
 
 class loadDataInfoRunnable(QRunnable):
     def __init__(self, file_data, montage, channels_selected, tmin, tmax):
+        """
+
+        :param file_data:
+        :type file_data:
+        :param montage:
+        :type montage:
+        :param channels_selected:
+        :type channels_selected:
+        :param tmin:
+        :type tmin:
+        :param tmax:
+        :type tmax:
+        """
         super().__init__()
         self.signals = loadDataInfoWorkerSignals()
 
@@ -141,16 +154,20 @@ class loadDataInfoRunnable(QRunnable):
         self.tmax = tmax
 
     def run(self):
-        print(self.montage)
-        print(self.channels_selected)
-        print(self.tmin)
-        print(self.tmax)
-        if self.montage != "default":
-            montage = make_standard_montage(self.montage)
-            self.file_data.set_montage(montage)
-        self.file_data = self.file_data.pick_channels(self.channels_selected)
-        self.file_data = self.file_data.crop(tmin=self.tmin, tmax=self.tmax)
-        self.signals.finished.emit()
+        try:
+            print(self.montage)
+            print(self.channels_selected)
+            print(self.tmin)
+            print(self.tmax)
+            if self.montage != "default":
+                montage = make_standard_montage(self.montage)
+                self.file_data.set_montage(montage)
+            self.file_data = self.file_data.pick_channels(self.channels_selected)
+            self.file_data = self.file_data.crop(tmin=self.tmin, tmax=self.tmax)
+            self.signals.finished.emit()
+        except Exception as e:
+            print(e)
+            print(type(e))
 
     def get_file_data(self):
         return self.file_data
@@ -164,6 +181,13 @@ class findEventsFromChannelWorkerSignals(QObject):
 
 class findEventsFromChannelRunnable(QRunnable):
     def __init__(self, file_data, stim_channel):
+        """
+
+        :param file_data:
+        :type file_data:
+        :param stim_channel:
+        :type stim_channel:
+        """
         super().__init__()
         self.signals = findEventsFromChannelWorkerSignals()
 
@@ -172,6 +196,9 @@ class findEventsFromChannelRunnable(QRunnable):
         self.read_events = None
 
     def run(self):
+        """
+
+        """
         try:
             self.read_events = find_events(self.file_data, stim_channel=self.stim_channel)
             self.signals.finished.emit()
@@ -180,4 +207,9 @@ class findEventsFromChannelRunnable(QRunnable):
             self.signals.error.emit()
 
     def get_read_events(self):
+        """
+
+        :return:
+        :rtype:
+        """
         return self.read_events
