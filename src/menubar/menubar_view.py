@@ -19,8 +19,11 @@ __status__ = "Dev"
 
 class menubarView(QMenuBar):
     def __init__(self):
+        """
+        Displays the menubar on the top of the main window.
+        """
         super().__init__()
-        self.menubarListener = None
+        self.menubar_listener = None
 
         # File menu
         self.file_menu = QMenu("File", self)
@@ -221,6 +224,9 @@ class menubarView(QMenuBar):
         self.help_menu.addAction(about_action)
 
     def enable_menu_when_file_loaded(self):
+        """
+        Make the menus accessible when a dataset is loaded.
+        """
         menu_actions = self.file_menu.actions()
         self.events_menu.setEnabled(True)
         # self.export_menu.setEnabled(True)
@@ -239,22 +245,22 @@ class menubarView(QMenuBar):
     # File menu triggers
     def open_fif_file_trigger(self):
         path_to_file = QFileDialog().getOpenFileName(self, "Open file", "*.fif")
-        self.menubarListener.open_fif_file_clicked(path_to_file[0])
+        self.menubar_listener.open_fif_file_clicked(path_to_file[0])
 
     def open_cnt_file_trigger(self):
         path_to_file = QFileDialog().getOpenFileName(self, "Open file", "*.cnt")
-        self.menubarListener.open_cnt_file_clicked(path_to_file[0])
+        self.menubar_listener.open_cnt_file_clicked(path_to_file[0])
 
     def open_set_file_trigger(self):
         path_to_file = QFileDialog().getOpenFileName(self, "Open file", "*.set")
-        self.menubarListener.open_set_file_clicked(path_to_file[0])
+        self.menubar_listener.open_set_file_clicked(path_to_file[0])
 
     def read_events_file_trigger(self):
         path_to_file = QFileDialog().getOpenFileName(self, "Open file")
-        self.menubarListener.read_events_file_clicked(path_to_file[0])
+        self.menubar_listener.read_events_file_clicked(path_to_file[0])
 
     def find_events_from_channel_trigger(self):
-        self.menubarListener.find_events_from_channel_clicked()
+        self.menubar_listener.find_events_from_channel_clicked()
 
     def export_data_to_file_trigger(self):
         self.export_data_to_file_clicked()
@@ -263,103 +269,108 @@ class menubarView(QMenuBar):
         self.export_events_to_file_clicked()
 
     def save_file_trigger(self):
-        self.menubarListener.save_file_clicked()
+        self.menubar_listener.save_file_clicked()
 
     def save_file_as_trigger(self):
-        self.menubarListener.save_file_as_clicked()
+        self.menubar_listener.save_file_as_clicked()
 
     def exit_program_trigger(self):
-        self.menubarListener.exit_program_clicked()
+        self.menubar_listener.exit_program_clicked()
 
     # Edit menu trigger
     def dataset_info_trigger(self):
-        self.menubarListener.dataset_info_clicked()
+        self.menubar_listener.dataset_info_clicked()
 
     def event_values_trigger(self):
-        self.menubarListener.event_values_clicked()
+        self.menubar_listener.event_values_clicked()
 
     def channel_location_trigger(self):
-        self.menubarListener.channel_location_clicked()
+        self.menubar_listener.channel_location_clicked()
 
     def select_data_trigger(self):
-        self.menubarListener.select_data_clicked()
+        self.menubar_listener.select_data_clicked()
 
     def select_data_events_trigger(self):
-        self.menubarListener.select_data_events_clicked()
+        self.menubar_listener.select_data_events_clicked()
 
     # Tools menu triggers
     def filter_trigger(self):
-        self.menubarListener.filter_clicked()
+        self.menubar_listener.filter_clicked()
 
     def resampling_trigger(self):
-        self.menubarListener.resampling_clicked()
+        self.menubar_listener.resampling_clicked()
 
     def re_referencing_trigger(self):
-        self.menubarListener.re_referencing_clicked()
+        self.menubar_listener.re_referencing_clicked()
 
     def inspect_reject_data_trigger(self):
-        self.menubarListener.inspect_reject_data_clicked()
+        self.menubar_listener.inspect_reject_data_clicked()
 
     def ica_decomposition_trigger(self):
-        self.menubarListener.ica_decomposition_clicked()
+        self.menubar_listener.ica_decomposition_clicked()
 
     def extract_epochs_trigger(self):
-        self.menubarListener.extract_epochs_clicked()
+        self.menubar_listener.extract_epochs_clicked()
 
     def source_estimation_trigger(self):
-        self.menubarListener.source_estimation_clicked()
+        self.menubar_listener.source_estimation_clicked()
 
     # Plot menu triggers
     def plot_channel_locations(self):
-        self.menubarListener.plot_channel_locations_clicked()
+        self.menubar_listener.plot_channel_locations_clicked()
 
     def plot_data_trigger(self):
-        self.menubarListener.plot_data_clicked()
+        self.menubar_listener.plot_data_clicked()
 
     def plot_topographies_trigger(self):
-        self.menubarListener.plot_topographies_clicked()
+        self.menubar_listener.plot_topographies_clicked()
 
     def plot_spectra_maps_trigger(self):
-        self.menubarListener.plot_spectra_maps_clicked()
+        self.menubar_listener.plot_spectra_maps_clicked()
 
     def plot_channel_properties_trigger(self):
-        self.menubarListener.plot_channel_properties_clicked()
+        self.menubar_listener.plot_channel_properties_clicked()
 
     def plot_ERP_image_trigger(self):
-        self.menubarListener.plot_ERP_image_clicked()
+        self.menubar_listener.plot_ERP_image_clicked()
 
     def plot_ERPs_trigger(self):
-        self.menubarListener.plot_ERPs_clicked()
+        self.menubar_listener.plot_ERPs_clicked()
 
     def plot_time_frequency_trigger(self):
-        self.menubarListener.plot_time_frequency_clicked()
+        self.menubar_listener.plot_time_frequency_clicked()
 
     # Connectivity menu triggers
     def envelope_correlation_trigger(self):
-        self.menubarListener.envelope_correlation_clicked()
+        self.menubar_listener.envelope_correlation_clicked()
 
     def source_space_connectivity_trigger(self):
-        self.menubarListener.source_space_connectivity_clicked()
+        self.menubar_listener.source_space_connectivity_clicked()
 
     def sensor_space_connectivity_trigger(self):
-        self.menubarListener.sensor_space_connectivity_clicked()
+        self.menubar_listener.sensor_space_connectivity_clicked()
 
     def spectro_temporal_connectivity_trigger(self):
-        self.menubarListener.spectro_temporal_connectivity_clicked()
+        self.menubar_listener.spectro_temporal_connectivity_clicked()
 
     # Classification menu triggers
     def classify_trigger(self):
-        self.menubarListener.classify_clicked()
+        self.menubar_listener.classify_clicked()
 
     # Help menu triggers
     def help_trigger(self):
-        self.menubarListener.help_clicked()
+        self.menubar_listener.help_clicked()
 
     def about_trigger(self):
-        self.menubarListener.about_clicked()
+        self.menubar_listener.about_clicked()
 
     """
     Setters
     """
-    def set_listener(self, menubar_listener):
-        self.menubarListener = menubar_listener
+    def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: menubarController
+        """
+        self.menubar_listener = listener

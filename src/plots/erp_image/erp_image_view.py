@@ -20,6 +20,11 @@ __status__ = "Dev"
 
 class erpImageView(QWidget):
     def __init__(self, all_channels_names):
+        """
+        Window displaying the parameters for computing an ERP image on the dataset.
+        :param all_channels_names: All the channels' names
+        :type all_channels_names: list of str
+        """
         super().__init__()
         self.erp_image_listener = None
         self.all_channels_names = all_channels_names
@@ -48,12 +53,22 @@ class erpImageView(QWidget):
     Triggers
     """
     def cancel_erp_image_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.erp_image_listener.cancel_button_clicked()
 
     def confirm_erp_image_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         self.erp_image_listener.confirm_button_clicked(self.channel_selected)
 
     def channels_selection_trigger(self):
+        """
+        Open the multiple selector window.
+        The user can select a single channel.
+        """
         title = "Select the channels used for the ERP image computation :"
         self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=False,
                                                                        unique_box=True)
@@ -63,7 +78,17 @@ class erpImageView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: erpImageController
+        """
         self.erp_image_listener = listener
 
     def set_channels_selected(self, channel_selected):
+        """
+        Set the channel selected in the multiple selector window.
+        :param channel_selected: The channel selected.
+        :type channel_selected: str
+        """
         self.channel_selected = channel_selected

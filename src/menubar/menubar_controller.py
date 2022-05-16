@@ -21,11 +21,18 @@ __status__ = "Dev"
 
 class menubarController(menubarListener):
     def __init__(self):
+        """
+        Controller for the menubar on top of the main window.
+        Does the link between the main menus of the main window and the main controller.
+        """
         self.main_listener = None
         self.menubar_view = menubarView()
         self.menubar_view.set_listener(self)
 
     def enable_menu_when_file_loaded(self):
+        """
+        Make the menus accessible when a dataset is loaded.
+        """
         self.menubar_view.enable_menu_when_file_loaded()
 
     """

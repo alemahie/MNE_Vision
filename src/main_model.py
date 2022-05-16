@@ -824,7 +824,7 @@ class mainModel:
         """
         Gets the "power" data of the time-frequency analysis computation performed on the dataset.
         :return: "power" data of the time-frequency analysis computation.
-        :rtype: AverageTFR (MNE)
+        :rtype: MNE.AverageTFR
         """
         return self.time_frequency_runnable.get_power()
 
@@ -832,7 +832,7 @@ class mainModel:
         """
         Gets the "itc" data of the time-frequency analysis computation performed on the dataset.
         :return: "itc" data of the time-frequency analysis computation.
-        :rtype: AverageTFR
+        :rtype: MNE.AverageTFR
         """
         return self.time_frequency_runnable.get_itc()
 

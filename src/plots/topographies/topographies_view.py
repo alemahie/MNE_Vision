@@ -18,6 +18,9 @@ __status__ = "Dev"
 
 class topographiesView(QWidget):
     def __init__(self):
+        """
+        Window displaying the parameters for computing topographies on the dataset.
+        """
         super().__init__()
         self.topographies_listener = None
 
@@ -65,9 +68,15 @@ class topographiesView(QWidget):
     Triggers
     """
     def cancel_topographies_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.topographies_listener.cancel_button_clicked()
 
     def confirm_topographies_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         mode = None
         checked_button = self.topographies_mode_buttons.checkedButton()
         button_id = self.topographies_mode_buttons.id(checked_button)
@@ -83,6 +92,13 @@ class topographiesView(QWidget):
     Others
     """
     def create_array_from_time_points(self, mode):
+        """
+        Create an array of time points depending on the time points given.
+        :param mode: Mode used for plotting the topographies.
+        :type mode: str
+        :return: "auto" if no time points are set. Will create an evenly dispersed time points to display.
+        :rtype: str/None/list of float
+        """
         time_points = self.time_points_line.text()
         if time_points == "":
             if mode == "separated":
@@ -100,4 +116,9 @@ class topographiesView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: topographiesController
+        """
         self.topographies_listener = listener

@@ -17,6 +17,11 @@ __status__ = "Dev"
 
 
 class topographiesListener(ABC):
+    """
+    Listener doing the connection between the controller and the view for computing topographies on the dataset.
+    It retrieves the information from the view to send it to the controller.
+    """
+
     @abstractmethod
     def cancel_button_clicked(self):
         pass

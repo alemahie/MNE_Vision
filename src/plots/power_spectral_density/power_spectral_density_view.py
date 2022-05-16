@@ -22,6 +22,13 @@ __status__ = "Dev"
 
 class powerSpectralDensityView(QWidget):
     def __init__(self, minimum_time, maximum_time):
+        """
+        Window displaying the parameters for computing the power spectral density on the dataset.
+        :param minimum_time: Minimum time of the epochs from which the power spectral density can be computed.
+        :type minimum_time: float
+        :param maximum_time: Maximum time of the epochs from which the power spectral density can be computed.
+        :type maximum_time: float
+        """
         super().__init__()
         self.power_spectral_density_listener = None
 
@@ -62,6 +69,13 @@ class powerSpectralDensityView(QWidget):
 
     @staticmethod
     def plot_psd(psds, freqs):
+        """
+        Plot the power spectral density.
+        :param psds: The actual power spectral density data computed
+        :type psds: list of, list of, list of float
+        :param freqs: The frequencies at which the power spectral density is computed.
+        :type freqs: list of float
+        """
         psds_plot = 10 * np.log10(psds)
         psds_mean = psds_plot.mean(axis=(0, 1))
         psds_std = psds_plot.std(axis=(0, 1))
@@ -76,9 +90,15 @@ class powerSpectralDensityView(QWidget):
     Triggers
     """
     def cancel_power_spectral_density_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.power_spectral_density_listener.cancel_button_clicked()
 
     def confirm_power_spectral_density_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         method_psd = self.method_box.currentText()
         minimum_frequency = None
         maximum_frequency = None
@@ -95,4 +115,9 @@ class powerSpectralDensityView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: powerSpectralDensityController
+        """
         self.power_spectral_density_listener = listener

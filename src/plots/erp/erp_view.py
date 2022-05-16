@@ -20,6 +20,11 @@ __status__ = "Dev"
 
 class erpView(QWidget):
     def __init__(self, all_channels_names):
+        """
+        Window displaying the parameters for computing the ERPs on the dataset.
+        :param all_channels_names: All the channels' names
+        :type all_channels_names: list of str
+        """
         super().__init__()
         self.erp_listener = None
         self.all_channels_names = all_channels_names
@@ -48,12 +53,22 @@ class erpView(QWidget):
     Triggers
     """
     def cancel_erp_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.erp_listener.cancel_button_clicked()
 
     def confirm_erp_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         self.erp_listener.confirm_button_clicked(self.channels_selected)
 
     def channels_selection_trigger(self):
+        """
+        Open the multiple selector window.
+        The user can select multiple channels.
+        """
         title = "Select the channels used for the ERP computation :"
         self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=True)
         self.channels_selector_controller.set_listener(self.erp_listener)
@@ -62,7 +77,17 @@ class erpView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: erpController
+        """
         self.erp_listener = listener
 
     def set_channels_selected(self, channels_selected):
+        """
+        Set the channels selected in the multiple selector window.
+        :param channels_selected: Channels selected.
+        :type channels_selected: list of str
+        """
         self.channels_selected = channels_selected

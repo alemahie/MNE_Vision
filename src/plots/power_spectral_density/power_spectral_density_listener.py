@@ -17,6 +17,11 @@ __status__ = "Dev"
 
 
 class powerSpectralDensityListener(ABC):
+    """
+    Listener doing the connection between the controller and the view for computing the power spectral density on the dataset.
+    It retrieves the information from the view to send it to the controller.
+    """
+
     @abstractmethod
     def cancel_button_clicked(self):
         pass

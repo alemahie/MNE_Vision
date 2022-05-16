@@ -17,6 +17,11 @@ __status__ = "Dev"
 
 
 class menubarListener(ABC):
+    """
+    Listener doing the connection between the controller and the view for displaying the menubar
+    It retrieves the information from the view to send it to the controller.
+    """
+
     # File menu
     @abstractmethod
     def open_fif_file_clicked(self, path_to_file):
