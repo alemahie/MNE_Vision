@@ -25,12 +25,27 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
+# Filter
 class filterWorkerSignals(QObject):
+    """
+    Contain the signals used by the filter runnable.
+    """
     finished = pyqtSignal()
 
 
 class filterRunnable(QRunnable):
     def __init__(self, low_frequency, high_frequency, channels_selected, file_data):
+        """
+        Runnable for the computation of the filtering of the given data.
+        :param low_frequency: Lowest frequency from where the data will be filtered.
+        :type low_frequency: float
+        :param high_frequency: Highest frequency from where the data will be filtered.
+        :type high_frequency: float
+        :param channels_selected: Channels on which the filtering will be performed.
+        :type channels_selected: list of str
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        """
         super().__init__()
         self.signals = filterWorkerSignals()
         self.low_frequency = low_frequency
@@ -39,25 +54,49 @@ class filterRunnable(QRunnable):
         self.file_data = file_data
 
     def run(self):
+        """
+        Launch the computation of the filtering on the given data.
+        Notifies the main model that the computation is finished.
+        """
         self.file_data.filter(l_freq=self.low_frequency, h_freq=self.high_frequency, picks=self.channels_selected)
         self.signals.finished.emit()
 
     def get_file_data(self):
+        """
+        Get the file data.
+        :return: MNE data of the dataset.
+        :rtype: MNE.Epochs/MNE.Raw
+        """
         return self.file_data
 
 
+# Resampling
 class resamplingWorkerSignals(QObject):
+    """
+    Contain the signals used by the resampling runnable.
+    """
     finished = pyqtSignal()
 
 
 class resamplingRunnable(QRunnable):
     def __init__(self, frequency, file_data):
+        """
+        Runnable for the computation of the resampling of the given data.
+        :param frequency: The new frequency at which the data will be resampled.
+        :type frequency: int
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        """
         super().__init__()
         self.signals = filterWorkerSignals()
         self.frequency = frequency
         self.file_data = file_data
 
     def run(self):
+        """
+        Launch the computation of the resampling on the given data.
+        Notifies the main model that the computation is finished.
+        """
         old_frequency = self.file_data.info.get("sfreq")
         new_frequency = self.frequency
         self.file_data.resample(new_frequency)
@@ -70,15 +109,34 @@ class resamplingRunnable(QRunnable):
         self.signals.finished.emit()
 
     def get_file_data(self):
+        """
+        Get the file data.
+        :return: MNE data of the dataset.
+        :rtype: MNE.Epochs/MNE.Raw
+        """
         return self.file_data
 
 
+# Re-referencing
 class reReferencingWorkerSignals(QObject):
+    """
+    Contain the signals used by the re-referencing runnable.
+    """
     finished = pyqtSignal()
 
 
 class reReferencingRunnable(QRunnable):
     def __init__(self, references, file_data, n_jobs):
+        """
+        Runnable for the computation of the re-referencing of the given data.
+        :param references: References from which the data will be re-referenced. Can be a single or multiple channels;
+        Can be an average of all channels; Can be a "point to infinity".
+        :type references: list of str; str
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param n_jobs: Number of parallel processes used to compute the re-referencing
+        :type n_jobs: int
+        """
         super().__init__()
         self.signals = filterWorkerSignals()
         self.references = references
@@ -88,6 +146,12 @@ class reReferencingRunnable(QRunnable):
         self.subjects_dir = get_project_freesurfer_path()
 
     def run(self):
+        """
+        Launch the computation of the re-referencing on the given data.
+        Compute the forward solution and the necessary information for the computation of the re-referencing to the point
+        in infinity, which requires some information of the source space to be done.
+        Notifies the main model that the computation is finished.
+        """
         if self.references == "infinity":
             src = self.compute_source_space()
             bem = self.compute_bem_solution()
@@ -98,12 +162,22 @@ class reReferencingRunnable(QRunnable):
         self.signals.finished.emit()
 
     def compute_source_space(self):
+        """
+        Compute the source space of the "fsaverage" model.
+        :return: The source space
+        :rtype: MNE.SourceSpaces
+        """
         print("Compute source space")
         src = setup_source_space(subject=self.subject, spacing='oct6', add_dist='patch', subjects_dir=self.subjects_dir,
                                  n_jobs=self.n_jobs, verbose=False)
         return src
 
     def compute_bem_solution(self):
+        """
+        Compute the BEM solution of the "fsaverage" model.
+        :return: The BEM solution.
+        :rtype: MNE.ConductorModel
+        """
         print("Compute bem solution")
         conductivity = (0.3, 0.006, 0.3)  # for three layers
         model = make_bem_model(subject=self.subject, ico=4, conductivity=conductivity, subjects_dir=self.subjects_dir,
@@ -112,6 +186,15 @@ class reReferencingRunnable(QRunnable):
         return bem
 
     def compute_forward_solution(self, src, bem):
+        """
+        Compute the forward solution of the given data, based on the source space model of the "fsaverage" model.
+        :param src: The source space
+        :type src: MNE.SourceSpaces
+        :param bem: The BEM solution.
+        :type bem: MNE.ConductorModel
+        :return: The forward solution.
+        :rtype: MNE.Forward
+        """
         print("Compute forward solution")
         fwd = make_forward_solution(self.file_data.info, trans='fsaverage', src=src, bem=bem, meg=False, eeg=True,
                                     mindist=5.0, n_jobs=self.n_jobs, verbose=False)
@@ -121,24 +204,49 @@ class reReferencingRunnable(QRunnable):
     Getters
     """
     def get_file_data(self):
+        """
+        Get the file data.
+        :return: MNE data of the dataset.
+        :rtype: MNE.Epochs/MNE.Raw
+        """
         return self.file_data
 
     def get_references(self):
+        """
+        Get the references on which the data has been re-referenced.
+        :return: The references
+        :rtype: str/list of str
+        """
         return self.references
 
 
+# ICA Decomposition
 class icaWorkerSignals(QObject):
+    """
+    Contain the signals used by the ICA Decomposition runnable.
+    """
     finished = pyqtSignal()
 
 
 class icaRunnable(QRunnable):
     def __init__(self, ica_method, file_data):
+        """
+        Runnable for the computation of the ICA decomposition of the given data.
+        :param ica_method: Method used for performing the ICA decomposition
+        :type ica_method: str
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        """
         super().__init__()
         self.signals = icaWorkerSignals()
         self.ica_method = ica_method
         self.file_data = file_data
 
     def run(self):
+        """
+        Launch the computation of the ICA decomposition on the given data.
+        Notifies the main model that the computation is finished.
+        """
         ica = ICA(method=self.ica_method)
         ica.fit(self.file_data)
         self.signals.finished.emit()
@@ -147,15 +255,35 @@ class icaRunnable(QRunnable):
     Getters
     """
     def get_file_data(self):
+        """
+        Get the file data.
+        :return: MNE data of the dataset.
+        :rtype: MNE.Epochs/MNE.Raw
+        """
         return self.file_data
 
 
+# Extract Epochs
 class extractEpochsWorkerSignals(QObject):
+    """
+    Contain the signals used by the extract epochs runnable.
+    """
     finished = pyqtSignal()
 
 
 class extractEpochsRunnable(QRunnable):
     def __init__(self, file_data, events, tmin, tmax):
+        """
+        Runnable for the computation of the extraction of the epochs of the given data.
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param events: The events from which the epochs will be extracted.
+        :type events: list of, list of int
+        :param tmin: Start time of the epoch to keep
+        :type tmin: float
+        :param tmax: End time of the epoch to keep
+        :type tmax: float
+        """
         super().__init__()
         self.signals = extractEpochsWorkerSignals()
 
@@ -165,6 +293,10 @@ class extractEpochsRunnable(QRunnable):
         self.tmax = tmax
 
     def run(self):
+        """
+        Launch the computation of the extraction of the epochs on the given data.
+        Notifies the main model that the computation is finished.
+        """
         self.file_data = Epochs(self.file_data, self.events, tmin=self.tmin, tmax=self.tmax, preload=True)
         self.signals.finished.emit()
 
@@ -172,16 +304,40 @@ class extractEpochsRunnable(QRunnable):
     Getters
     """
     def get_file_data(self):
+        """
+        Get the file data.
+        :return: MNE data of the dataset.
+        :rtype: MNE.Epochs/MNE.Raw
+        """
         return self.file_data
 
 
+# Source Estimation
 class sourceEstimationWorkerSignals(QObject):
+    """
+    Contain the signals used by the source estimation runnable.
+    """
     finished = pyqtSignal()
     error = pyqtSignal()
 
 
 class sourceEstimationRunnable(QRunnable):
     def __init__(self, source_estimation_method, file_data, file_path, write_files, read_files, n_jobs):
+        """
+        Runnable for the computation of the source estimation of the given data.
+        :param source_estimation_method: The method used to compute the source estimation
+        :type source_estimation_method: str
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param file_path: The path to the file
+        :type file_path: str
+        :param write_files: Boolean telling if the data computed must be saved into files.
+        :type write_files: bool
+        :param read_files: Boolean telling if the data used for the computation can be read from computer files.
+        :type read_files: bool
+        :param n_jobs: Number of processes used to computed the source estimation
+        :type n_jobs: int
+        """
         super().__init__()
         self.signals = sourceEstimationWorkerSignals()
         self.source_estimation_method = source_estimation_method
@@ -196,6 +352,14 @@ class sourceEstimationRunnable(QRunnable):
         self.source_estimation_data = None
 
     def run(self):
+        """
+        Launch the computation of the source estimation.
+        Notifies the main model when the computation is finished.
+        If it is tried to load the source space information file, but that those file does not exist yet, an error message
+        is displayed describing the error.
+        If to extreme parameters are given and the computation fails, an error message is displayed describing the error.
+        Notifies the main model when an error occurs.
+        """
         try:
             self.source_estimation_data = self.mne_source_estimation_computation()
             self.signals.finished.emit()
@@ -214,6 +378,12 @@ class sourceEstimationRunnable(QRunnable):
             self.signals.error.emit()
 
     def mne_source_estimation_computation(self):
+        """
+        Launch the computation of the source space if it is not provided.
+        Once the source space is computed, compute the source estimation on this source space and the given data.
+        :return: The source estimation of the evoked response of the data.
+        :rtype: MNE.SourceEstimate
+        """
         self.file_data.apply_baseline()
         self.file_data.set_eeg_reference(projection=True)
         if self.read_files:
@@ -224,6 +394,13 @@ class sourceEstimationRunnable(QRunnable):
         return stc
 
     def compute_inverse(self, inv):
+        """
+        Apply the inverse operator on the given data.
+        :param inv: The inverse operator.
+        :type inv: MNE.InverseOperator
+        :return: The source estimation of the evoked response of the data.
+        :rtype: MNE.SourceEstimate
+        """
         print("Apply inverse")
         evoked = self.file_data.average()
         snr = 3.0
@@ -232,6 +409,11 @@ class sourceEstimationRunnable(QRunnable):
         return stc
 
     def create_inverse_operator(self):
+        """
+        Launch all the necessary computation to compute the inverse operator.
+        :return: The inverse operator.
+        :rtype: MNE.InverseOperator
+        """
         print("Compute all data necessary for creating inverse\n===============================================")
         noise_cov = self.compute_noise_covariance()
         src = self.compute_source_space()
@@ -241,6 +423,11 @@ class sourceEstimationRunnable(QRunnable):
         return inv
 
     def compute_noise_covariance(self):
+        """
+        Compute the noise covariance of the given data.
+        :return: The noise covariance.
+        :rtype: MNE.Covariance
+        """
         print("Compute noise covariance")
         noise_cov = compute_covariance(self.file_data, tmax=0., method=['shrunk', 'empirical'], n_jobs=self.n_jobs, verbose=False)
         if self.write_files:
@@ -248,6 +435,11 @@ class sourceEstimationRunnable(QRunnable):
         return noise_cov
 
     def compute_source_space(self):
+        """
+        Compute the source space of the "fsaverage" model.
+        :return: The source space
+        :rtype: MNE.SourceSpaces
+        """
         print("Compute source space")
         src = setup_source_space(subject=self.subject, spacing='oct6', add_dist='patch', subjects_dir=self.subjects_dir,
                                  n_jobs=self.n_jobs, verbose=False)
@@ -256,6 +448,11 @@ class sourceEstimationRunnable(QRunnable):
         return src
 
     def compute_bem_solution(self):
+        """
+        Compute the BEM solution of the "fsaverage" model.
+        :return: The BEM solution.
+        :rtype: MNE.ConductorModel
+        """
         print("Compute bem solution")
         conductivity = (0.3, 0.006, 0.3)  # for three layers
         model = make_bem_model(subject=self.subject, ico=4, conductivity=conductivity, subjects_dir=self.subjects_dir,
@@ -266,6 +463,15 @@ class sourceEstimationRunnable(QRunnable):
         return bem
 
     def compute_forward_solution(self, src, bem):
+        """
+        Compute the forward solution of the given data, based on the source space model of the "fsaverage" model.
+        :param src: The source space
+        :type src: MNE.SourceSpaces
+        :param bem: The BEM solution.
+        :type bem: MNE.ConductorModel
+        :return: The forward solution.
+        :rtype: MNE.Forward
+        """
         print("Compute forward solution")
         fwd = make_forward_solution(self.file_data.info, trans='fsaverage', src=src, bem=bem, meg=False, eeg=True,
                                     mindist=5.0, n_jobs=self.n_jobs, verbose=False)
@@ -274,6 +480,16 @@ class sourceEstimationRunnable(QRunnable):
         return fwd
 
     def compute_inverse_operator(self, fwd, noise_cov):
+        """
+        Compute the inverse operator of the given data, based on the forward solution and the noise covariance previously
+        computed.
+        :param fwd: The forward solution.
+        :type fwd: MNE.Forward
+        :param noise_cov: The noise covariance.
+        :type noise_cov: MNE.Covariance
+        :return: The inverse operator.
+        :rtype: MNE.InverseOperator
+        """
         print("Compute inverse operator")
         inverse_operator = make_inverse_operator(self.file_data.info, fwd, noise_cov, loose=0.2, depth=0.8,
                                                  verbose=False)
@@ -285,4 +501,9 @@ class sourceEstimationRunnable(QRunnable):
     Getters
     """
     def get_source_estimation_data(self):
+        """
+        Get the source estimation data.
+        :return: The source estimation of the evoked response of the data.
+        :rtype: MNE.SourceEstimate
+        """
         return self.source_estimation_data

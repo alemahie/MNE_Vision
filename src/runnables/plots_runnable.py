@@ -21,12 +21,31 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
+# Power Spectral Density
 class powerSpectralDensityWorkerSignals(QObject):
+    """
+    Contain the signals used by the power spectral density runnable.
+    """
     finished = pyqtSignal()
 
 
 class powerSpectralDensityRunnable(QRunnable):
     def __init__(self, file_data, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
+        """
+        Runnable for the computation of the power spectral density of the given data.
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param method_psd: Method used to compute the power spectral density.
+        :type method_psd: str
+        :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.
+        :type minimum_frequency: float
+        :param maximum_frequency: Maximum frequency from which the power spectral density will be computed.
+        :type maximum_frequency: float
+        :param minimum_time: Minimum time of the epochs from which the power spectral density will be computed.
+        :type minimum_time: float
+        :param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.
+        :type maximum_time: float
+        """
         super().__init__()
         self.signals = powerSpectralDensityWorkerSignals()
 
@@ -40,6 +59,10 @@ class powerSpectralDensityRunnable(QRunnable):
         self.freqs = None
 
     def run(self):
+        """
+        Launch the computation of the power spectral density on the given data.
+        Notifies the main model that the computation is finished.
+        """
         if self.method_psd == "Welch":
             self.psds, self.freqs = psd_welch(self.file_data, fmin=self.minimum_frequency, fmax=self.maximum_frequency,
                                               tmin=self.tmin, tmax=self.tmax)
@@ -49,19 +72,48 @@ class powerSpectralDensityRunnable(QRunnable):
         self.signals.finished.emit()
 
     def get_psds(self):
+        """
+        Get the power spectral density's data
+        :return: The actual power spectral density's data computed
+        :rtype: list of, list of, list of float
+        """
         return self.psds
 
     def get_freqs(self):
+        """
+        Get the frequencies of the power spectral density computation.
+        :return: The frequencies at which the power spectral density is computed.
+        :rtype: list of float
+        """
         return self.freqs
 
 
+# Time Frequency
 class timeFrequencyWorkerSignals(QObject):
+    """
+    Contain the signals used by the time-frequency runnable.
+    """
     finished = pyqtSignal()
     error = pyqtSignal()
 
 
 class timeFrequencyRunnable(QRunnable):
     def __init__(self, file_data, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
+        """
+        Runnable for the computation of the time-frequency analysis of the given data.
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param method_tfr: Method used for computing the time-frequency analysis.
+        :type method_tfr: str
+        :param channel_selected: Channel on which the time-frequency analysis will be computed.
+        :type channel_selected: str
+        :param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.
+        :type min_frequency: float
+        :param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.
+        :type max_frequency: float
+        :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
+        :type n_cycles: int
+        """
         super().__init__()
         self.signals = timeFrequencyWorkerSignals()
 
@@ -75,6 +127,12 @@ class timeFrequencyRunnable(QRunnable):
         self.itc = None
 
     def run(self):
+        """
+        Launch the computation of the time-frequency analysis on the given data.
+        Notifies the main model that the computation is finished.
+        If to extreme parameters are given and the computation fails, an error message is displayed describing the error.
+        Notifies the main model when an error occurs.
+        """
         try:
             freqs = np.arange(self.min_frequency, self.max_frequency)
             if self.method_tfr == "Morlet":
@@ -95,10 +153,25 @@ class timeFrequencyRunnable(QRunnable):
             self.signals.error.emit()
 
     def get_channel_selected(self):
+        """
+        Get the channel selected for the computation.
+        :return: The channel selected.
+        :rtype: str
+        """
         return self.channel_selected
 
     def get_power(self):
+        """
+        Get the "power" data of the time-frequency analysis computation.
+        :return: "power" data of the time-frequency analysis computation.
+        :rtype: MNE.AverageTFR
+        """
         return self.power
 
     def get_itc(self):
+        """
+        Get the "itc" data of the time-frequency analysis computation.
+        :return: "itc" data of the time-frequency analysis computation.
+        :rtype: MNE.AverageTFR
+        """
         return self.itc
