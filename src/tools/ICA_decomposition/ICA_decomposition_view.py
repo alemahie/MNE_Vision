@@ -18,6 +18,9 @@ __status__ = "Dev"
 
 class icaDecompositionView(QWidget):
     def __init__(self):
+        """
+        indow displaying the parameters for computing the ICA decomposition on the dataset.
+        """
         super().__init__()
         self.ica_decomposition_listener = None
 
@@ -43,9 +46,15 @@ class icaDecompositionView(QWidget):
     Triggers
     """
     def cancel_ica_decomposition_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.ica_decomposition_listener.cancel_button_clicked()
 
     def confirm_ica_decomposition_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         ica_method = self.method_selection.currentText()
         self.ica_decomposition_listener.confirm_button_clicked(ica_method)
 
@@ -53,4 +62,9 @@ class icaDecompositionView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: icaDecompositionController
+        """
         self.ica_decomposition_listener = listener

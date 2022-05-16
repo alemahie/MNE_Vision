@@ -25,6 +25,13 @@ __status__ = "Dev"
 
 class reReferencingView(QWidget):
     def __init__(self, reference, all_channels_names):
+        """
+        Window displaying the parameters for computing the re-referencing on the dataset.
+        :param reference: Current reference
+        :type reference: str/list of str
+        :param all_channels_names: All the channels names
+        :type all_channels_names: list of str
+        """
         super().__init__()
         self.re_referencing_listener = None
         self.channels_selector_controller = None
@@ -94,9 +101,15 @@ class reReferencingView(QWidget):
     Triggers
     """
     def cancel_re_referencing_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.re_referencing_listener.cancel_button_clicked()
 
     def confirm_re_referencing_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         checked_button = self.re_referencing_mode_buttons.checkedButton()
         button_id = self.re_referencing_mode_buttons.id(checked_button)
         references = None
@@ -116,11 +129,18 @@ class reReferencingView(QWidget):
             error_window.show()
 
     def channels_selection_trigger(self):
+        """
+        Open the multiple selector window.
+        The user can select multiple channels.
+        """
         title = "Select the channels used for the re-referencing :"
         self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=False)
         self.channels_selector_controller.set_listener(self.re_referencing_listener)
 
     def slider_value_changed_trigger(self):
+        """
+        Change the value of the slider displayed on the window when the actual slider is moved.
+        """
         slider_value = self.n_jobs_slider.value()
         self.n_jobs_label.setText(str(slider_value))
 
@@ -128,7 +148,17 @@ class reReferencingView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: reReferencingController
+        """
         self.re_referencing_listener = listener
 
     def set_channels_selected(self, channels_selected):
+        """
+        Set the channels selected in the multiple selector window.
+        :param channels_selected: Channels selected.
+        :type channels_selected: list of str
+        """
         self.channels_selected = channels_selected

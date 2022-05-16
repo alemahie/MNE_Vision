@@ -19,6 +19,12 @@ __status__ = "Dev"
 
 class resamplingController(resamplingListener):
     def __init__(self, frequency):
+        """
+        Controller for computing the resampling on the dataset.
+        Create a new window for specifying some parameters.
+        :param frequency: The frequency rate
+        :type frequency: float
+        """
         self.main_listener = None
         self.resampling_view = resamplingView(frequency)
         self.resampling_view.set_listener(self)
@@ -26,9 +32,17 @@ class resamplingController(resamplingListener):
         self.resampling_view.show()
 
     def cancel_button_clicked(self):
+        """
+        Close the window.
+        """
         self.resampling_view.close()
 
     def confirm_button_clicked(self, frequency):
+        """
+        Close the window and send the information to the main controller.
+        :param frequency: The frequency rate
+        :type frequency: float
+        """
         self.main_listener.resampling_information(frequency)
         self.resampling_view.close()
 
@@ -36,4 +50,9 @@ class resamplingController(resamplingListener):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the main listener so that the controller is able to communicate with the main controller.
+        :param listener: main listener
+        :type listener: mainController
+        """
         self.main_listener = listener

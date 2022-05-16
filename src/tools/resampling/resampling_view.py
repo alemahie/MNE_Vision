@@ -18,6 +18,11 @@ __status__ = "Dev"
 
 class resamplingView(QWidget):
     def __init__(self, frequency):
+        """
+         Window displaying the parameters for computing the resampling on the dataset.
+        :param frequency: The frequency rate
+        :type frequency: float
+        """
         super().__init__()
         self.resampling_listener = None
 
@@ -31,9 +36,9 @@ class resamplingView(QWidget):
         self.spinbox_value.setMaximum(16384)
         self.spinbox_value.setValue(frequency)
         self.cancel = QPushButton("&Cancel", self)
-        self.cancel.clicked.connect(self.cancel_filtering_trigger)
+        self.cancel.clicked.connect(self.cancel_resampling_trigger)
         self.confirm = QPushButton("&Confirm", self)
-        self.confirm.clicked.connect(self.confirm_filtering_trigger)
+        self.confirm.clicked.connect(self.confirm_resampling_trigger)
 
         self.grid_layout.addWidget(QLabel("Frequency (Hz) : "), 0, 0)
         self.grid_layout.addWidget(self.spinbox_value, 0, 1)
@@ -43,10 +48,16 @@ class resamplingView(QWidget):
     """
     Triggers
     """
-    def cancel_filtering_trigger(self):
+    def cancel_resampling_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.resampling_listener.cancel_button_clicked()
 
-    def confirm_filtering_trigger(self):
+    def confirm_resampling_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         frequency = self.spinbox_value.value()
         self.resampling_listener.confirm_button_clicked(frequency)
 
@@ -54,4 +65,9 @@ class resamplingView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: resamplingController
+        """
         self.resampling_listener = listener

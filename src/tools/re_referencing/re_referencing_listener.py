@@ -17,6 +17,11 @@ __status__ = "Dev"
 
 
 class reReferencingListener(ABC):
+    """
+    Listener doing the connection between the controller and the view for computing the re-referencing on the dataset.
+    It retrieves the information from the view to send it to the controller.
+    """
+
     @abstractmethod
     def cancel_button_clicked(self):
         pass

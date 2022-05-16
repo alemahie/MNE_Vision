@@ -19,6 +19,9 @@ __status__ = "Dev"
 
 class extractEpochsView(QWidget):
     def __init__(self):
+        """
+        Window displaying the parameters for extracting epochs from the dataset.
+        """
         super().__init__()
         self.extract_epochs_listener = None
 
@@ -48,9 +51,15 @@ class extractEpochsView(QWidget):
     Triggers
     """
     def cancel_extract_epochs_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.extract_epochs_listener.cancel_button_clicked()
 
     def confirm_extract_epochs_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         tmin = None
         tmax = None
         if self.tmin_line.hasAcceptableInput():
@@ -65,4 +74,9 @@ class extractEpochsView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: extractEpochsController
+        """
         self.extract_epochs_listener = listener

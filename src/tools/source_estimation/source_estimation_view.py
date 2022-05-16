@@ -26,6 +26,11 @@ __status__ = "Dev"
 
 class sourceEstimationView(QWidget):
     def __init__(self, title=None):
+        """
+        Window displaying the parameters for computing the source estimation on the dataset.
+        :param title: Title of window
+        :type title: str
+        """
         super().__init__()
         self.source_estimation_listener = None
         self.subject = "fsaverage"
@@ -95,6 +100,11 @@ class sourceEstimationView(QWidget):
         self.global_layout.addWidget(self.cancel_confirm_widget)
 
     def plot_source_estimation(self, source_estimation_data):
+        """
+        Plot the source estimation.
+        :param source_estimation_data: The source estimation's data.
+        :type source_estimation_data: MNE.SourceEstimation
+        """
         plot_source_estimates(source_estimation_data, subject=self.subject, subjects_dir=self.subjects_dir,
                               hemi="both", backend="pyvista")
 
@@ -102,15 +112,24 @@ class sourceEstimationView(QWidget):
     Triggers
     """
     def cancel_source_estimation_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.source_estimation_listener.cancel_button_clicked()
 
     def confirm_source_estimation_trigger(self):
+        """
+        Retrieve the parameters and send the information to the controller.
+        """
         source_estimation_method = self.method_box.currentText()
         save_data, load_data = self.get_save_load_button_checked()
         n_jobs = self.n_jobs_slider.value()
         self.source_estimation_listener.confirm_button_clicked(source_estimation_method, save_data, load_data, n_jobs)
 
     def slider_value_changed_trigger(self):
+        """
+        Change the value of the slider displayed on the window when the actual slider is moved.
+        """
         slider_value = self.n_jobs_slider.value()
         self.n_jobs_label.setText(str(slider_value))
 
@@ -118,12 +137,23 @@ class sourceEstimationView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: sourceEstimationController
+        """
         self.source_estimation_listener = listener
 
     """
     Getters
     """
     def get_save_load_button_checked(self):
+        """
+        Get the values of the save and load buttons.
+        :return: save_data: True if the data must be saved. Otherwise, False.
+        load_data: True if the data must be loaded. Otherwise, False.
+        :rtype: boolean, boolean
+        """
         checked_button = self.save_load_buttons.checkedButton()
         button_id = self.save_load_buttons.id(checked_button)
         save_data = None

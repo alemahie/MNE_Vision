@@ -792,7 +792,7 @@ class mainModel:
         """
         Gets the data of the source estimation computation performed on the dataset.
         :return: The source estimation's data.
-        :rtype: MNESourceEstimation
+        :rtype: MNE.SourceEstimation
         """
         return self.source_estimation_runnable.get_source_estimation_data()
 
