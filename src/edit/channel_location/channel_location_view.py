@@ -19,6 +19,11 @@ __status__ = "Dev"
 
 class channelLocationView(QWidget):
     def __init__(self, number_of_channels):
+        """
+        Window displaying the channels' information of the dataset.
+        :param number_of_channels: The number of channels.
+        :type number_of_channels: int
+        """
         super().__init__()
         self.channel_location_listener = None
 
@@ -99,11 +104,16 @@ class channelLocationView(QWidget):
     """
     Triggers
     """
-
     def cancel_channel_location_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.channel_location_listener.cancel_button_clicked()
 
     def confirm_channel_location_trigger(self):
+        """
+        Retrieve the channel name and location and send the information to the controller.
+        """
         channel_name = self.channel_name_line.text()
         x_coordinate = float(self.x_coordinate_line.text().replace(',', '.'))
         y_coordinate = float(self.y_coordinate_line.text().replace(',', '.'))
@@ -111,6 +121,9 @@ class channelLocationView(QWidget):
         self.channel_location_listener.confirm_button_clicked(channel_name, x_coordinate, y_coordinate, z_coordinate)
 
     def previous_button_trigger(self):
+        """
+        Retrieve the channel name and location and send the information to the controller to display the previous channel.
+        """
         channel_name = self.channel_name_line.text()
         x_coordinate = float(self.x_coordinate_line.text().replace(',', '.'))
         y_coordinate = float(self.y_coordinate_line.text().replace(',', '.'))
@@ -118,6 +131,9 @@ class channelLocationView(QWidget):
         self.channel_location_listener.previous_button_clicked(channel_name, x_coordinate, y_coordinate, z_coordinate)
 
     def next_button_trigger(self):
+        """
+        Retrieve the channel name and location and send the information to the controller to display the next channel.
+        """
         channel_name = self.channel_name_line.text()
         x_coordinate = float(self.x_coordinate_line.text().replace(',', '.'))
         y_coordinate = float(self.y_coordinate_line.text().replace(',', '.'))
@@ -125,9 +141,15 @@ class channelLocationView(QWidget):
         self.channel_location_listener.next_button_clicked(channel_name, x_coordinate, y_coordinate, z_coordinate)
 
     def delete_button_trigger(self):
+        """
+        Send the information to the controller to delete the current channel.
+        """
         self.channel_location_listener.delete_button_clicked()
 
     def insert_button_trigger(self):
+        """
+        Retrieve the channel name and location and send the information to the controller to insert a new channel.
+        """
         channel_name = self.channel_name_line.text()
         x_coordinate = float(self.x_coordinate_line.text())
         y_coordinate = float(self.y_coordinate_line.text())
@@ -135,6 +157,10 @@ class channelLocationView(QWidget):
         self.channel_location_listener.insert_button_clicked(channel_name, x_coordinate, y_coordinate, z_coordinate)
 
     def editing_finished_trigger(self):
+        """
+        Retrieve the new channel number wanted to be displayed and send the information to the controller to display the
+        wanted channel.
+        """
         channel_number = int(self.channel_number.text())-1
         self.channel_location_listener.editing_finished_clicked(channel_number)
 
@@ -143,6 +169,21 @@ class channelLocationView(QWidget):
     """
     def update_channel_displayed(self, channel_number, channel_name, x_coordinate, y_coordinate, z_coordinate,
                                  number_of_channels):
+        """
+        Update the channel displayed on the window.
+        :param channel_number: The channel number
+        :type channel_number: int
+        :param channel_name: Channel name
+        :type channel_name: str
+        :param x_coordinate: X coordinate of the channel's location
+        :type x_coordinate: float
+        :param y_coordinate: Y coordinate of the channel's location
+        :type y_coordinate: float
+        :param z_coordinate: Z coordinate of the channel's location
+        :type z_coordinate: float
+        :param number_of_channels: The number of channels
+        :type number_of_channels: int
+        """
         self.channel_name_line.setText(channel_name)
         self.x_coordinate_line.setText(str(round(x_coordinate, 3)))
         self.y_coordinate_line.setText(str(round(y_coordinate, 3)))
@@ -153,6 +194,10 @@ class channelLocationView(QWidget):
     """
     Setters
     """
-
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: channelLocationController
+        """
         self.channel_location_listener = listener

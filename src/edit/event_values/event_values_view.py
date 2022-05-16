@@ -18,6 +18,17 @@ __status__ = "Dev"
 
 class eventValuesView(QWidget):
     def __init__(self, event_values, event_ids, number_of_epochs, number_of_frames):
+        """
+        Window displaying the events' information of the dataset.
+        :param event_values: Event values
+        :type event_values: list of, list of int
+        :param event_ids: Event ids
+        :type event_ids: dict
+        :param number_of_epochs: The number of epochs
+        :type number_of_epochs: int
+        :param number_of_frames: The number of frames
+        :type number_of_frames: int
+        """
         super().__init__()
         self.event_values_listener = None
         self.event_values = event_values
@@ -99,32 +110,54 @@ class eventValuesView(QWidget):
     Triggers
     """
     def cancel_event_values_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.event_values_listener.cancel_button_clicked()
 
     def confirm_event_values_trigger(self):
+        """
+        Retrieve the event name and latency and send the information to the controller.
+        """
         event_name = self.event_name_line.text()
         latency = int(self.latency_line.text())
         self.event_values_listener.confirm_button_clicked(event_name, latency)
 
     def previous_button_trigger(self):
+        """
+        Retrieve the event name and latency and send the information to the controller to display the previous channel.
+        """
         event_name = self.event_name_line.text()
         latency = int(self.latency_line.text())
         self.event_values_listener.previous_button_clicked(event_name, latency)
 
     def next_button_trigger(self):
+        """
+        Retrieve the event name and latency and send the information to the controller to display the next channel.
+        """
         event_name = self.event_name_line.text()
         latency = int(self.latency_line.text())
         self.event_values_listener.next_button_clicked(event_name, latency)
 
     def delete_button_trigger(self):
+        """
+        Send the information to the controller to delete the current event.
+        """
         self.event_values_listener.delete_button_clicked()
 
     def insert_button_trigger(self):
+        """
+        Retrieve the event name and latency and send the information to the controller to insert a new event.
+        """
         event_name = self.event_name_line.text()
         latency = int(self.latency_line.text())
         self.event_values_listener.insert_button_clicked(event_name, latency)
 
     def editing_finished_trigger(self):
+        """
+        Retrieve the new event number wanted to be displayed and send the information to the controller to display the
+        wanted event.
+        """
         event_number = int(self.event_number_line.text())-1
         self.event_values_listener.editing_finished_clicked(event_number)
 
@@ -132,6 +165,17 @@ class eventValuesView(QWidget):
     Updates
     """
     def update_event_displayed(self, event_number, event_name, epoch_number, latency):
+        """
+        Update the event displayed on the window.
+        :param event_number: The event number.
+        :type event_number: int
+        :param event_name: The event name.
+        :type event_name: str
+        :param epoch_number: The epoch number.
+        :type epoch_number: int
+        :param latency: The latency of the event.
+        :type latency: int
+        """
         self.event_number_line.setText(str(event_number + 1))
         self.event_name_line.setText(event_name)
         self.epoch_number_line.setText(str(epoch_number + 1))
@@ -142,8 +186,18 @@ class eventValuesView(QWidget):
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: eventValuesController
+        """
         self.event_values_listener = listener
 
     def set_event_values(self, event_values):
+        """
+        Set the event values.
+        :param event_values: The event values
+        :type event_values: list of, list of int
+        """
         self.event_values = event_values
         self.number_of_events = len(self.event_values)

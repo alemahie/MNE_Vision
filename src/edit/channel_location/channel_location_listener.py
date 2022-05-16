@@ -17,6 +17,11 @@ __status__ = "Dev"
 
 
 class channelLocationListener(ABC):
+    """
+    Listener doing the connection between the controller and the view for displaying the channels' information.
+    It retrieves the information from the view to send it to the controller.
+    """
+
     @abstractmethod
     def cancel_button_clicked(self):
         pass

@@ -18,7 +18,16 @@ __status__ = "Dev"
 
 
 class datasetInfoView(QWidget):
-    def __init__(self, sampling_rate, time_points_epochs, start_time):
+    def __init__(self, sampling_rate, number_of_frames, start_time):
+        """
+        Window displaying the dataset's information.
+        :param sampling_rate: The sampling rate
+        :type sampling_rate: float
+        :param number_of_frames: The number of frames
+        :type number_of_frames: int
+        :param start_time: The start time of an epoch or the raw file.
+        :type start_time: float
+        """
         super().__init__()
         self.dataset_info_listener = None
 
@@ -33,7 +42,7 @@ class datasetInfoView(QWidget):
         self.sampling_rate.setText(str(sampling_rate))
         self.time_points_epochs = QLineEdit()
         self.time_points_epochs.setValidator(self.only_int)
-        self.time_points_epochs.setText(str(time_points_epochs))
+        self.time_points_epochs.setText(str(number_of_frames))
         self.start_time = QLineEdit()
         self.start_time.setValidator(self.only_int)
         self.start_time.setText(str(start_time))
@@ -56,13 +65,24 @@ class datasetInfoView(QWidget):
     Triggers
     """
     def cancel_dataset_info_trigger(self):
+        """
+        Send the information to the controller that the computation is cancelled.
+        """
         self.dataset_info_listener.cancel_button_clicked()
 
     def confirm_dataset_info_trigger(self):
+        """
+        Retrieve the channel name and location and send the information to the controller.
+        """
         self.dataset_info_listener.confirm_button_clicked()
 
     """
     Setters
     """
     def set_listener(self, listener):
+        """
+        Set the listener to the controller.
+        :param listener: Listener to the controller.
+        :type listener: datasetInfoController
+        """
         self.dataset_info_listener = listener

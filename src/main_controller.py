@@ -329,9 +329,9 @@ class mainController(mainListener):
         Create the controller for displaying some information about the dataset.
         """
         sampling_rate = self.main_model.get_sampling_frequency()
-        time_points_epochs = self.main_model.get_number_of_frames()
+        number_of_frames = self.main_model.get_number_of_frames()
         start_time = self.main_model.get_epochs_start()
-        self.dataset_info_controller = datasetInfoController(sampling_rate, time_points_epochs, start_time)
+        self.dataset_info_controller = datasetInfoController(sampling_rate, number_of_frames, start_time)
         self.dataset_info_controller.set_listener(self)
 
     def event_values_clicked(self):

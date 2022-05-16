@@ -15,4 +15,8 @@ __status__ = "Dev"
 
 
 class EventFileError(Exception):
+    """
+    Exception for an event file error.
+    When an event file is of the wrong type (wrong extension) the exception must be thrown.
+    """
     pass
