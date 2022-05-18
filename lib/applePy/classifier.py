@@ -1318,8 +1318,6 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         self.labels = np.asarray(self.labels)
         self.nb_paradigms = len(self.dataset.event_id)
 
-        print("class")
-
         try:
             if classify_test and test_dataset_size != 0:
                 limit_dataset = self.dataset.shape[0] // test_dataset_size

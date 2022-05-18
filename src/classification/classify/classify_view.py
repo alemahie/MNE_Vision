@@ -120,8 +120,8 @@ class classifyView(QWidget):
         The user can select a multiple pipelines used for the classification.
         """
         title = "Select the pipelines used for the classification :"
-        all_pipelines = ['XdawnCovTSLR', 'XdawnCov', 'Xdawn', 'CSP', 'CSP2', 'cov', 'Cosp', 'HankelCov', 'CSSP', 'PSD',
-                         'MDM', 'FgMDM']
+        all_pipelines = ['XdawnCov', 'Xdawn', 'CSP', 'CSP2', 'cov', 'HankelCov', 'CSSP', 'PSD', 'MDM', 'FgMDM']
+        # 'XdawnCovTSLR', 'Cosp'
         self.pipeline_selector_controller = multipleSelectorController(all_pipelines, title, box_checked=True)
         self.pipeline_selector_controller.set_listener(self.classify_listener)
 
