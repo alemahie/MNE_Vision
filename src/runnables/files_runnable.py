@@ -248,7 +248,12 @@ class loadDataInfoRunnable(QRunnable):
             montage = make_standard_montage(self.montage)
             self.file_data.set_montage(montage)
         self.file_data = self.file_data.pick_channels(self.channels_selected)
-        self.file_data = self.file_data.crop(tmin=self.tmin, tmax=self.tmax)
+        if self.tmin is not None and self.tmax is not None:
+            if self.tmin is None:
+                self.tmin = self.file_data.times[0]
+            if self.tmax is None:
+                self.tmax = self.file_data.times[-1]
+            self.file_data = self.file_data.crop(tmin=self.tmin, tmax=self.tmax)
         self.signals.finished.emit()
 
     def get_file_data(self):

@@ -199,9 +199,9 @@ class mainController(mainListener):
         """
         Create the controller for loading more information about the dataset.
         """
-        channel_names = self.main_model.get_all_channels_names()
-        tmin = self.main_model.get_epochs_start()
-        tmax = self.main_model.get_epochs_end()
+        channel_names = self.main_model.get_all_tmp_channels_names()
+        tmin = self.main_model.get_tmp_epochs_start()
+        tmax = self.main_model.get_tmp_epochs_end()
         self.load_data_info_controller = loadDataInfoController(channel_names, tmin, tmax)
         self.load_data_info_controller.set_listener(self)
 

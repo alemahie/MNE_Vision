@@ -48,9 +48,16 @@ class mainModel:
         """
         self.main_listener = None
 
-        self.file_path_name = None
-        self.file_type = None
         self.file_data = None
+        self.file_type = None
+        self.file_path_name = None
+
+        # The 3 tmp variables are used when loading a dataset, prevents the case that if a new dataset is loaded and an
+        # error occurs, the old data won't be overwritten if there was a dataset loaded before.
+        self.file_data_tmp = None
+        self.file_type_tmp = None
+        self.file_path_name_tmp = None
+
         self.channels_locations = {}
         self.ica_decomposition = "No"
         self.references = "Unknown"
@@ -99,10 +106,9 @@ class mainModel:
         Retrieves the data from the runnable when the FIF file has been opened.
         Notifies the main controller that the reading is done.
         """
-        self.file_data = self.open_fif_file_runnable.get_file_data()
-        self.file_type = self.open_fif_file_runnable.get_file_type()
-        self.file_path_name = self.open_fif_file_runnable.get_path_to_file()
-        self.create_channels_locations()
+        self.file_data_tmp = self.open_fif_file_runnable.get_file_data()
+        self.file_type_tmp = self.open_fif_file_runnable.get_file_type()
+        self.file_path_name_tmp = self.open_fif_file_runnable.get_path_to_file()
         self.main_listener.open_fif_file_computation_finished()
 
     # Open CNT File
@@ -122,10 +128,9 @@ class mainModel:
         Retrieves the data from the runnable when the CNT file has been opened.
         Notifies the main controller that the reading is done.
         """
-        self.file_data = self.open_cnt_file_runnable.get_file_data()
-        self.file_type = self.open_cnt_file_runnable.get_file_type()
-        self.file_path_name = self.open_cnt_file_runnable.get_path_to_file()
-        self.create_channels_locations()
+        self.file_data_tmp = self.open_cnt_file_runnable.get_file_data()
+        self.file_type_tmp = self.open_cnt_file_runnable.get_file_type()
+        self.file_path_name_tmp = self.open_cnt_file_runnable.get_path_to_file()
         self.main_listener.open_cnt_file_computation_finished()
 
     # Open SET File
@@ -145,10 +150,9 @@ class mainModel:
         Retrieves the data from the runnable when the SET file has been opened.
         Notifies the main controller that the reading is done.
         """
-        self.file_data = self.open_set_file_runnable.get_file_data()
-        self.file_type = self.open_set_file_runnable.get_file_type()
-        self.file_path_name = self.open_set_file_runnable.get_file_path_name()
-        self.create_channels_locations()
+        self.file_data_tmp = self.open_set_file_runnable.get_file_data()
+        self.file_type_tmp = self.open_set_file_runnable.get_file_type()
+        self.file_path_name_tmp = self.open_set_file_runnable.get_path_to_file()
         self.main_listener.open_set_file_computation_finished()
 
     # Data Info
@@ -165,7 +169,7 @@ class mainModel:
         :type tmax: float
         """
         pool = QThreadPool.globalInstance()
-        self.load_data_info_runnable = loadDataInfoRunnable(self.file_data, montage, channels_selected, tmin, tmax)
+        self.load_data_info_runnable = loadDataInfoRunnable(self.file_data_tmp, montage, channels_selected, tmin, tmax)
         pool.start(self.load_data_info_runnable)
         self.load_data_info_runnable.signals.finished.connect(self.load_data_info_computation_finished)
 
@@ -175,6 +179,10 @@ class mainModel:
         Notifies the main controller that the reading is done.
         """
         self.file_data = self.load_data_info_runnable.get_file_data()
+        self.file_type = self.file_type_tmp
+        self.file_path_name = self.file_path_name_tmp
+        self.create_channels_locations()
+        self.reset_tmp_attributes()
         self.main_listener.load_data_info_computation_finished()
 
     # Events
@@ -596,6 +604,11 @@ class mainModel:
         for channel in channels_info:
             self.channels_locations[channel["ch_name"]] = channel["loc"][:3]
 
+    def reset_tmp_attributes(self):
+        self.file_data_tmp = None
+        self.file_type_tmp = None
+        self.file_path_name_tmp = None
+
     """
     Getters
     """
@@ -784,6 +797,33 @@ class mainModel:
         :rtype: Epochs/Raw
         """
         return self.file_data
+
+    """
+    Temporaries
+    """
+    def get_all_tmp_channels_names(self):
+        """
+        Gets all the channels' names of the dataset being loaded.
+        :return: The channels' names.
+        :rtype: list of str
+        """
+        return self.file_data_tmp.ch_names
+
+    def get_tmp_epochs_start(self):
+        """
+        Gets the start time of the epochs of the dataset being loaded.
+        :return: The start time of the epochs.
+        :rtype: float
+        """
+        return round(self.file_data_tmp.times[0], 3)
+
+    def get_tmp_epochs_end(self):
+        """
+        Gets the end time of the epochs of the dataset being loaded.
+        :return: The end time of the epochs.
+        :rtype: float
+        """
+        return round(self.file_data_tmp.times[-1], 3)
 
     """
     Runnable getters
