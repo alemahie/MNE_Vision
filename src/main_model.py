@@ -556,7 +556,7 @@ class mainModel:
     """
     Classification menu
     """
-    def classify(self, pipeline_selected, feature_selection, hyper_tuning, cross_val_number):
+    def classify(self, pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning, cross_val_number):
         """
         Creates the parallel runnable for computing the classification with pipeline(s) of artificial intelligence of
         the dataset.
@@ -565,6 +565,8 @@ class mainModel:
         :param feature_selection: Boolean telling if the computation of some feature selection techniques must be performed
         on the dataset.
         :type feature_selection: boolean
+        :param number_of_channels_to_select: Number of channels to select for the feature selection.
+        :type number_of_channels_to_select: int
         :param hyper_tuning: Boolean telling if the computation of the tuning of the hyper-parameters of the pipelines must
         be performed on the dataset.
         :type hyper_tuning: boolean
@@ -573,8 +575,8 @@ class mainModel:
         """
         pool = QThreadPool.globalInstance()
         self.classify_runnable = classifyRunnable(self.file_data, self.get_directory_path_from_file_path(),
-                                                  pipeline_selected, feature_selection, hyper_tuning,
-                                                  cross_val_number)
+                                                  pipeline_selected, feature_selection, number_of_channels_to_select,
+                                                  hyper_tuning, cross_val_number)
         pool.start(self.classify_runnable)
         self.classify_runnable.signals.finished.connect(self.classify_computation_finished)
 

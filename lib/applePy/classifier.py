@@ -866,8 +866,8 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
                                        ("features", selected_feats)]
         self.classifier_log.extend(additional_informations)
         print("Selected features are : ", selected_feats)
-        for person_idx in range(self.dataset.shape[0]):
-            self.dataset[person_idx] = self.dataset[person_idx][:, selected_feats_idx, :]
+        # for person_idx in range(self.dataset.shape[0]):
+        #     self.dataset[person_idx] = self.dataset[person_idx][:, selected_feats_idx, :]
         return self.dataset
 
     def tune_hyperparameters(self, cv, use_sources=False, use_groups=True, factor=None):
@@ -1281,22 +1281,22 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         ----------
         dataset : string; the path to the dataset \n
         test_dataset_size : int; the fraction of the dataset to be considered for testing \n
-        pre_epoched : boolean; whether or not the dataset is already epoched \n
+        pre_epoched : boolean; whether the dataset is already epoched or not\n
         tmin, tmax : time limits for the epochs \n
         bads : list of electrodes to be rejected \n
         picks : list of electrodes to be worked on \n
         filtering : tuple containing the higher and lower frequencies to filter the data \n
         tmin, tmax : tmin, tmax for delimiting the epochs in time \n
-        ICA : Boolean, whether or not to apply Independent Component Analysis \n
-        resample : boolean, whether or not to resample the data at 512 Hz \n
+        ICA : Boolean, whether to apply Independent Component Analysis or not\n
+        resample : boolean, whether to resample the data at 512 Hz or not \n
         baseline : the baseline to be applied to the data  \n
         cv_value : int; the number of folds for cross validation. If None, the number of subjects will be used (Leave one out) \n
-        independent_features_selection : boolean; whether or not to apply independent features selection \n
+        independent_features_selection : boolean; whether to apply independent features selection or not \n
         channels_to_select : int or None; the number of channels to be selected or None if automatic number selection \n
-        use_groups : boolean; whether or not to use groups for cross validation \n
-        tune_hypers : boolean; whether or not to tune hyperparameters \n
+        use_groups : boolean; whether to use groups for cross validation or not \n
+        tune_hypers : boolean; whether to tune hyperparameters or not \n
         names : list; names of the categories \n
-        classify_test : boolean; whether or not there should be a separate test dataset \n
+        classify_test : boolean; whether there should be a separate test dataset or not \n
         """
         self.dataset = dataset
         self.labels = []
@@ -1318,15 +1318,20 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         self.labels = np.asarray(self.labels)
         self.nb_paradigms = len(self.dataset.event_id)
 
-        if classify_test and test_dataset_size != 0:
-            limit_dataset = self.dataset.shape[0] // test_dataset_size
-            limit_dataset_0 = limit_dataset // 2
-            limit_dataset_1 = limit_dataset - limit_dataset_0
-            self.test_dataset = np.concatenate(
-                [self.dataset[:limit_dataset_0], self.dataset[-limit_dataset_1:]])
-            self.dataset = self.dataset[limit_dataset_0:-limit_dataset_1]
-            self.test_labels = np.concatenate([self.labels[:limit_dataset_0], self.labels[-limit_dataset_1:]])
-            self.labels = self.labels[limit_dataset_0:-limit_dataset_1]
+        print("class")
+
+        try:
+            if classify_test and test_dataset_size != 0:
+                limit_dataset = self.dataset.shape[0] // test_dataset_size
+                limit_dataset_0 = limit_dataset // 2
+                limit_dataset_1 = limit_dataset - limit_dataset_0
+                self.test_dataset = np.concatenate(
+                    [self.dataset[:limit_dataset_0], self.dataset[-limit_dataset_1:]])
+                self.dataset = self.dataset[limit_dataset_0:-limit_dataset_1]
+                self.test_labels = np.concatenate([self.labels[:limit_dataset_0], self.labels[-limit_dataset_1:]])
+                self.labels = self.labels[limit_dataset_0:-limit_dataset_1]
+        except Exception as e:
+            print(e)
 
         if use_groups:
             cv = GroupKFold(cv_value)
@@ -1335,15 +1340,15 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
 
         if independent_features_selection:
             try:
-                print("inde")
                 self.independent_features_selection(False, channels_to_select=channels_to_select, use_groups=use_groups)
             except Exception as e:
+                print("Independent features selection error")
                 print(e)
         if tune_hypers:
             try:
-                print("tune")
                 self.tune_hyperparameters(cv_value, use_sources=False, use_groups=use_groups)
             except Exception as e:
+                print("Hyperparameters tuning error")
                 print(e)
         if use_groups:
             groups = self.groups

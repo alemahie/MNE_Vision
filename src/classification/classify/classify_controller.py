@@ -18,13 +18,15 @@ __status__ = "Dev"
 
 
 class classifyController(classifyListener):
-    def __init__(self):
+    def __init__(self, number_of_channels):
         """
         Controller for computing the classification on the dataset.
         Create a new window for specifying some parameters.
+        :param number_of_channels: The number of channels in the dataset.
+        :type number_of_channels: int
         """
         self.main_listener = None
-        self.classify_view = classifyView()
+        self.classify_view = classifyView(number_of_channels)
         self.classify_view.set_listener(self)
 
         self.classify_view.show()
@@ -35,7 +37,7 @@ class classifyController(classifyListener):
         """
         self.classify_view.close()
 
-    def confirm_button_clicked(self, pipeline_selected, feature_selection, hyper_tuning, cross_val_number):
+    def confirm_button_clicked(self, pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning, cross_val_number):
         """
         Close the window and send the information to the main controller.
         :param pipeline_selected: The pipeline(s) used for the classification of the dataset.
@@ -43,6 +45,8 @@ class classifyController(classifyListener):
         :param feature_selection: Boolean telling if the computation of some feature selection techniques must be performed
         on the dataset.
         :type feature_selection: boolean
+        :param number_of_channels_to_select: Number of channels to select for the feature selection.
+        :type number_of_channels_to_select: int
         :param hyper_tuning: Boolean telling if the computation of the tuning of the hyper-parameters of the pipelines must
         be performed on the dataset.
         :type hyper_tuning: boolean
@@ -50,7 +54,8 @@ class classifyController(classifyListener):
         :type cross_val_number: int
         """
         self.classify_view.close()
-        self.main_listener.classify_information(pipeline_selected, feature_selection, hyper_tuning, cross_val_number)
+        self.main_listener.classify_information(pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning,
+                                                cross_val_number)
 
     def plot_results(self, classifier):
         """

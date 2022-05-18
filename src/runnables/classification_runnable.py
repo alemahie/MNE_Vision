@@ -27,7 +27,8 @@ class classifyWorkerSignals(QObject):
 
 
 class classifyRunnable(QRunnable):
-    def __init__(self, file_data, directory_path, pipeline_selected, feature_selection, hyper_tuning, cross_val_number):
+    def __init__(self, file_data, directory_path, pipeline_selected, feature_selection, number_of_channels_to_select,
+                 hyper_tuning, cross_val_number):
         """
         Runnable for the computation of the classification of the dataset.
         Create the pipelines were the classification will be performed and launch the classification depending on the
@@ -40,10 +41,12 @@ class classifyRunnable(QRunnable):
         :type pipeline_selected: list of str
         :param feature_selection: Boolean telling if the computation of some feature selection techniques must be performed
         on the dataset.
-        :type feature_selection: boolean
+        :type feature_selection: bool
+        :param number_of_channels_to_select: Number of channels to select for the feature selection.
+        :type number_of_channels_to_select: int
         :param hyper_tuning: Boolean telling if the computation of the tuning of the hyper-parameters of the pipelines must
         be performed on the dataset.
-        :type hyper_tuning: boolean
+        :type hyper_tuning: bool
         :param cross_val_number: Number of cross-validation fold used by the pipelines on the dataset.
         :type cross_val_number: int
         """
@@ -55,6 +58,7 @@ class classifyRunnable(QRunnable):
         self.directory_path = directory_path
         self.pipeline_selected = pipeline_selected
         self.feature_selection = feature_selection
+        self.number_of_channels_to_select = number_of_channels_to_select
         self.hyper_tuning = hyper_tuning
         self.cross_val_number = cross_val_number
 
@@ -64,9 +68,9 @@ class classifyRunnable(QRunnable):
         Notifies the main model that the computation is finished.
         """
         self.classifier = ApplePyClassifier(used_pipelines=self.pipeline_selected)
-        self.classifier.classify(self.file_data, dataset_path=self.directory_path, classify_test=False,
-                                 independent_features_selection=self.feature_selection, tune_hypers=self.hyper_tuning,
-                                 use_groups=False, cv_value=self.cross_val_number)
+        self.classifier.classify(self.file_data, dataset_path=self.directory_path, classify_test=False, test_dataset_size=5,
+                                 independent_features_selection=self.feature_selection, channels_to_select=self.number_of_channels_to_select,
+                                 tune_hypers=self.hyper_tuning, use_groups=False, cv_value=self.cross_val_number)
         self.signals.finished.emit()
 
     def get_classifier(self):

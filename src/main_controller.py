@@ -961,10 +961,11 @@ class mainController(mainListener):
         """
         Create the controller for classifying the dataset.
         """
-        self.classify_controller = classifyController()
+        number_of_channels = self.main_model.get_number_of_channels()
+        self.classify_controller = classifyController(number_of_channels)
         self.classify_controller.set_listener(self)
 
-    def classify_information(self, pipeline_selected, feature_selection, hyper_tuning, cross_val_number):
+    def classify_information(self, pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning, cross_val_number):
         """
         Create the waiting window while the classification is done on the dataset.
         :param pipeline_selected: The pipeline(s) used for the classification of the dataset.
@@ -972,6 +973,8 @@ class mainController(mainListener):
         :param feature_selection: Boolean telling if the computation of some feature selection techniques must be performed
         on the dataset.
         :type feature_selection: boolean
+        :param number_of_channels_to_select: Number of channels to select for the feature selection.
+        :type number_of_channels_to_select: int
         :param hyper_tuning: Boolean telling if the computation of the tuning of the hyper-parameters of the pipelines must
         be performed on the dataset.
         :type hyper_tuning: boolean
@@ -982,7 +985,7 @@ class mainController(mainListener):
         finish_method = "classify"
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.classify(pipeline_selected, feature_selection, hyper_tuning, cross_val_number)
+        self.main_model.classify(pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning, cross_val_number)
 
     def classify_computation_finished(self):
         """

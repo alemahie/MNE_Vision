@@ -6,7 +6,7 @@ Classify view
 """
 
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QGridLayout, QCheckBox, \
-    QDoubleSpinBox
+    QDoubleSpinBox, QSpinBox
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
 
@@ -20,12 +20,15 @@ __status__ = "Dev"
 
 
 class classifyView(QWidget):
-    def __init__(self):
+    def __init__(self, number_of_channels):
         """
         Window displaying the parameters for performing the classification.
+        :param number_of_channels: The number of channels in the dataset.
+        :type number_of_channels: int
         """
         super().__init__()
         self.classify_listener = None
+        self.number_of_channels = number_of_channels
         self.pipeline_selector_controller = None
         self.pipeline_selected = None
 
@@ -40,6 +43,14 @@ class classifyView(QWidget):
         self.pipeline_selection_button = QPushButton("&Pipelines ...", self)
         self.pipeline_selection_button.clicked.connect(self.pipeline_selection_trigger)
         self.feature_selection = QCheckBox()
+
+        self.number_of_features = QSpinBox()
+        self.number_of_features.setRange(1, self.number_of_channels)
+        if self.number_of_channels >= 20:
+            self.number_of_features.setValue(20)
+        else:
+            self.number_of_features.setValue(self.number_of_channels)
+
         self.hyper_tuning = QCheckBox()
         self.cross_validation_number = QDoubleSpinBox()
         self.cross_validation_number.setValue(5)
@@ -50,10 +61,12 @@ class classifyView(QWidget):
         self.grid_layout.addWidget(self.pipeline_selection_button, 0, 1)
         self.grid_layout.addWidget(QLabel("Feature selection : "), 1, 0)
         self.grid_layout.addWidget(self.feature_selection, 1, 1)
-        self.grid_layout.addWidget(QLabel("Hyper-parameters tuning : "), 2, 0)
-        self.grid_layout.addWidget(self.hyper_tuning, 2, 1)
-        self.grid_layout.addWidget(QLabel("Cross-validation k-fold : "), 3, 0)
-        self.grid_layout.addWidget(self.cross_validation_number, 3, 1)
+        self.grid_layout.addWidget(QLabel("Number of features to select : "), 2, 0)
+        self.grid_layout.addWidget(self.number_of_features, 2, 1)
+        self.grid_layout.addWidget(QLabel("Hyper-parameters tuning : "), 3, 0)
+        self.grid_layout.addWidget(self.hyper_tuning, 3, 1)
+        self.grid_layout.addWidget(QLabel("Cross-validation k-fold : "), 4, 0)
+        self.grid_layout.addWidget(self.cross_validation_number, 4, 1)
         self.grid_widget.setLayout(self.grid_layout)
 
         self.cancel_confirm_widget = QWidget()
@@ -95,10 +108,11 @@ class classifyView(QWidget):
         Retrieve the parameters and send the information to the controller.
         """
         feature_selection = self.feature_selection.isChecked()
+        number_of_channels_to_select = self.number_of_features.value()
         hyper_tuning = self.hyper_tuning.isChecked()
         cross_val_number = int(self.cross_validation_number.value())
-        self.classify_listener.confirm_button_clicked(self.pipeline_selected, feature_selection, hyper_tuning,
-                                                      cross_val_number)
+        self.classify_listener.confirm_button_clicked(self.pipeline_selected, feature_selection, number_of_channels_to_select,
+                                                      hyper_tuning, cross_val_number)
 
     def pipeline_selection_trigger(self):
         """
