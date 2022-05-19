@@ -7,7 +7,7 @@ Sensor Space Connectivity View
 
 from PyQt6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout
 
-from mne.viz import plot_sensors_connectivity
+from mne_connectivity.viz import plot_sensors_connectivity
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

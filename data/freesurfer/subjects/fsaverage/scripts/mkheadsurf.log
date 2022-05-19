@@ -1,0 +1,113 @@
+Log file for mkheadsurf
+Thu Feb 14 18:09:59 CET 2019
+/home/sik/code/mne-python
+/home/sik/software/freesurfer/bin/mkheadsurf
+-subjid fsaverage -srcvol T1.mgz
+Filesystem         1K-blocks      Used Available Use% Mounted on
+/home/sik/.Private 486362480 448690316  12943332  98% /home/sik
+--------------------------------
+Thu Feb 14 18:09:59 CET 2019
+/home/sik/code/mne-python
+mri_seghead --invol /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/mri/T1.mgz --outvol /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/mri/seghead.mgz --fill 1 --thresh1 20 --thresh2 20 --nhitsmin 2
+--------------------------------
+input volume:  /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/mri/T1.mgz
+output volume: /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/mri/seghead.mgz
+threshold1:    20
+threshold2:    20
+nhitsmin:      2
+fill value:    1
+Loading input volume
+Filling Columns
+Filling Rows
+Filling Slices
+Merging and Inverting
+Growing
+Counting
+N Head Voxels = 4839897
+N Back Voxels = 11937319
+Avg. Back Intensity = 2.011904
+Max. Back Intensity = 56.000000
+Writing output
+Done
+--------------------------------
+Thu Feb 14 18:10:04 CET 2019
+/home/sik/code/mne-python
+mri_tessellate /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/mri/seghead.mgz 1 /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/surf/lh.seghead
+--------------------------------
+$Id: mri_tessellate.c,v 1.38.2.1 2016/07/26 18:46:38 zkaufman Exp $
+  $Id: mrisurf.c,v 1.781.2.6 2016/12/27 16:47:14 zkaufman Exp $
+slice 10: 3448 vertices, 3601 faces
+slice 20: 13522 vertices, 13772 faces
+slice 30: 24176 vertices, 24485 faces
+slice 40: 35811 vertices, 36169 faces
+slice 50: 46628 vertices, 47017 faces
+slice 60: 56771 vertices, 57203 faces
+slice 70: 67235 vertices, 67737 faces
+slice 80: 78725 vertices, 79348 faces
+slice 90: 90017 vertices, 90697 faces
+slice 100: 100156 vertices, 100871 faces
+slice 110: 109950 vertices, 110700 faces
+slice 120: 119647 vertices, 120430 faces
+slice 130: 129430 vertices, 130251 faces
+slice 140: 140152 vertices, 141030 faces
+slice 150: 151022 vertices, 151930 faces
+slice 160: 163066 vertices, 164062 faces
+slice 170: 176890 vertices, 177980 faces
+slice 180: 190597 vertices, 191684 faces
+slice 190: 203057 vertices, 204094 faces
+slice 200: 216280 vertices, 217276 faces
+slice 210: 224923 vertices, 225809 faces
+slice 220: 232777 vertices, 233518 faces
+slice 230: 232777 vertices, 233518 faces
+slice 240: 232777 vertices, 233518 faces
+slice 250: 232777 vertices, 233518 faces
+using the conformed surface RAS to save vertex points...
+writing /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/surf/lh.seghead
+using vox2ras matrix:
+-1.00000   0.00000   0.00000   128.00000;
+ 0.00000   0.00000   1.00000  -128.00000;
+ 0.00000  -1.00000   0.00000   128.00000;
+ 0.00000   0.00000   0.00000   1.00000;
+--------------------------------
+Thu Feb 14 18:10:05 CET 2019
+/home/sik/code/mne-python
+mris_smooth -n 10 -b area.seghead -c curv.seghead /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/surf/lh.seghead /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/surf/lh.seghead
+--------------------------------
+smoothing for 10 iterations
+smoothing surface tessellation for 10 iterations...
+smoothing complete - recomputing first and second fundamental forms...
+writing smoothed curvature to /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/surf/lh.curv.seghead
+writing smoothed area to /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/surf/lh.area.seghead
+--------------------------------
+Thu Feb 14 18:10:10 CET 2019
+/home/sik/code/mne-python
+mris_inflate -n 10 -sulc sulc.seghead /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/surf/lh.seghead /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/surf/lh.seghead.inflated
+--------------------------------
+niterations = 10
+sulc name = sulc.seghead
+Reading /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/surf/lh.seghead
+avg radius = 106.2 mm, total surface area = 150824 mm^2
+writing inflated surface to /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/surf/lh.seghead.inflated
+writing sulcal depths to /home/sik/mne_data/MNE-sample-data/subjects/fsaverage/surf/lh.sulc.seghead
+step 000: RMS=0.069 (target=0.015)   step 005: RMS=0.044 (target=0.015)   step 010: RMS=0.039 (target=0.015)   step 015: RMS=0.034 (target=0.015)   step 020: RMS=0.030 (target=0.015)   step 025: RMS=0.027 (target=0.015)   step 030: RMS=0.026 (target=0.015)   step 035: RMS=0.023 (target=0.015)   step 040: RMS=0.022 (target=0.015)   step 045: RMS=0.021 (target=0.015)   step 050: RMS=0.020 (target=0.015)   step 055: RMS=0.021 (target=0.015)   step 060: RMS=0.020 (target=0.015)   
+inflation complete.
+inflation took 0.6 minutes
+mris_inflate utimesec    34.472464
+mris_inflate stimesec    0.067977
+mris_inflate ru_maxrss   297920
+mris_inflate ru_ixrss    0
+mris_inflate ru_idrss    0
+mris_inflate ru_isrss    0
+mris_inflate ru_minflt   73264
+mris_inflate ru_majflt   279
+mris_inflate ru_nswap    0
+mris_inflate ru_inblock  3096
+mris_inflate ru_oublock  12792
+mris_inflate ru_msgsnd   0
+mris_inflate ru_msgrcv   0
+mris_inflate ru_nsignals 0
+mris_inflate ru_nvcsw    203
+mris_inflate ru_nivcsw   81
+Started at: Thu Feb 14 18:09:59 CET 2019
+Ended   at: Thu Feb 14 18:10:45 CET 2019
+mkheadsurf done

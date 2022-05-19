@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
 from keras.losses import categorical_crossentropy
-from keras.optimizers import Adadelta
+from tensorflow.keras.optimizers import Adadelta
 
 from tensorflow.python.ops.init_ops import glorot_uniform_initializer
 
