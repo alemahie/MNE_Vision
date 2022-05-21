@@ -6,8 +6,9 @@ mne_connectivity == 0.3
 numpy
 philistine == 0.1
 pyEDFlib == 0.1.28
-PyQt6 == 6.3.0
 PyQt5 == 5.15.6
+PyQt6 == 6.3.0
+PyQtWebEngine
 pyriemann == 0.2.7
 scikit_learn == 1.1.1
 scipy == 1.8.1

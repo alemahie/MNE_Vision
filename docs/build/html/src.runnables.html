@@ -1,0 +1,1014 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>src.runnables package &#8212; MNE_Vision  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.tools package" href="src.tools.html" />
+    <link rel="prev" title="src.plots.topographies package" href="src.plots.topographies.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.tools.html" title="src.tools package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.plots.topographies.html" title="src.plots.topographies package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" accesskey="U">src package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.runnables package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="src-runnables-package">
+<h1>src.runnables package<a class="headerlink" href="#src-runnables-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-src.runnables.classification_runnable">
+<span id="src-runnables-classification-runnable-module"></span><h2>src.runnables.classification_runnable module<a class="headerlink" href="#module-src.runnables.classification_runnable" title="Permalink to this headline">¶</a></h2>
+<p>Classification runnable</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.classification_runnable.classifyRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.classification_runnable.</span></span><span class="sig-name descname"><span class="pre">classifyRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipeline_selected</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_selection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_channels_to_select</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyper_tuning</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_val_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.classification_runnable.classifyRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.classification_runnable.classifyRunnable.get_classifier">
+<span class="sig-name descname"><span class="pre">get_classifier</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.classification_runnable.classifyRunnable.get_classifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the classifier/pipelines on which the classification is performed.
+:return: The classifiers
+:rtype: ApplePyClassifier</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.classification_runnable.classifyRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.classification_runnable.classifyRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the classifier and launch the computation of the classification.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.classification_runnable.classifyWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.classification_runnable.</span></span><span class="sig-name descname"><span class="pre">classifyWorkerSignals</span></span><a class="headerlink" href="#src.runnables.classification_runnable.classifyWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the classification runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.classification_runnable.classifyWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.classification_runnable.classifyWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.runnables.connectivity_runnable">
+<span id="src-runnables-connectivity-runnable-module"></span><h2>src.runnables.connectivity_runnable module<a class="headerlink" href="#module-src.runnables.connectivity_runnable" title="Permalink to this headline">¶</a></h2>
+<p>Connectivity runnable</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.envelopeCorrelationRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.connectivity_runnable.</span></span><span class="sig-name descname"><span class="pre">envelopeCorrelationRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.envelopeCorrelationRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.envelopeCorrelationRunnable.get_envelope_correlation_data">
+<span class="sig-name descname"><span class="pre">get_envelope_correlation_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.envelopeCorrelationRunnable.get_envelope_correlation_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the envelope correlation’s data.
+:return: The envelope correlation’s data.
+:rtype: list of, list of float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.envelopeCorrelationRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.envelopeCorrelationRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the envelope correlation on the given data.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.envelopeCorrelationWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.connectivity_runnable.</span></span><span class="sig-name descname"><span class="pre">envelopeCorrelationWorkerSignals</span></span><a class="headerlink" href="#src.runnables.connectivity_runnable.envelopeCorrelationWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the envelope correlation runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.envelopeCorrelationWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.connectivity_runnable.envelopeCorrelationWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sensorSpaceConnectivityRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.connectivity_runnable.</span></span><span class="sig-name descname"><span class="pre">sensorSpaceConnectivityRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sensorSpaceConnectivityRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sensorSpaceConnectivityRunnable.get_sensor_space_connectivity_data">
+<span class="sig-name descname"><span class="pre">get_sensor_space_connectivity_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sensorSpaceConnectivityRunnable.get_sensor_space_connectivity_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the sensor space connectivity’s data.
+:return: The sensor space’s data.
+:rtype: list of, list of float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sensorSpaceConnectivityRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sensorSpaceConnectivityRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the envelope correlation on the given data.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sensorSpaceConnectivityWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.connectivity_runnable.</span></span><span class="sig-name descname"><span class="pre">sensorSpaceConnectivityWorkerSignals</span></span><a class="headerlink" href="#src.runnables.connectivity_runnable.sensorSpaceConnectivityWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the sensor space connectivity runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sensorSpaceConnectivityWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.connectivity_runnable.sensorSpaceConnectivityWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.connectivity_runnable.</span></span><span class="sig-name descname"><span class="pre">sourceSpaceConnectivityRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connectivity_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum_estimation_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_estimation_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_bem_solution">
+<span class="sig-name descname"><span class="pre">compute_bem_solution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_bem_solution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the BEM solution of the “fsaverage” model.
+:return: The BEM solution.
+:rtype: MNE.ConductorModel</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_envelope_correlation_with_source_space">
+<span class="sig-name descname"><span class="pre">compute_envelope_correlation_with_source_space</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_envelope_correlation_with_source_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the source space if it is not provided.
+Once the source space is computed, compute the envelope correlation on this source space, giving the source space
+connectivity of the given data.
+:return: The envelope correlation’s data.
+:rtype: list of, list of float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_forward_solution">
+<span class="sig-name descname"><span class="pre">compute_forward_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bem</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_forward_solution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the forward solution of the given data, based on the source space model of the “fsaverage” model.
+:param src: The source space
+:type src: MNE.SourceSpaces
+:param bem: The BEM solution.
+:type bem: MNE.ConductorModel
+:return: The forward solution.
+:rtype: MNE.Forward</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_inverse">
+<span class="sig-name descname"><span class="pre">compute_inverse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the inverse operator on the given data.
+:param inv: The inverse operator.
+:type inv: MNE.InverseOperator
+:return: The source estimation of all epochs.
+:rtype: list of MNE.SourceEstimate</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_inverse_operator">
+<span class="sig-name descname"><span class="pre">compute_inverse_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fwd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_cov</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_inverse_operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the inverse operator of the given data, based on the forward solution and the noise covariance previously
+computed.
+:param fwd: The forward solution.
+:type fwd: MNE.Forward
+:param noise_cov: The noise covariance.
+:type noise_cov: MNE.Covariance
+:return: The inverse operator.
+:rtype: MNE.InverseOperator</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_noise_covariance">
+<span class="sig-name descname"><span class="pre">compute_noise_covariance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_noise_covariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the noise covariance of the given data.
+:return: The noise covariance.
+:rtype: MNE.Covariance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_source_space">
+<span class="sig-name descname"><span class="pre">compute_source_space</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.compute_source_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the source space of the “fsaverage” model.
+:return: The source space
+:rtype: MNE.SourceSpaces</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.create_inverse_operator">
+<span class="sig-name descname"><span class="pre">create_inverse_operator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.create_inverse_operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch all the necessary computation to compute the inverse operator.
+:return: The inverse operator.
+:rtype: MNE.InverseOperator</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.get_source_space_connectivity_data">
+<span class="sig-name descname"><span class="pre">get_source_space_connectivity_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.get_source_space_connectivity_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the source space connectivity’s data.
+:return: The source space’s data.
+:rtype: list of, list of float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the source space connectivity on the given data.
+Notifies the main model when the computation is finished.
+If it is tried to load the source space information file, but that those file does not exist yet, an error message
+is displayed describing the error.
+If to extreme parameters are given and the computation fails, an error message is displayed describing the error.
+Notifies the main model when an error occurs.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.connectivity_runnable.</span></span><span class="sig-name descname"><span class="pre">sourceSpaceConnectivityWorkerSignals</span></span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the source space connectivity runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityWorkerSignals.error">
+<span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityWorkerSignals.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.connectivity_runnable.sourceSpaceConnectivityWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.connectivity_runnable.sourceSpaceConnectivityWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.runnables.files_runnable">
+<span id="src-runnables-files-runnable-module"></span><h2>src.runnables.files_runnable module<a class="headerlink" href="#module-src.runnables.files_runnable" title="Permalink to this headline">¶</a></h2>
+<p>Files runnable</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.findEventsFromChannelRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.files_runnable.</span></span><span class="sig-name descname"><span class="pre">findEventsFromChannelRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stim_channel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.findEventsFromChannelRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.findEventsFromChannelRunnable.get_read_events">
+<span class="sig-name descname"><span class="pre">get_read_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.findEventsFromChannelRunnable.get_read_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the read events.
+:return: The events.
+:rtype: list of int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.findEventsFromChannelRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.findEventsFromChannelRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the reading of the events based on the stimulation channel of the given data.
+Notifies the main model that the computation is finished.
+If no events can be found in the dataset or if the stimulation channel does not contain any information, an error
+message is displayed describing the error.
+Notifies the main model when an error occurs.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.findEventsFromChannelWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.files_runnable.</span></span><span class="sig-name descname"><span class="pre">findEventsFromChannelWorkerSignals</span></span><a class="headerlink" href="#src.runnables.files_runnable.findEventsFromChannelWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the find events from channel runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.findEventsFromChannelWorkerSignals.error">
+<span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#src.runnables.files_runnable.findEventsFromChannelWorkerSignals.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.findEventsFromChannelWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.files_runnable.findEventsFromChannelWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.loadDataInfoRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.files_runnable.</span></span><span class="sig-name descname"><span class="pre">loadDataInfoRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">montage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels_selected</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.loadDataInfoRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.loadDataInfoRunnable.get_file_data">
+<span class="sig-name descname"><span class="pre">get_file_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.loadDataInfoRunnable.get_file_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.loadDataInfoRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.loadDataInfoRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the loading of the additional information of the dataset.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.loadDataInfoWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.files_runnable.</span></span><span class="sig-name descname"><span class="pre">loadDataInfoWorkerSignals</span></span><a class="headerlink" href="#src.runnables.files_runnable.loadDataInfoWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the load data info runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.loadDataInfoWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.files_runnable.loadDataInfoWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openCntFileRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.files_runnable.</span></span><span class="sig-name descname"><span class="pre">openCntFileRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_to_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openCntFileRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openCntFileRunnable.get_file_data">
+<span class="sig-name descname"><span class="pre">get_file_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openCntFileRunnable.get_file_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file data.
+:return: MNE data of the dataset.
+:rtype: MNE.Epochs/MNE.Raw</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openCntFileRunnable.get_file_type">
+<span class="sig-name descname"><span class="pre">get_file_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openCntFileRunnable.get_file_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file type.
+:return: The file type.
+:rtype: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openCntFileRunnable.get_path_to_file">
+<span class="sig-name descname"><span class="pre">get_path_to_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openCntFileRunnable.get_path_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the path to the file.
+:return: The path to the file.
+:rtype: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openCntFileRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openCntFileRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the reading of the CNT file.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openCntFileWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.files_runnable.</span></span><span class="sig-name descname"><span class="pre">openCntFileWorkerSignals</span></span><a class="headerlink" href="#src.runnables.files_runnable.openCntFileWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the open CNT file runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openCntFileWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.files_runnable.openCntFileWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openFifFileRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.files_runnable.</span></span><span class="sig-name descname"><span class="pre">openFifFileRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_to_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openFifFileRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openFifFileRunnable.get_file_data">
+<span class="sig-name descname"><span class="pre">get_file_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openFifFileRunnable.get_file_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file data.
+:return: MNE data of the dataset.
+:rtype: MNE.Epochs/MNE.Raw</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openFifFileRunnable.get_file_type">
+<span class="sig-name descname"><span class="pre">get_file_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openFifFileRunnable.get_file_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file type.
+:return: The file type.
+:rtype: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openFifFileRunnable.get_path_to_file">
+<span class="sig-name descname"><span class="pre">get_path_to_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openFifFileRunnable.get_path_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the path to the file.
+:return: The path to the file.
+:rtype: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openFifFileRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openFifFileRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the reading of the FIF file.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openFifFileWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.files_runnable.</span></span><span class="sig-name descname"><span class="pre">openFifFileWorkerSignals</span></span><a class="headerlink" href="#src.runnables.files_runnable.openFifFileWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the open FIF file runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openFifFileWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.files_runnable.openFifFileWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openSetFileRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.files_runnable.</span></span><span class="sig-name descname"><span class="pre">openSetFileRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_to_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openSetFileRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openSetFileRunnable.get_file_data">
+<span class="sig-name descname"><span class="pre">get_file_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openSetFileRunnable.get_file_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file data.
+:return: MNE data of the dataset.
+:rtype: MNE.Epochs/MNE.Raw</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openSetFileRunnable.get_file_type">
+<span class="sig-name descname"><span class="pre">get_file_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openSetFileRunnable.get_file_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file type.
+:return: The file type.
+:rtype: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openSetFileRunnable.get_path_to_file">
+<span class="sig-name descname"><span class="pre">get_path_to_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openSetFileRunnable.get_path_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the path to the file.
+:return: The path to the file.
+:rtype: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openSetFileRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.files_runnable.openSetFileRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the reading of the SET file.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openSetFileWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.files_runnable.</span></span><span class="sig-name descname"><span class="pre">openSetFileWorkerSignals</span></span><a class="headerlink" href="#src.runnables.files_runnable.openSetFileWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the open SET file runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.files_runnable.openSetFileWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.files_runnable.openSetFileWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.runnables.plots_runnable">
+<span id="src-runnables-plots-runnable-module"></span><h2>src.runnables.plots_runnable module<a class="headerlink" href="#module-src.runnables.plots_runnable" title="Permalink to this headline">¶</a></h2>
+<p>Plots runnable</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.powerSpectralDensityRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.plots_runnable.</span></span><span class="sig-name descname"><span class="pre">powerSpectralDensityRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method_psd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.plots_runnable.powerSpectralDensityRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.powerSpectralDensityRunnable.get_freqs">
+<span class="sig-name descname"><span class="pre">get_freqs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.plots_runnable.powerSpectralDensityRunnable.get_freqs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the frequencies of the power spectral density computation.
+:return: The frequencies at which the power spectral density is computed.
+:rtype: list of float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.powerSpectralDensityRunnable.get_psds">
+<span class="sig-name descname"><span class="pre">get_psds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.plots_runnable.powerSpectralDensityRunnable.get_psds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the power spectral density’s data
+:return: The actual power spectral density’s data computed
+:rtype: list of, list of, list of float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.powerSpectralDensityRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.plots_runnable.powerSpectralDensityRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the power spectral density on the given data.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.powerSpectralDensityWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.plots_runnable.</span></span><span class="sig-name descname"><span class="pre">powerSpectralDensityWorkerSignals</span></span><a class="headerlink" href="#src.runnables.plots_runnable.powerSpectralDensityWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the power spectral density runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.powerSpectralDensityWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.plots_runnable.powerSpectralDensityWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.timeFrequencyRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.plots_runnable.</span></span><span class="sig-name descname"><span class="pre">timeFrequencyRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method_tfr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_selected</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cycles</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.plots_runnable.timeFrequencyRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.timeFrequencyRunnable.get_channel_selected">
+<span class="sig-name descname"><span class="pre">get_channel_selected</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.plots_runnable.timeFrequencyRunnable.get_channel_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the channel selected for the computation.
+:return: The channel selected.
+:rtype: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.timeFrequencyRunnable.get_itc">
+<span class="sig-name descname"><span class="pre">get_itc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.plots_runnable.timeFrequencyRunnable.get_itc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the “itc” data of the time-frequency analysis computation.
+:return: “itc” data of the time-frequency analysis computation.
+:rtype: MNE.AverageTFR</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.timeFrequencyRunnable.get_power">
+<span class="sig-name descname"><span class="pre">get_power</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.plots_runnable.timeFrequencyRunnable.get_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the “power” data of the time-frequency analysis computation.
+:return: “power” data of the time-frequency analysis computation.
+:rtype: MNE.AverageTFR</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.timeFrequencyRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.plots_runnable.timeFrequencyRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the time-frequency analysis on the given data.
+Notifies the main model that the computation is finished.
+If to extreme parameters are given and the computation fails, an error message is displayed describing the error.
+Notifies the main model when an error occurs.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.timeFrequencyWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.plots_runnable.</span></span><span class="sig-name descname"><span class="pre">timeFrequencyWorkerSignals</span></span><a class="headerlink" href="#src.runnables.plots_runnable.timeFrequencyWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the time-frequency runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.timeFrequencyWorkerSignals.error">
+<span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#src.runnables.plots_runnable.timeFrequencyWorkerSignals.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.plots_runnable.timeFrequencyWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.plots_runnable.timeFrequencyWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.runnables.tools_runnable">
+<span id="src-runnables-tools-runnable-module"></span><h2>src.runnables.tools_runnable module<a class="headerlink" href="#module-src.runnables.tools_runnable" title="Permalink to this headline">¶</a></h2>
+<p>Tools runnable</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.extractEpochsRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.tools_runnable.</span></span><span class="sig-name descname"><span class="pre">extractEpochsRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.extractEpochsRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.extractEpochsRunnable.get_file_data">
+<span class="sig-name descname"><span class="pre">get_file_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.extractEpochsRunnable.get_file_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file data.
+:return: MNE data of the dataset.
+:rtype: MNE.Epochs/MNE.Raw</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.extractEpochsRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.extractEpochsRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the extraction of the epochs on the given data.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.extractEpochsWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.tools_runnable.</span></span><span class="sig-name descname"><span class="pre">extractEpochsWorkerSignals</span></span><a class="headerlink" href="#src.runnables.tools_runnable.extractEpochsWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the extract epochs runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.extractEpochsWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.tools_runnable.extractEpochsWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.filterRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.tools_runnable.</span></span><span class="sig-name descname"><span class="pre">filterRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">low_frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high_frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels_selected</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.filterRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.filterRunnable.get_file_data">
+<span class="sig-name descname"><span class="pre">get_file_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.filterRunnable.get_file_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file data.
+:return: MNE data of the dataset.
+:rtype: MNE.Epochs/MNE.Raw</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.filterRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.filterRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the filtering on the given data.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.filterWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.tools_runnable.</span></span><span class="sig-name descname"><span class="pre">filterWorkerSignals</span></span><a class="headerlink" href="#src.runnables.tools_runnable.filterWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the filter runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.filterWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.tools_runnable.filterWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.icaRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.tools_runnable.</span></span><span class="sig-name descname"><span class="pre">icaRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ica_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.icaRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.icaRunnable.get_file_data">
+<span class="sig-name descname"><span class="pre">get_file_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.icaRunnable.get_file_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file data.
+:return: MNE data of the dataset.
+:rtype: MNE.Epochs/MNE.Raw</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.icaRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.icaRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the ICA decomposition on the given data.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.icaWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.tools_runnable.</span></span><span class="sig-name descname"><span class="pre">icaWorkerSignals</span></span><a class="headerlink" href="#src.runnables.tools_runnable.icaWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the ICA Decomposition runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.icaWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.tools_runnable.icaWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.reReferencingRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.tools_runnable.</span></span><span class="sig-name descname"><span class="pre">reReferencingRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.reReferencingRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.reReferencingRunnable.compute_bem_solution">
+<span class="sig-name descname"><span class="pre">compute_bem_solution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.reReferencingRunnable.compute_bem_solution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the BEM solution of the “fsaverage” model.
+:return: The BEM solution.
+:rtype: MNE.ConductorModel</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.reReferencingRunnable.compute_forward_solution">
+<span class="sig-name descname"><span class="pre">compute_forward_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bem</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.reReferencingRunnable.compute_forward_solution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the forward solution of the given data, based on the source space model of the “fsaverage” model.
+:param src: The source space
+:type src: MNE.SourceSpaces
+:param bem: The BEM solution.
+:type bem: MNE.ConductorModel
+:return: The forward solution.
+:rtype: MNE.Forward</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.reReferencingRunnable.compute_source_space">
+<span class="sig-name descname"><span class="pre">compute_source_space</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.reReferencingRunnable.compute_source_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the source space of the “fsaverage” model.
+:return: The source space
+:rtype: MNE.SourceSpaces</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.reReferencingRunnable.get_file_data">
+<span class="sig-name descname"><span class="pre">get_file_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.reReferencingRunnable.get_file_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file data.
+:return: MNE data of the dataset.
+:rtype: MNE.Epochs/MNE.Raw</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.reReferencingRunnable.get_references">
+<span class="sig-name descname"><span class="pre">get_references</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.reReferencingRunnable.get_references" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the references on which the data has been re-referenced.
+:return: The references
+:rtype: str/list of str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.reReferencingRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.reReferencingRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the re-referencing on the given data.
+Compute the forward solution and the necessary information for the computation of the re-referencing to the point
+in infinity, which requires some information of the source space to be done.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.reReferencingWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.tools_runnable.</span></span><span class="sig-name descname"><span class="pre">reReferencingWorkerSignals</span></span><a class="headerlink" href="#src.runnables.tools_runnable.reReferencingWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the re-referencing runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.reReferencingWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.tools_runnable.reReferencingWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.resamplingRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.tools_runnable.</span></span><span class="sig-name descname"><span class="pre">resamplingRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.resamplingRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.resamplingRunnable.get_file_data">
+<span class="sig-name descname"><span class="pre">get_file_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.resamplingRunnable.get_file_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file data.
+:return: MNE data of the dataset.
+:rtype: MNE.Epochs/MNE.Raw</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.resamplingRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.resamplingRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the resampling on the given data.
+Notifies the main model that the computation is finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.resamplingWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.tools_runnable.</span></span><span class="sig-name descname"><span class="pre">resamplingWorkerSignals</span></span><a class="headerlink" href="#src.runnables.tools_runnable.resamplingWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the resampling runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.resamplingWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.tools_runnable.resamplingWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.tools_runnable.</span></span><span class="sig-name descname"><span class="pre">sourceEstimationRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_estimation_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationRunnable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QRunnable</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationRunnable.compute_bem_solution">
+<span class="sig-name descname"><span class="pre">compute_bem_solution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationRunnable.compute_bem_solution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the BEM solution of the “fsaverage” model.
+:return: The BEM solution.
+:rtype: MNE.ConductorModel</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationRunnable.compute_forward_solution">
+<span class="sig-name descname"><span class="pre">compute_forward_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bem</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationRunnable.compute_forward_solution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the forward solution of the given data, based on the source space model of the “fsaverage” model.
+:param src: The source space
+:type src: MNE.SourceSpaces
+:param bem: The BEM solution.
+:type bem: MNE.ConductorModel
+:return: The forward solution.
+:rtype: MNE.Forward</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationRunnable.compute_inverse">
+<span class="sig-name descname"><span class="pre">compute_inverse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationRunnable.compute_inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the inverse operator on the given data.
+:param inv: The inverse operator.
+:type inv: MNE.InverseOperator
+:return: The source estimation of the evoked response of the data.
+:rtype: MNE.SourceEstimate</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationRunnable.compute_inverse_operator">
+<span class="sig-name descname"><span class="pre">compute_inverse_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fwd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_cov</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationRunnable.compute_inverse_operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the inverse operator of the given data, based on the forward solution and the noise covariance previously
+computed.
+:param fwd: The forward solution.
+:type fwd: MNE.Forward
+:param noise_cov: The noise covariance.
+:type noise_cov: MNE.Covariance
+:return: The inverse operator.
+:rtype: MNE.InverseOperator</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationRunnable.compute_noise_covariance">
+<span class="sig-name descname"><span class="pre">compute_noise_covariance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationRunnable.compute_noise_covariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the noise covariance of the given data.
+:return: The noise covariance.
+:rtype: MNE.Covariance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationRunnable.compute_source_space">
+<span class="sig-name descname"><span class="pre">compute_source_space</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationRunnable.compute_source_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the source space of the “fsaverage” model.
+:return: The source space
+:rtype: MNE.SourceSpaces</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationRunnable.create_inverse_operator">
+<span class="sig-name descname"><span class="pre">create_inverse_operator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationRunnable.create_inverse_operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch all the necessary computation to compute the inverse operator.
+:return: The inverse operator.
+:rtype: MNE.InverseOperator</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationRunnable.get_source_estimation_data">
+<span class="sig-name descname"><span class="pre">get_source_estimation_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationRunnable.get_source_estimation_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the source estimation data.
+:return: The source estimation of the evoked response of the data.
+:rtype: MNE.SourceEstimate</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationRunnable.mne_source_estimation_computation">
+<span class="sig-name descname"><span class="pre">mne_source_estimation_computation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationRunnable.mne_source_estimation_computation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the source space if it is not provided.
+Once the source space is computed, compute the source estimation on this source space and the given data.
+:return: The source estimation of the evoked response of the data.
+:rtype: MNE.SourceEstimate</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationRunnable.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationRunnable.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the computation of the source estimation.
+Notifies the main model when the computation is finished.
+If it is tried to load the source space information file, but that those file does not exist yet, an error message
+is displayed describing the error.
+If to extreme parameters are given and the computation fails, an error message is displayed describing the error.
+Notifies the main model when an error occurs.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationWorkerSignals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.runnables.tools_runnable.</span></span><span class="sig-name descname"><span class="pre">sourceEstimationWorkerSignals</span></span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtCore.QObject</span></code></p>
+<p>Contain the signals used by the source estimation runnable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationWorkerSignals.error">
+<span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationWorkerSignals.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.runnables.tools_runnable.sourceEstimationWorkerSignals.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#src.runnables.tools_runnable.sourceEstimationWorkerSignals.finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.runnables">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.runnables" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">src.runnables package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.runnables.classification_runnable">src.runnables.classification_runnable module</a></li>
+<li><a class="reference internal" href="#module-src.runnables.connectivity_runnable">src.runnables.connectivity_runnable module</a></li>
+<li><a class="reference internal" href="#module-src.runnables.files_runnable">src.runnables.files_runnable module</a></li>
+<li><a class="reference internal" href="#module-src.runnables.plots_runnable">src.runnables.plots_runnable module</a></li>
+<li><a class="reference internal" href="#module-src.runnables.tools_runnable">src.runnables.tools_runnable module</a></li>
+<li><a class="reference internal" href="#module-src.runnables">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="src.plots.topographies.html"
+                          title="previous chapter">src.plots.topographies package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="src.tools.html"
+                          title="next chapter">src.tools package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.runnables.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.tools.html" title="src.tools package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.plots.topographies.html" title="src.plots.topographies package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.runnables package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+  </body>
+</html>

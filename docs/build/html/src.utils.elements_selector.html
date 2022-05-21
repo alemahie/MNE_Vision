@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>src.utils.elements_selector package &#8212; MNE_Vision  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.utils.waiting_while_processing package" href="src.utils.waiting_while_processing.html" />
+    <link rel="prev" title="src.utils package" href="src.utils.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.utils.waiting_while_processing.html" title="src.utils.waiting_while_processing package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.utils.html" title="src.utils package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.utils.html" accesskey="U">src.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.utils.elements_selector package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="src-utils-elements-selector-package">
+<h1>src.utils.elements_selector package<a class="headerlink" href="#src-utils-elements-selector-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-src.utils.elements_selector.elements_selector_controller">
+<span id="src-utils-elements-selector-elements-selector-controller-module"></span><h2>src.utils.elements_selector.elements_selector_controller module<a class="headerlink" href="#module-src.utils.elements_selector.elements_selector_controller" title="Permalink to this headline">¶</a></h2>
+<p>Multiple selector controller</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_controller.multipleSelectorController">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.utils.elements_selector.elements_selector_controller.</span></span><span class="sig-name descname"><span class="pre">multipleSelectorController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_elements_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_checked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_box</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_controller.multipleSelectorController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">utils.elements_selector.elements_selector_listener.multipleSelectorListener</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_controller.multipleSelectorController.cancel_button_clicked">
+<span class="sig-name descname"><span class="pre">cancel_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_controller.multipleSelectorController.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_controller.multipleSelectorController.confirm_button_clicked">
+<span class="sig-name descname"><span class="pre">confirm_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements_selected</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_controller.multipleSelectorController.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window and send the information to the controller that opened the multiple elements window.
+:param elements_selected: All the elements selected.
+:type elements_selected: list of str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_controller.multipleSelectorController.set_listener">
+<span class="sig-name descname"><span class="pre">set_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_controller.multipleSelectorController.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the listener so that the controller is able to communicate with the controller that opened the multiple
+elements window.
+:param listener: Listener linked to the view that opened the multiple elements window.
+:type listener: listener</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.utils.elements_selector.elements_selector_listener">
+<span id="src-utils-elements-selector-elements-selector-listener-module"></span><h2>src.utils.elements_selector.elements_selector_listener module<a class="headerlink" href="#module-src.utils.elements_selector.elements_selector_listener" title="Permalink to this headline">¶</a></h2>
+<p>Multiple selector Listener</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_listener.multipleSelectorListener">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.utils.elements_selector.elements_selector_listener.</span></span><span class="sig-name descname"><span class="pre">multipleSelectorListener</span></span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_listener.multipleSelectorListener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Listener doing the connection between the controller and the view for selecting multiple elements.
+It retrieves the information from the view to send it to the controller.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_listener.multipleSelectorListener.cancel_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cancel_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_listener.multipleSelectorListener.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_listener.multipleSelectorListener.confirm_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">confirm_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements_selected</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_listener.multipleSelectorListener.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.utils.elements_selector.elements_selector_view">
+<span id="src-utils-elements-selector-elements-selector-view-module"></span><h2>src.utils.elements_selector.elements_selector_view module<a class="headerlink" href="#module-src.utils.elements_selector.elements_selector_view" title="Permalink to this headline">¶</a></h2>
+<p>Multiple selector View</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_view.multipleSelectorView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.utils.elements_selector.elements_selector_view.</span></span><span class="sig-name descname"><span class="pre">multipleSelectorView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_elements_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_checked</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_box</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_view.multipleSelectorView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtWidgets.QWidget</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_view.multipleSelectorView.cancel_trigger">
+<span class="sig-name descname"><span class="pre">cancel_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_view.multipleSelectorView.cancel_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the information to the controller that the computation is cancelled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_view.multipleSelectorView.confirm_trigger">
+<span class="sig-name descname"><span class="pre">confirm_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_view.multipleSelectorView.confirm_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the parameters and send the information to the controller.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_view.multipleSelectorView.create_check_boxes">
+<span class="sig-name descname"><span class="pre">create_check_boxes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_elements_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_checked</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_box</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_view.multipleSelectorView.create_check_boxes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_view.multipleSelectorView.create_select_unselect_buttons">
+<span class="sig-name descname"><span class="pre">create_select_unselect_buttons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_view.multipleSelectorView.create_select_unselect_buttons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_view.multipleSelectorView.get_all_elements_selected">
+<span class="sig-name descname"><span class="pre">get_all_elements_selected</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_view.multipleSelectorView.get_all_elements_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the elements selected by the user in the multiple elements’ selector.
+:return: Elements selected in the multiple elements’ selector.
+:rtype: str/list of str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_view.multipleSelectorView.select_all_elements_trigger">
+<span class="sig-name descname"><span class="pre">select_all_elements_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_view.multipleSelectorView.select_all_elements_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select all the elements of the window.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_view.multipleSelectorView.set_listener">
+<span class="sig-name descname"><span class="pre">set_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_view.multipleSelectorView.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the listener to the controller.
+:param listener: Listener to the controller.
+:type listener: elementsSelectorController</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.elements_selector.elements_selector_view.multipleSelectorView.unselect_all_elements_trigger">
+<span class="sig-name descname"><span class="pre">unselect_all_elements_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.elements_selector.elements_selector_view.multipleSelectorView.unselect_all_elements_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unselect all the elements of the window.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.utils.elements_selector">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.utils.elements_selector" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">src.utils.elements_selector package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.utils.elements_selector.elements_selector_controller">src.utils.elements_selector.elements_selector_controller module</a></li>
+<li><a class="reference internal" href="#module-src.utils.elements_selector.elements_selector_listener">src.utils.elements_selector.elements_selector_listener module</a></li>
+<li><a class="reference internal" href="#module-src.utils.elements_selector.elements_selector_view">src.utils.elements_selector.elements_selector_view module</a></li>
+<li><a class="reference internal" href="#module-src.utils.elements_selector">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="src.utils.html"
+                          title="previous chapter">src.utils package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="src.utils.waiting_while_processing.html"
+                          title="next chapter">src.utils.waiting_while_processing package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.utils.elements_selector.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.utils.waiting_while_processing.html" title="src.utils.waiting_while_processing package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.utils.html" title="src.utils package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.utils.html" >src.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.utils.elements_selector package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+  </body>
+</html>

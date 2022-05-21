@@ -1,0 +1,410 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>src.edit.channel_location package &#8212; MNE_Vision  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.edit.dataset_info package" href="src.edit.dataset_info.html" />
+    <link rel="prev" title="src.edit package" href="src.edit.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.edit.dataset_info.html" title="src.edit.dataset_info package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.edit.html" title="src.edit package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.edit.html" accesskey="U">src.edit package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.edit.channel_location package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="src-edit-channel-location-package">
+<h1>src.edit.channel_location package<a class="headerlink" href="#src-edit-channel-location-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-src.edit.channel_location.channel_location_controller">
+<span id="src-edit-channel-location-channel-location-controller-module"></span><h2>src.edit.channel_location.channel_location_controller module<a class="headerlink" href="#module-src.edit.channel_location.channel_location_controller" title="Permalink to this headline">¶</a></h2>
+<p>Channel Location Controller</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.edit.channel_location.channel_location_controller.</span></span><span class="sig-name descname"><span class="pre">channelLocationController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_locations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">edit.channel_location.channel_location_listener.channelLocationListener</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.cancel_button_clicked">
+<span class="sig-name descname"><span class="pre">cancel_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.channel_name_is_free">
+<span class="sig-name descname"><span class="pre">channel_name_is_free</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.channel_name_is_free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the channel name provided is available or not. If it is not available, display an error message and the
+user must set a new name for the channel.
+:param channel_name: The channel name.
+:type channel_name: str
+:return: True if the channel name is available. False otherwise.
+:rtype: bool</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.confirm_button_clicked">
+<span class="sig-name descname"><span class="pre">confirm_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_coordinate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window and send the information to the main controller.
+Save the information of the last channel displayed before sending the information to the controller.
+:param channel_name: Channel name
+:type channel_name: str
+:param x_coordinate: X coordinate of the channel’s location
+:type x_coordinate: float
+:param y_coordinate: Y coordinate of the channel’s location
+:type y_coordinate: float
+:param z_coordinate: Z coordinate of the channel’s location
+:type z_coordinate: float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.delete_button_clicked">
+<span class="sig-name descname"><span class="pre">delete_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.delete_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the information of the channel displayed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.editing_finished_clicked">
+<span class="sig-name descname"><span class="pre">editing_finished_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.editing_finished_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the channel’s information based on the channel number given.
+:param channel_number: Channel number
+:type channel_number: int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.get_channel_info_from_number">
+<span class="sig-name descname"><span class="pre">get_channel_info_from_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.get_channel_info_from_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the information of a channel based on a channel number.
+:param channel_number: The channel number
+:type channel_number: int
+:return: channel_name: The channel name.
+channel_location: The channel location.
+:rtype: str, list of float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.insert_button_clicked">
+<span class="sig-name descname"><span class="pre">insert_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_coordinate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.insert_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the information of the last channel displayed before inserting a new channel.
+:param channel_name: Channel name
+:type channel_name: str
+:param x_coordinate: X coordinate of the channel’s location
+:type x_coordinate: float
+:param y_coordinate: Y coordinate of the channel’s location
+:type y_coordinate: float
+:param z_coordinate: Z coordinate of the channel’s location
+:type z_coordinate: float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.insert_new_channel">
+<span class="sig-name descname"><span class="pre">insert_new_channel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.insert_new_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a new channel in the data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.next_button_clicked">
+<span class="sig-name descname"><span class="pre">next_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_coordinate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.next_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the information of the last channel displayed before displaying the information of the next channel.
+:param channel_name: Channel name
+:type channel_name: str
+:param x_coordinate: X coordinate of the channel’s location
+:type x_coordinate: float
+:param y_coordinate: Y coordinate of the channel’s location
+:type y_coordinate: float
+:param z_coordinate: Z coordinate of the channel’s location
+:type z_coordinate: float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.previous_button_clicked">
+<span class="sig-name descname"><span class="pre">previous_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_coordinate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.previous_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the information of the last channel displayed before displaying the information of the previous channel.
+:param channel_name: Channel name
+:type channel_name: str
+:param x_coordinate: X coordinate of the channel’s location
+:type x_coordinate: float
+:param y_coordinate: Y coordinate of the channel’s location
+:type y_coordinate: float
+:param z_coordinate: Z coordinate of the channel’s location
+:type z_coordinate: float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.set_listener">
+<span class="sig-name descname"><span class="pre">set_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the main listener so that the controller is able to communicate with the main controller.
+:param listener: main listener
+:type listener: mainController</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.update_channel_data">
+<span class="sig-name descname"><span class="pre">update_channel_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_coordinate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.update_channel_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the information of a channel.
+:param channel_name: Channel name
+:type channel_name: str
+:param x_coordinate: X coordinate of the channel’s location
+:type x_coordinate: float
+:param y_coordinate: Y coordinate of the channel’s location
+:type y_coordinate: float
+:param z_coordinate: Z coordinate of the channel’s location
+:type z_coordinate: float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_controller.channelLocationController.update_channel_displayed">
+<span class="sig-name descname"><span class="pre">update_channel_displayed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_controller.channelLocationController.update_channel_displayed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the information of the channel displayed based on the current channel number (could have change because of
+the next, previous, etc. button pushed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.edit.channel_location.channel_location_listener">
+<span id="src-edit-channel-location-channel-location-listener-module"></span><h2>src.edit.channel_location.channel_location_listener module<a class="headerlink" href="#module-src.edit.channel_location.channel_location_listener" title="Permalink to this headline">¶</a></h2>
+<p>Channel location listener</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_listener.channelLocationListener">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.edit.channel_location.channel_location_listener.</span></span><span class="sig-name descname"><span class="pre">channelLocationListener</span></span><a class="headerlink" href="#src.edit.channel_location.channel_location_listener.channelLocationListener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Listener doing the connection between the controller and the view for displaying the channels’ information.
+It retrieves the information from the view to send it to the controller.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_listener.channelLocationListener.cancel_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cancel_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_listener.channelLocationListener.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_listener.channelLocationListener.confirm_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">confirm_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_coordinate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_listener.channelLocationListener.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_listener.channelLocationListener.delete_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_listener.channelLocationListener.delete_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_listener.channelLocationListener.editing_finished_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">editing_finished_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_listener.channelLocationListener.editing_finished_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_listener.channelLocationListener.insert_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">insert_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_coordinate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_listener.channelLocationListener.insert_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_listener.channelLocationListener.next_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">next_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_coordinate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_listener.channelLocationListener.next_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_listener.channelLocationListener.previous_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">previous_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_coordinate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_listener.channelLocationListener.previous_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.edit.channel_location.channel_location_view">
+<span id="src-edit-channel-location-channel-location-view-module"></span><h2>src.edit.channel_location.channel_location_view module<a class="headerlink" href="#module-src.edit.channel_location.channel_location_view" title="Permalink to this headline">¶</a></h2>
+<p>Channel location view</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_view.channelLocationView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.edit.channel_location.channel_location_view.</span></span><span class="sig-name descname"><span class="pre">channelLocationView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_channels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_view.channelLocationView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtWidgets.QWidget</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_view.channelLocationView.cancel_channel_location_trigger">
+<span class="sig-name descname"><span class="pre">cancel_channel_location_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_view.channelLocationView.cancel_channel_location_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the information to the controller that the computation is cancelled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_view.channelLocationView.confirm_channel_location_trigger">
+<span class="sig-name descname"><span class="pre">confirm_channel_location_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_view.channelLocationView.confirm_channel_location_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the channel name and location and send the information to the controller.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_view.channelLocationView.delete_button_trigger">
+<span class="sig-name descname"><span class="pre">delete_button_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_view.channelLocationView.delete_button_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the information to the controller to delete the current channel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_view.channelLocationView.editing_finished_trigger">
+<span class="sig-name descname"><span class="pre">editing_finished_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_view.channelLocationView.editing_finished_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the new channel number wanted to be displayed and send the information to the controller to display the
+wanted channel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_view.channelLocationView.insert_button_trigger">
+<span class="sig-name descname"><span class="pre">insert_button_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_view.channelLocationView.insert_button_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the channel name and location and send the information to the controller to insert a new channel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_view.channelLocationView.next_button_trigger">
+<span class="sig-name descname"><span class="pre">next_button_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_view.channelLocationView.next_button_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the channel name and location and send the information to the controller to display the next channel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_view.channelLocationView.previous_button_trigger">
+<span class="sig-name descname"><span class="pre">previous_button_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_view.channelLocationView.previous_button_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the channel name and location and send the information to the controller to display the previous channel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_view.channelLocationView.set_listener">
+<span class="sig-name descname"><span class="pre">set_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_view.channelLocationView.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the listener to the controller.
+:param listener: Listener to the controller.
+:type listener: channelLocationController</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.channel_location.channel_location_view.channelLocationView.update_channel_displayed">
+<span class="sig-name descname"><span class="pre">update_channel_displayed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_channels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.channel_location.channel_location_view.channelLocationView.update_channel_displayed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the channel displayed on the window.
+:param channel_number: The channel number
+:type channel_number: int
+:param channel_name: Channel name
+:type channel_name: str
+:param x_coordinate: X coordinate of the channel’s location
+:type x_coordinate: float
+:param y_coordinate: Y coordinate of the channel’s location
+:type y_coordinate: float
+:param z_coordinate: Z coordinate of the channel’s location
+:type z_coordinate: float
+:param number_of_channels: The number of channels
+:type number_of_channels: int</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.edit.channel_location">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.edit.channel_location" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">src.edit.channel_location package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.edit.channel_location.channel_location_controller">src.edit.channel_location.channel_location_controller module</a></li>
+<li><a class="reference internal" href="#module-src.edit.channel_location.channel_location_listener">src.edit.channel_location.channel_location_listener module</a></li>
+<li><a class="reference internal" href="#module-src.edit.channel_location.channel_location_view">src.edit.channel_location.channel_location_view module</a></li>
+<li><a class="reference internal" href="#module-src.edit.channel_location">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="src.edit.html"
+                          title="previous chapter">src.edit package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="src.edit.dataset_info.html"
+                          title="next chapter">src.edit.dataset_info package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.edit.channel_location.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.edit.dataset_info.html" title="src.edit.dataset_info package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.edit.html" title="src.edit package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.edit.html" >src.edit package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.edit.channel_location package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+  </body>
+</html>

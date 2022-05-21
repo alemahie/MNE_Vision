@@ -1,0 +1,18 @@
+src.classification package
+==========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   src.classification.classify
+
+Module contents
+---------------
+
+.. automodule:: src.classification
+   :members:
+   :undoc-members:
+   :show-inheritance:

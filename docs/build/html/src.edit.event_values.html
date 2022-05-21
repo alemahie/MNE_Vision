@@ -1,0 +1,410 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>src.edit.event_values package &#8212; MNE_Vision  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.file package" href="src.file.html" />
+    <link rel="prev" title="src.edit.dataset_info package" href="src.edit.dataset_info.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.file.html" title="src.file package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.edit.dataset_info.html" title="src.edit.dataset_info package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.edit.html" accesskey="U">src.edit package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.edit.event_values package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="src-edit-event-values-package">
+<h1>src.edit.event_values package<a class="headerlink" href="#src-edit-event-values-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-src.edit.event_values.event_values_controller">
+<span id="src-edit-event-values-event-values-controller-module"></span><h2>src.edit.event_values.event_values_controller module<a class="headerlink" href="#module-src.edit.event_values.event_values_controller" title="Permalink to this headline">¶</a></h2>
+<p>Event Values Controller</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.edit.event_values.event_values_controller.</span></span><span class="sig-name descname"><span class="pre">eventValuesController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_frames</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">edit.event_values.event_values_listener.eventValuesListener</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.cancel_button_clicked">
+<span class="sig-name descname"><span class="pre">cancel_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.confirm_button_clicked">
+<span class="sig-name descname"><span class="pre">confirm_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latency</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window and send the information to the main controller.
+Display an error message if the number of events is different from the number of epochs, because there must be
+a event for each epoch.
+:param event_name: The event name.
+:type event_name: str
+:param latency: The latency of the event.
+:type latency: int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.delete_button_clicked">
+<span class="sig-name descname"><span class="pre">delete_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.delete_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the information of the event displayed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.editing_finished_clicked">
+<span class="sig-name descname"><span class="pre">editing_finished_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.editing_finished_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the event’s information based on the event number given.
+:param event_number: The event number
+:type event_number: int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.get_epoch_number_from_latency">
+<span class="sig-name descname"><span class="pre">get_epoch_number_from_latency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latency</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.get_epoch_number_from_latency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of the epoch associated to the latency given.
+:param latency: The latency
+:type latency: int
+:return: epoch_number: The epoch number
+:rtype: int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.get_event_info_from_number">
+<span class="sig-name descname"><span class="pre">get_event_info_from_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.get_event_info_from_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the information of an event based on an event number.
+:param event_number: The event number
+:type event_number: int
+:return: current_event_name: The event name.
+latency: The event latency.
+:rtype: str, int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.get_max_event_id">
+<span class="sig-name descname"><span class="pre">get_max_event_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.get_max_event_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the greatest event id in the event ids dictionary.
+:return: max_event_id: The greatest event id
+:rtype: int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.insert_button_clicked">
+<span class="sig-name descname"><span class="pre">insert_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latency</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.insert_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the information of the last event displayed before inserting a new event.
+:param event_name: The event name.
+:type event_name: str
+:param latency: The latency of the event.
+:type latency: int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.insert_new_event_id">
+<span class="sig-name descname"><span class="pre">insert_new_event_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.insert_new_event_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a new event id in the dictionary containing all the event ids.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.next_button_clicked">
+<span class="sig-name descname"><span class="pre">next_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latency</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.next_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the information of the last event displayed before displaying the information of the next event.
+:param event_name: The event name.
+:type event_name: str
+:param latency: The latency of the event.
+:type latency: int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.previous_button_clicked">
+<span class="sig-name descname"><span class="pre">previous_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latency</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.previous_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the information of the last event displayed before displaying the information of the previous event.
+:param event_name: The event name.
+:type event_name: str
+:param latency: The latency of the event.
+:type latency: int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.set_listener">
+<span class="sig-name descname"><span class="pre">set_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the main listener so that the controller is able to communicate with the main controller.
+:param listener: main listener
+:type listener: mainController</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.update_event_data">
+<span class="sig-name descname"><span class="pre">update_event_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latency</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.update_event_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the information of an event.
+:param event_name: The event name.
+:type event_name: str
+:param latency: The latency of the event.
+:type latency: int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.update_event_displayed">
+<span class="sig-name descname"><span class="pre">update_event_displayed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.update_event_displayed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the information of the event displayed based on the current event number (could have change because of
+the next, previous, etc. button pushed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_controller.eventValuesController.update_event_ids">
+<span class="sig-name descname"><span class="pre">update_event_ids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_controller.eventValuesController.update_event_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the event ids.
+When a new event is inserted or a new event type is created by changing one, a new event id is associated to it.
+If an event id has no event associated to it (e.g. because of the deletion of an event), the event id is removed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.edit.event_values.event_values_listener">
+<span id="src-edit-event-values-event-values-listener-module"></span><h2>src.edit.event_values.event_values_listener module<a class="headerlink" href="#module-src.edit.event_values.event_values_listener" title="Permalink to this headline">¶</a></h2>
+<p>Event Values Listener</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_listener.eventValuesListener">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.edit.event_values.event_values_listener.</span></span><span class="sig-name descname"><span class="pre">eventValuesListener</span></span><a class="headerlink" href="#src.edit.event_values.event_values_listener.eventValuesListener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Listener doing the connection between the controller and the view for displaying the events’ information.
+It retrieves the information from the view to send it to the controller.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_listener.eventValuesListener.cancel_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cancel_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_listener.eventValuesListener.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_listener.eventValuesListener.confirm_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">confirm_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latency</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_listener.eventValuesListener.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_listener.eventValuesListener.delete_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_listener.eventValuesListener.delete_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_listener.eventValuesListener.editing_finished_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">editing_finished_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_listener.eventValuesListener.editing_finished_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_listener.eventValuesListener.insert_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">insert_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latency</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_listener.eventValuesListener.insert_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_listener.eventValuesListener.next_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">next_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latency</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_listener.eventValuesListener.next_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_listener.eventValuesListener.previous_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">previous_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latency</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_listener.eventValuesListener.previous_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.edit.event_values.event_values_view">
+<span id="src-edit-event-values-event-values-view-module"></span><h2>src.edit.event_values.event_values_view module<a class="headerlink" href="#module-src.edit.event_values.event_values_view" title="Permalink to this headline">¶</a></h2>
+<p>Event Values View</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_view.eventValuesView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.edit.event_values.event_values_view.</span></span><span class="sig-name descname"><span class="pre">eventValuesView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_frames</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_view.eventValuesView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtWidgets.QWidget</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_view.eventValuesView.cancel_event_values_trigger">
+<span class="sig-name descname"><span class="pre">cancel_event_values_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_view.eventValuesView.cancel_event_values_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the information to the controller that the computation is cancelled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_view.eventValuesView.confirm_event_values_trigger">
+<span class="sig-name descname"><span class="pre">confirm_event_values_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_view.eventValuesView.confirm_event_values_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the event name and latency and send the information to the controller.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_view.eventValuesView.delete_button_trigger">
+<span class="sig-name descname"><span class="pre">delete_button_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_view.eventValuesView.delete_button_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the information to the controller to delete the current event.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_view.eventValuesView.editing_finished_trigger">
+<span class="sig-name descname"><span class="pre">editing_finished_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_view.eventValuesView.editing_finished_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the new event number wanted to be displayed and send the information to the controller to display the
+wanted event.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_view.eventValuesView.insert_button_trigger">
+<span class="sig-name descname"><span class="pre">insert_button_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_view.eventValuesView.insert_button_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the event name and latency and send the information to the controller to insert a new event.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_view.eventValuesView.next_button_trigger">
+<span class="sig-name descname"><span class="pre">next_button_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_view.eventValuesView.next_button_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the event name and latency and send the information to the controller to display the next channel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_view.eventValuesView.previous_button_trigger">
+<span class="sig-name descname"><span class="pre">previous_button_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_view.eventValuesView.previous_button_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the event name and latency and send the information to the controller to display the previous channel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_view.eventValuesView.set_event_values">
+<span class="sig-name descname"><span class="pre">set_event_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_view.eventValuesView.set_event_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the event values.
+:param event_values: The event values
+:type event_values: list of, list of int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_view.eventValuesView.set_listener">
+<span class="sig-name descname"><span class="pre">set_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_view.eventValuesView.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the listener to the controller.
+:param listener: Listener to the controller.
+:type listener: eventValuesController</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.event_values.event_values_view.eventValuesView.update_event_displayed">
+<span class="sig-name descname"><span class="pre">update_event_displayed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latency</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.event_values.event_values_view.eventValuesView.update_event_displayed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the event displayed on the window.
+:param event_number: The event number.
+:type event_number: int
+:param event_name: The event name.
+:type event_name: str
+:param epoch_number: The epoch number.
+:type epoch_number: int
+:param latency: The latency of the event.
+:type latency: int</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.edit.event_values">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.edit.event_values" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">src.edit.event_values package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.edit.event_values.event_values_controller">src.edit.event_values.event_values_controller module</a></li>
+<li><a class="reference internal" href="#module-src.edit.event_values.event_values_listener">src.edit.event_values.event_values_listener module</a></li>
+<li><a class="reference internal" href="#module-src.edit.event_values.event_values_view">src.edit.event_values.event_values_view module</a></li>
+<li><a class="reference internal" href="#module-src.edit.event_values">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="src.edit.dataset_info.html"
+                          title="previous chapter">src.edit.dataset_info package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="src.file.html"
+                          title="next chapter">src.file package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.edit.event_values.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.file.html" title="src.file package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.edit.dataset_info.html" title="src.edit.dataset_info package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.edit.html" >src.edit package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.edit.event_values package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+  </body>
+</html>

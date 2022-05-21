@@ -1,0 +1,19 @@
+src.file package
+================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   src.file.find_events_from_channel
+   src.file.load_data_info
+
+Module contents
+---------------
+
+.. automodule:: src.file
+   :members:
+   :undoc-members:
+   :show-inheritance:

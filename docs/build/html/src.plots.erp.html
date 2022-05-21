@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>src.plots.erp package &#8212; MNE_Vision  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.plots.erp_image package" href="src.plots.erp_image.html" />
+    <link rel="prev" title="src.plots package" href="src.plots.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.plots.erp_image.html" title="src.plots.erp_image package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.plots.html" title="src.plots package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.plots.html" accesskey="U">src.plots package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.plots.erp package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="src-plots-erp-package">
+<h1>src.plots.erp package<a class="headerlink" href="#src-plots-erp-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-src.plots.erp.erp_controller">
+<span id="src-plots-erp-erp-controller-module"></span><h2>src.plots.erp.erp_controller module<a class="headerlink" href="#module-src.plots.erp.erp_controller" title="Permalink to this headline">¶</a></h2>
+<p>ERP controller</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.plots.erp.erp_controller.erpController">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.plots.erp.erp_controller.</span></span><span class="sig-name descname"><span class="pre">erpController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_channels_names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_controller.erpController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">plots.erp.erp_listener.erpListener</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.plots.erp.erp_controller.erpController.cancel_button_clicked">
+<span class="sig-name descname"><span class="pre">cancel_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_controller.erpController.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.plots.erp.erp_controller.erpController.confirm_button_clicked">
+<span class="sig-name descname"><span class="pre">confirm_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channels_selected</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_controller.erpController.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window and send the information to the main controller.
+:param channels_selected: The channels selected.
+:type channels_selected: list of str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.plots.erp.erp_controller.erpController.get_elements_selected">
+<span class="sig-name descname"><span class="pre">get_elements_selected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements_selected</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_controller.erpController.get_elements_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the elements selected by the user in the multiple elements’ selector.
+:param elements_selected: Elements selected in the multiple elements’ selector.
+:type elements_selected: list of str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.plots.erp.erp_controller.erpController.set_listener">
+<span class="sig-name descname"><span class="pre">set_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_controller.erpController.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the main listener so that the controller is able to communicate with the main controller.
+:param listener: main listener
+:type listener: mainController</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.plots.erp.erp_listener">
+<span id="src-plots-erp-erp-listener-module"></span><h2>src.plots.erp.erp_listener module<a class="headerlink" href="#module-src.plots.erp.erp_listener" title="Permalink to this headline">¶</a></h2>
+<p>ERP listener</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.plots.erp.erp_listener.erpListener">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.plots.erp.erp_listener.</span></span><span class="sig-name descname"><span class="pre">erpListener</span></span><a class="headerlink" href="#src.plots.erp.erp_listener.erpListener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Listener doing the connection between the controller and the view for computing the ERPs on the dataset.
+It retrieves the information from the view to send it to the controller.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.plots.erp.erp_listener.erpListener.cancel_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cancel_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_listener.erpListener.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.plots.erp.erp_listener.erpListener.confirm_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">confirm_button_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channels_selected</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_listener.erpListener.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.plots.erp.erp_view">
+<span id="src-plots-erp-erp-view-module"></span><h2>src.plots.erp.erp_view module<a class="headerlink" href="#module-src.plots.erp.erp_view" title="Permalink to this headline">¶</a></h2>
+<p>ERP view</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.plots.erp.erp_view.erpView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.plots.erp.erp_view.</span></span><span class="sig-name descname"><span class="pre">erpView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_channels_names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_view.erpView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtWidgets.QWidget</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.plots.erp.erp_view.erpView.cancel_erp_trigger">
+<span class="sig-name descname"><span class="pre">cancel_erp_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_view.erpView.cancel_erp_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the information to the controller that the computation is cancelled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.plots.erp.erp_view.erpView.channels_selection_trigger">
+<span class="sig-name descname"><span class="pre">channels_selection_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_view.erpView.channels_selection_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the multiple selector window.
+The user can select multiple channels.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.plots.erp.erp_view.erpView.confirm_erp_trigger">
+<span class="sig-name descname"><span class="pre">confirm_erp_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_view.erpView.confirm_erp_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the parameters and send the information to the controller.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.plots.erp.erp_view.erpView.set_channels_selected">
+<span class="sig-name descname"><span class="pre">set_channels_selected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channels_selected</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_view.erpView.set_channels_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the channels selected in the multiple selector window.
+:param channels_selected: Channels selected.
+:type channels_selected: list of str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.plots.erp.erp_view.erpView.set_listener">
+<span class="sig-name descname"><span class="pre">set_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.plots.erp.erp_view.erpView.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the listener to the controller.
+:param listener: Listener to the controller.
+:type listener: erpController</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.plots.erp">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.plots.erp" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">src.plots.erp package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.plots.erp.erp_controller">src.plots.erp.erp_controller module</a></li>
+<li><a class="reference internal" href="#module-src.plots.erp.erp_listener">src.plots.erp.erp_listener module</a></li>
+<li><a class="reference internal" href="#module-src.plots.erp.erp_view">src.plots.erp.erp_view module</a></li>
+<li><a class="reference internal" href="#module-src.plots.erp">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="src.plots.html"
+                          title="previous chapter">src.plots package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="src.plots.erp_image.html"
+                          title="next chapter">src.plots.erp_image package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.plots.erp.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.plots.erp_image.html" title="src.plots.erp_image package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.plots.html" title="src.plots package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.plots.html" >src.plots package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.plots.erp package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+  </body>
+</html>

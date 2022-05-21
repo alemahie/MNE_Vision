@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>src.utils.waiting_while_processing package &#8212; MNE_Vision  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="src.utils.elements_selector package" href="src.utils.elements_selector.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.utils.elements_selector.html" title="src.utils.elements_selector package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.utils.html" accesskey="U">src.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.utils.waiting_while_processing package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="src-utils-waiting-while-processing-package">
+<h1>src.utils.waiting_while_processing package<a class="headerlink" href="#src-utils-waiting-while-processing-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-src.utils.waiting_while_processing.waiting_while_processing_controller">
+<span id="src-utils-waiting-while-processing-waiting-while-processing-controller-module"></span><h2>src.utils.waiting_while_processing.waiting_while_processing_controller module<a class="headerlink" href="#module-src.utils.waiting_while_processing.waiting_while_processing_controller" title="Permalink to this headline">¶</a></h2>
+<p>Waiting while processing controller</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.utils.waiting_while_processing.waiting_while_processing_controller.waitingWhileProcessingController">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.utils.waiting_while_processing.waiting_while_processing_controller.</span></span><span class="sig-name descname"><span class="pre">waitingWhileProcessingController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processing_title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">finish_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.waiting_while_processing.waiting_while_processing_controller.waitingWhileProcessingController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">utils.waiting_while_processing.waiting_while_processing_listener.waitingWhileProcessingListener</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.waiting_while_processing.waiting_while_processing_controller.waitingWhileProcessingController.continue_button_clicked">
+<span class="sig-name descname"><span class="pre">continue_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.waiting_while_processing.waiting_while_processing_controller.waitingWhileProcessingController.continue_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window and send the information to the main controller.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.waiting_while_processing.waiting_while_processing_controller.waitingWhileProcessingController.set_finish_method">
+<span class="sig-name descname"><span class="pre">set_finish_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">finish_method</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.waiting_while_processing.waiting_while_processing_controller.waitingWhileProcessingController.set_finish_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the finish method.
+:param finish_method: The method to call when the computation is finished.
+:type finish_method: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.waiting_while_processing.waiting_while_processing_controller.waitingWhileProcessingController.set_listener">
+<span class="sig-name descname"><span class="pre">set_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.waiting_while_processing.waiting_while_processing_controller.waitingWhileProcessingController.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the main listener so that the controller is able to communicate with the main controller.
+:param listener: main listener
+:type listener: mainController</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.waiting_while_processing.waiting_while_processing_controller.waitingWhileProcessingController.stop_progress_bar">
+<span class="sig-name descname"><span class="pre">stop_progress_bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processing_title_finished</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.waiting_while_processing.waiting_while_processing_controller.waitingWhileProcessingController.stop_progress_bar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop the progress bar of the waiting window.
+:param processing_title_finished: The title displayed on the window.
+:type processing_title_finished: str</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.utils.waiting_while_processing.waiting_while_processing_listener">
+<span id="src-utils-waiting-while-processing-waiting-while-processing-listener-module"></span><h2>src.utils.waiting_while_processing.waiting_while_processing_listener module<a class="headerlink" href="#module-src.utils.waiting_while_processing.waiting_while_processing_listener" title="Permalink to this headline">¶</a></h2>
+<p>Waiting while processing listener</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.utils.waiting_while_processing.waiting_while_processing_listener.waitingWhileProcessingListener">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.utils.waiting_while_processing.waiting_while_processing_listener.</span></span><span class="sig-name descname"><span class="pre">waitingWhileProcessingListener</span></span><a class="headerlink" href="#src.utils.waiting_while_processing.waiting_while_processing_listener.waitingWhileProcessingListener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Listener doing the connection between the controller and the view for the waiting window
+It retrieves the information from the view to send it to the controller.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.waiting_while_processing.waiting_while_processing_listener.waitingWhileProcessingListener.continue_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">continue_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.waiting_while_processing.waiting_while_processing_listener.waitingWhileProcessingListener.continue_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.utils.waiting_while_processing.waiting_while_processing_view">
+<span id="src-utils-waiting-while-processing-waiting-while-processing-view-module"></span><h2>src.utils.waiting_while_processing.waiting_while_processing_view module<a class="headerlink" href="#module-src.utils.waiting_while_processing.waiting_while_processing_view" title="Permalink to this headline">¶</a></h2>
+<p>Waiting while processing view</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.utils.waiting_while_processing.waiting_while_processing_view.waitingWhileProcessingView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.utils.waiting_while_processing.waiting_while_processing_view.</span></span><span class="sig-name descname"><span class="pre">waitingWhileProcessingView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processing_title</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.waiting_while_processing.waiting_while_processing_view.waitingWhileProcessingView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtWidgets.QWidget</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.waiting_while_processing.waiting_while_processing_view.waitingWhileProcessingView.continue_button_trigger">
+<span class="sig-name descname"><span class="pre">continue_button_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.waiting_while_processing.waiting_while_processing_view.waitingWhileProcessingView.continue_button_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.waiting_while_processing.waiting_while_processing_view.waitingWhileProcessingView.set_listener">
+<span class="sig-name descname"><span class="pre">set_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.waiting_while_processing.waiting_while_processing_view.waitingWhileProcessingView.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the listener to the controller.
+:param listener: Listener to the controller.
+:type listener: controller</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.waiting_while_processing.waiting_while_processing_view.waitingWhileProcessingView.stop_progress_bar">
+<span class="sig-name descname"><span class="pre">stop_progress_bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processing_title_finished</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.waiting_while_processing.waiting_while_processing_view.waitingWhileProcessingView.stop_progress_bar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop the progress bar of the waiting window.
+:param processing_title_finished: The title displayed on the window.
+:type processing_title_finished: str</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.utils.waiting_while_processing">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.utils.waiting_while_processing" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">src.utils.waiting_while_processing package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.utils.waiting_while_processing.waiting_while_processing_controller">src.utils.waiting_while_processing.waiting_while_processing_controller module</a></li>
+<li><a class="reference internal" href="#module-src.utils.waiting_while_processing.waiting_while_processing_listener">src.utils.waiting_while_processing.waiting_while_processing_listener module</a></li>
+<li><a class="reference internal" href="#module-src.utils.waiting_while_processing.waiting_while_processing_view">src.utils.waiting_while_processing.waiting_while_processing_view module</a></li>
+<li><a class="reference internal" href="#module-src.utils.waiting_while_processing">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="src.utils.elements_selector.html"
+                          title="previous chapter">src.utils.elements_selector package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.utils.waiting_while_processing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.utils.elements_selector.html" title="src.utils.elements_selector package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.utils.html" >src.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.utils.waiting_while_processing package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+  </body>
+</html>

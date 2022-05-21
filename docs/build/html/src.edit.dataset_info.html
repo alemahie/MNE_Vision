@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>src.edit.dataset_info package &#8212; MNE_Vision  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.edit.event_values package" href="src.edit.event_values.html" />
+    <link rel="prev" title="src.edit.channel_location package" href="src.edit.channel_location.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.edit.event_values.html" title="src.edit.event_values package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.edit.channel_location.html" title="src.edit.channel_location package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.edit.html" accesskey="U">src.edit package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.edit.dataset_info package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="src-edit-dataset-info-package">
+<h1>src.edit.dataset_info package<a class="headerlink" href="#src-edit-dataset-info-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-src.edit.dataset_info.dataset_info_controller">
+<span id="src-edit-dataset-info-dataset-info-controller-module"></span><h2>src.edit.dataset_info.dataset_info_controller module<a class="headerlink" href="#module-src.edit.dataset_info.dataset_info_controller" title="Permalink to this headline">¶</a></h2>
+<p>Dataset info controller</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.edit.dataset_info.dataset_info_controller.datasetInfoController">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.edit.dataset_info.dataset_info_controller.</span></span><span class="sig-name descname"><span class="pre">datasetInfoController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_frames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.dataset_info.dataset_info_controller.datasetInfoController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">edit.dataset_info.dataset_info_listener.datasetInfoListener</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.dataset_info.dataset_info_controller.datasetInfoController.cancel_button_clicked">
+<span class="sig-name descname"><span class="pre">cancel_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.dataset_info.dataset_info_controller.datasetInfoController.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.dataset_info.dataset_info_controller.datasetInfoController.confirm_button_clicked">
+<span class="sig-name descname"><span class="pre">confirm_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.dataset_info.dataset_info_controller.datasetInfoController.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window and send the information to the main controller.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.dataset_info.dataset_info_controller.datasetInfoController.set_listener">
+<span class="sig-name descname"><span class="pre">set_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.dataset_info.dataset_info_controller.datasetInfoController.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the main listener so that the controller is able to communicate with the main controller.
+:param listener: main listener
+:type listener: mainController</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.edit.dataset_info.dataset_info_listener">
+<span id="src-edit-dataset-info-dataset-info-listener-module"></span><h2>src.edit.dataset_info.dataset_info_listener module<a class="headerlink" href="#module-src.edit.dataset_info.dataset_info_listener" title="Permalink to this headline">¶</a></h2>
+<p>Dataset info listener</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.edit.dataset_info.dataset_info_listener.datasetInfoListener">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.edit.dataset_info.dataset_info_listener.</span></span><span class="sig-name descname"><span class="pre">datasetInfoListener</span></span><a class="headerlink" href="#src.edit.dataset_info.dataset_info_listener.datasetInfoListener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Listener doing the connection between the controller and the view for displaying the dataset’s information.
+It retrieves the information from the view to send it to the controller.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.dataset_info.dataset_info_listener.datasetInfoListener.cancel_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cancel_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.dataset_info.dataset_info_listener.datasetInfoListener.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.dataset_info.dataset_info_listener.datasetInfoListener.confirm_button_clicked">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">confirm_button_clicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.dataset_info.dataset_info_listener.datasetInfoListener.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.edit.dataset_info.dataset_info_view">
+<span id="src-edit-dataset-info-dataset-info-view-module"></span><h2>src.edit.dataset_info.dataset_info_view module<a class="headerlink" href="#module-src.edit.dataset_info.dataset_info_view" title="Permalink to this headline">¶</a></h2>
+<p>Dataset info view</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.edit.dataset_info.dataset_info_view.datasetInfoView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.edit.dataset_info.dataset_info_view.</span></span><span class="sig-name descname"><span class="pre">datasetInfoView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_frames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.dataset_info.dataset_info_view.datasetInfoView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt6.QtWidgets.QWidget</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.dataset_info.dataset_info_view.datasetInfoView.cancel_dataset_info_trigger">
+<span class="sig-name descname"><span class="pre">cancel_dataset_info_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.dataset_info.dataset_info_view.datasetInfoView.cancel_dataset_info_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the information to the controller that the computation is cancelled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.dataset_info.dataset_info_view.datasetInfoView.confirm_dataset_info_trigger">
+<span class="sig-name descname"><span class="pre">confirm_dataset_info_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.dataset_info.dataset_info_view.datasetInfoView.confirm_dataset_info_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the channel name and location and send the information to the controller.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.edit.dataset_info.dataset_info_view.datasetInfoView.set_listener">
+<span class="sig-name descname"><span class="pre">set_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.edit.dataset_info.dataset_info_view.datasetInfoView.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the listener to the controller.
+:param listener: Listener to the controller.
+:type listener: datasetInfoController</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.edit.dataset_info">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.edit.dataset_info" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">src.edit.dataset_info package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.edit.dataset_info.dataset_info_controller">src.edit.dataset_info.dataset_info_controller module</a></li>
+<li><a class="reference internal" href="#module-src.edit.dataset_info.dataset_info_listener">src.edit.dataset_info.dataset_info_listener module</a></li>
+<li><a class="reference internal" href="#module-src.edit.dataset_info.dataset_info_view">src.edit.dataset_info.dataset_info_view module</a></li>
+<li><a class="reference internal" href="#module-src.edit.dataset_info">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="src.edit.channel_location.html"
+                          title="previous chapter">src.edit.channel_location package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="src.edit.event_values.html"
+                          title="next chapter">src.edit.event_values package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.edit.dataset_info.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.edit.event_values.html" title="src.edit.event_values package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.edit.channel_location.html" title="src.edit.channel_location package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE_Vision  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.edit.html" >src.edit package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.edit.dataset_info package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+  </body>
+</html>
