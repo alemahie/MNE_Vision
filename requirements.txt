@@ -1,16 +1,16 @@
-keras == 2.9.0
-matplotlib == 3.1.2
-mayavi == 4.7.4
-mne == 1.0.3
-mne_connectivity == 0.3
+keras
+matplotlib
+mayavi
+mne
+mne_connectivity
 numpy
-philistine == 0.1
-pyEDFlib == 0.1.28
-PyQt5 == 5.15.6
-PyQt6 == 6.3.0
+philistine
+pyEDFlib
+PyQt5
+PyQt6
 PyQtWebEngine
-pyriemann == 0.2.7
-scikit_learn == 1.1.1
-scipy == 1.8.1
-seaborn == 0.11.2
-tensorflow == 2.9.0
+pyriemann
+scikit_learn
+scipy
+seaborn
+tensorflow
