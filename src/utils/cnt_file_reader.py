@@ -11,7 +11,7 @@ from mne.channels import make_standard_montage
 
 import numpy as np
 
-from libeep import *
+from lib.libeep.libeep import *
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
