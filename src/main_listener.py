@@ -233,6 +233,10 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def snr_clicked(self):
+        pass
+
+    @abstractmethod
     def source_estimation_clicked(self):
         pass
 
@@ -403,4 +407,12 @@ class mainListener(ABC):
     """
     @abstractmethod
     def waiting_while_processing_finished(self, finish_method):
+        pass
+
+    @abstractmethod
+    def download_fsaverage_mne_data_information(self):
+        pass
+
+    @abstractmethod
+    def download_fsaverage_mne_data_computation_finished(self):
         pass

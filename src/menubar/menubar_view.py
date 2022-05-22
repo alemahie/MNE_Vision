@@ -35,6 +35,7 @@ class menubarView(QMenuBar):
         self.create_events_menu()
         self.file_menu.addMenu(self.events_menu)
         self.events_menu.setEnabled(False)
+        self.export_menu = None
         # self.export_menu = QMenu("Export", self)
         # self.create_export_menu()
         # self.file_menu.addMenu(self.export_menu)
@@ -165,6 +166,10 @@ class menubarView(QMenuBar):
         extract_epochs_action.triggered.connect(self.extract_epochs_trigger)
         self.tools_menu.addAction(extract_epochs_action)
         self.tools_menu.addSeparator()
+        snr_action = QAction("Signal-to-noise ratio", self)
+        snr_action.triggered.connect(self.snr_trigger)
+        self.tools_menu.addAction(snr_action)
+        self.tools_menu.addSeparator()
         source_estimation_action = QAction("Source estimation", self)
         source_estimation_action.triggered.connect(self.source_estimation_trigger)
         self.tools_menu.addAction(source_estimation_action)
@@ -263,10 +268,10 @@ class menubarView(QMenuBar):
         self.menubar_listener.find_events_from_channel_clicked()
 
     def export_data_to_file_trigger(self):
-        self.export_data_to_file_clicked()
+        self.menubar_listener.export_data_to_file_clicked()
 
     def export_events_to_file_trigger(self):
-        self.export_events_to_file_clicked()
+        self.menubar_listener.export_events_to_file_clicked()
 
     def save_file_trigger(self):
         self.menubar_listener.save_file_clicked()
@@ -311,6 +316,9 @@ class menubarView(QMenuBar):
 
     def extract_epochs_trigger(self):
         self.menubar_listener.extract_epochs_clicked()
+
+    def snr_trigger(self):
+        self.menubar_listener.snr_clicked()
 
     def source_estimation_trigger(self):
         self.menubar_listener.source_estimation_clicked()

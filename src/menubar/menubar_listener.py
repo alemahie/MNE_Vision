@@ -110,6 +110,10 @@ class menubarListener(ABC):
         pass
 
     @abstractmethod
+    def snr_clicked(self):
+        pass
+
+    @abstractmethod
     def source_estimation_clicked(self):
         pass
 

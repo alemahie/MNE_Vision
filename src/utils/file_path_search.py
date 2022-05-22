@@ -8,6 +8,7 @@ File path search
 from pathlib import Path
 
 from mne import read_labels_from_annot
+from mne.datasets.sample import data_path
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -31,10 +32,21 @@ def get_project_root_path():
 def get_project_freesurfer_path():
     """
     Get the project freesurfer path, where the "fsaverage" data is present, used for the source space computations.
+    If the path does not exist, create the path and download the files.
     :return: The project freesurfer path.
     :rtype: str
     """
-    return get_project_root_path() + "/data/freesurfer/subjects/"
+    try:
+        subjects_dir = str(data_path(download=False))
+        print(subjects_dir)
+        if subjects_dir == ".":
+            subjects_dir = None
+        else:
+            subjects_dir += "/subjects/"
+    except FileNotFoundError:   # Path does not exist, create it and download the data.
+        subjects_dir = None
+    print(subjects_dir)
+    return subjects_dir
 
 
 def get_directory_path_from_file_path(file_path):

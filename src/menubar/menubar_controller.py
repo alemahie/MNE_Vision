@@ -104,6 +104,9 @@ class menubarController(menubarListener):
     def extract_epochs_clicked(self):
         self.main_listener.extract_epochs_clicked()
 
+    def snr_clicked(self):
+        self.main_listener.snr_clicked()
+
     def source_estimation_clicked(self):
         self.main_listener.source_estimation_clicked()
 

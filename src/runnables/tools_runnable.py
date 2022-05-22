@@ -153,10 +153,14 @@ class reReferencingRunnable(QRunnable):
         Notifies the main model that the computation is finished.
         """
         if self.references == "infinity":
-            src = self.compute_source_space()
-            bem = self.compute_bem_solution()
-            fwd = self.compute_forward_solution(src, bem)
-            self.file_data.set_eeg_reference('REST', forward=fwd)
+            try:
+                src = self.compute_source_space()
+                bem = self.compute_bem_solution()
+                fwd = self.compute_forward_solution(src, bem)
+                self.file_data.set_eeg_reference('REST', forward=fwd)
+            except Exception as e:
+                print(e)
+                print(type(e))
         else:
             self.file_data.set_eeg_reference(ref_channels=self.references)
         self.signals.finished.emit()

@@ -39,8 +39,10 @@ from connectivity.spectro_temporal_connectivity.spectro_temporal_connectivity_co
 
 from classification.classify.classify_controller import classifyController
 
+from utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller import downloadFsaverageMneDataController
 from utils.waiting_while_processing.waiting_while_processing_controller import waitingWhileProcessingController
 from utils.error_window import errorWindow
+from utils.file_path_search import get_project_freesurfer_path
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -103,6 +105,7 @@ class mainController(mainListener):
         self.classify_controller = None
 
         self.waiting_while_processing_controller = None
+        self.download_fsaverage_mne_data_controller = None
 
         splash_screen_runnable.close()
         self.main_view.show()
@@ -492,11 +495,16 @@ class mainController(mainListener):
         :param n_jobs: Number of parallel processes used to compute the re-referencing
         :type n_jobs: int
         """
-        processing_title = "Re-referencing running, please wait."
-        finish_method = "re-referencing"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
-        self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.re_referencing(references, n_jobs)
+        subjects_dir = get_project_freesurfer_path()
+        if subjects_dir is None and references == "infinity":
+            self.download_fsaverage_mne_data_controller = downloadFsaverageMneDataController()
+            self.download_fsaverage_mne_data_controller.set_listener(self)
+        else:
+            processing_title = "Re-referencing running, please wait."
+            finish_method = "re-referencing"
+            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+            self.waiting_while_processing_controller.set_listener(self)
+            self.main_model.re_referencing(references, n_jobs)
 
     def re_referencing_computation_finished(self):
         """
@@ -596,13 +604,25 @@ class mainController(mainListener):
         self.main_view.update_epoch_end(epoch_end)
         self.main_view.update_number_of_frames(number_of_frames)
 
+    # Signal-to-noise ratio
+    def snr_clicked(self):
+        """
+
+        """
+        print("SNR")
+
     # Source Estimation
     def source_estimation_clicked(self):
         """
         Create the controller for computing the source estimation of the dataset.
         """
-        self.source_estimation_controller = sourceEstimationController()
-        self.source_estimation_controller.set_listener(self)
+        subjects_dir = get_project_freesurfer_path()
+        if subjects_dir is None:
+            self.download_fsaverage_mne_data_controller = downloadFsaverageMneDataController()
+            self.download_fsaverage_mne_data_controller.set_listener(self)
+        else:
+            self.source_estimation_controller = sourceEstimationController()
+            self.source_estimation_controller.set_listener(self)
 
     def source_estimation_information(self, source_estimation_method, save_data, load_data, n_jobs):
         """
@@ -861,9 +881,14 @@ class mainController(mainListener):
         """
         Create the controller for computing the source space connectivity on the dataset.
         """
-        number_of_channels = self.main_model.get_number_of_channels()
-        self.source_space_connectivity_controller = sourceSpaceConnectivityController(number_of_channels)
-        self.source_space_connectivity_controller.set_listener(self)
+        subjects_dir = get_project_freesurfer_path()
+        if subjects_dir is None:
+            self.download_fsaverage_mne_data_controller = downloadFsaverageMneDataController()
+            self.download_fsaverage_mne_data_controller.set_listener(self)
+        else:
+            number_of_channels = self.main_model.get_number_of_channels()
+            self.source_space_connectivity_controller = sourceSpaceConnectivityController(number_of_channels)
+            self.source_space_connectivity_controller.set_listener(self)
 
     def source_space_connectivity_information(self, connectivity_method, spectrum_estimation_method, source_estimation_method,
                                               save_data, load_data, n_jobs):
@@ -1051,3 +1076,20 @@ class mainController(mainListener):
             self.sensor_space_connectivity_finished()
         elif finish_method == "classify":
             self.classify_finished()
+
+    def download_fsaverage_mne_data_information(self):
+        """
+        Create the waiting window while the download of the fsaverage and sample datasets is done.
+        """
+        processing_title = "Downloading, please wait."
+        finish_method = "downloading"
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.download_fsaverage_mne_data_controller.download_fsaverage_mne_data()
+
+    def download_fsaverage_mne_data_computation_finished(self):
+        """
+        Close the waiting window when the download of the fsaverage and sample datasets is done.
+        """
+        processing_title_finished = "Download finished. \n You can now use the tools where the source space is needed."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)

@@ -105,8 +105,12 @@ class sourceEstimationView(QWidget):
         :param source_estimation_data: The source estimation's data.
         :type source_estimation_data: MNE.SourceEstimation
         """
-        plot_source_estimates(source_estimation_data, subject=self.subject, subjects_dir=self.subjects_dir,
-                              hemi="both", backend="pyvista")
+        try:
+            plot_source_estimates(source_estimation_data, subject=self.subject, subjects_dir=self.subjects_dir,
+                                  hemi="both", backend="notebook", verbose=True)
+        except Exception as e:
+            print(type(e))
+            print(e)
 
     """
     Triggers
