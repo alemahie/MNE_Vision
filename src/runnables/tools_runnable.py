@@ -5,6 +5,8 @@
 Tools runnable
 """
 
+import time
+
 from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne import make_forward_solution, write_forward_solution, compute_covariance, setup_source_space, \
@@ -100,12 +102,10 @@ class resamplingRunnable(QRunnable):
         old_frequency = self.file_data.info.get("sfreq")
         new_frequency = self.frequency
         self.file_data.resample(new_frequency)
-
         number_of_frames = len(self.file_data.times)
         self.file_data.events[0][0] *= (new_frequency/old_frequency)
         for i in range(1, len(self.file_data.events)):
             self.file_data.events[i][0] = self.file_data.events[i-1][0] + number_of_frames
-
         self.signals.finished.emit()
 
     def get_file_data(self):

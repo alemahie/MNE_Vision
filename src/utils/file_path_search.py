@@ -38,14 +38,12 @@ def get_project_freesurfer_path():
     """
     try:
         subjects_dir = str(data_path(download=False))
-        print(subjects_dir)
         if subjects_dir == ".":
             subjects_dir = None
         else:
             subjects_dir += "/subjects/"
     except FileNotFoundError:   # Path does not exist, create it and download the data.
         subjects_dir = None
-    print(subjects_dir)
     return subjects_dir
 
 

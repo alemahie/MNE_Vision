@@ -107,7 +107,7 @@ class sourceEstimationView(QWidget):
         """
         try:
             plot_source_estimates(source_estimation_data, subject=self.subject, subjects_dir=self.subjects_dir,
-                                  hemi="both", backend="notebook", verbose=True)
+                                  hemi="both", backend="notebook", time_viewer=True,  smoothing_steps=7)
         except Exception as e:
             print(type(e))
             print(e)

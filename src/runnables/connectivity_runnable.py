@@ -10,7 +10,7 @@ from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
 from mne import compute_covariance, setup_source_space, write_source_spaces, make_bem_model, make_bem_solution, \
     write_bem_solution, make_forward_solution, write_forward_solution, extract_label_time_course
 from mne.minimum_norm import make_inverse_operator, write_inverse_operator, read_inverse_operator, apply_inverse_epochs
-from mne_connectivity import envelope_correlation, spectral_connectivity_epochs
+from mne_connectivity import envelope_correlation, phase_slope_index, spectral_connectivity_epochs
 
 from utils.error_window import errorWindow
 from utils.file_path_search import get_project_freesurfer_path, get_labels_from_subject
@@ -50,8 +50,14 @@ class envelopeCorrelationRunnable(QRunnable):
         Launch the computation of the envelope correlation on the given data.
         Notifies the main model that the computation is finished.
         """
-        correlation_data = envelope_correlation(self.file_data).combine()
-        self.envelope_correlation_data = correlation_data.get_data(output="dense")[:, :, 0]
+        try:
+            correlation_data = envelope_correlation(self.file_data).combine()
+            self.envelope_correlation_data = correlation_data.get_data(output="dense")[:, :, 0]
+
+            # correlation_data = phase_slope_index(self.file_data)
+            # self.envelope_correlation_data = correlation_data.get_data(output="dense")[:, :, 0]
+        except Exception as e:
+            print(e)
         self.signals.finished.emit()
 
     """
@@ -314,11 +320,14 @@ class sensorSpaceConnectivityRunnable(QRunnable):
         Launch the computation of the envelope correlation on the given data.
         Notifies the main model that the computation is finished.
         """
-        sfreq = self.file_data.info["sfreq"]
-        connectivity_data = spectral_connectivity_epochs(self.file_data, method='pli', mode='multitaper', sfreq=sfreq,
-                                                         faverage=True,  mt_adaptive=False, n_jobs=1)
-        self.sensor_space_connectivity_data = connectivity_data.get_data(output='dense')[:, :, 0]
-        self.signals.finished.emit()
+        try:
+            sfreq = self.file_data.info["sfreq"]
+            connectivity_data = spectral_connectivity_epochs(self.file_data, method='pli', mode='multitaper', sfreq=sfreq,
+                                                             faverage=True,  mt_adaptive=False, n_jobs=1)
+            self.sensor_space_connectivity_data = connectivity_data.get_data(output='dense')[:, :, 0]
+            self.signals.finished.emit()
+        except Exception as e:
+            print(e)
 
     """
     Getters

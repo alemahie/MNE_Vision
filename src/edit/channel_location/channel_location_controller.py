@@ -231,8 +231,6 @@ class channelLocationController(channelLocationListener):
         """
         channel_name = self.channel_names[channel_number]
         channel_location = self.channel_locations[channel_name]
-        print(channel_location)
-        print(type(channel_location))
         return channel_name, channel_location
 
     """

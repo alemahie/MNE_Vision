@@ -9,6 +9,8 @@ from PyQt6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLab
 
 from mne_connectivity.viz import plot_connectivity_circle
 
+import matplotlib.pyplot as plt
+
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
@@ -72,6 +74,25 @@ class envelopeCorrelationView(QWidget):
         """
         plot_connectivity_circle(envelope_correlation_data, channel_names, n_lines=self.number_strongest_connections,
                                  title="Envelope Correlation")
+
+        """
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        cax = ax.matshow(envelope_correlation_data)
+        fig.colorbar(cax)
+
+        # PSI : Positive value means from the channel to the other (row to columns)
+        # While negative means the opposite
+
+        # Set ticks on both sides of axes on
+        ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, labeltop=False)
+        plt.locator_params(axis="x", nbins=len(channel_names))
+        plt.locator_params(axis="y", nbins=len(channel_names))
+        ax.set_xticklabels([''] + channel_names, rotation=90)
+        ax.set_yticklabels([''] + channel_names)
+
+        plt.show()
+        """
 
     """
     Triggers

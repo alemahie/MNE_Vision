@@ -54,7 +54,7 @@ __status__ = "Dev"
 
 
 class mainController(mainListener):
-    def __init__(self, screen_size, splash_screen_runnable):
+    def __init__(self, screen_size, splash_screen_runnable = False):
         """
         The main controller is the link between the main model and the main view.
         It will "control" where the information needs to go and who does what.
@@ -107,7 +107,7 @@ class mainController(mainListener):
         self.waiting_while_processing_controller = None
         self.download_fsaverage_mne_data_controller = None
 
-        splash_screen_runnable.close()
+        # splash_screen_runnable.close()
         self.main_view.show()
 
     """
@@ -313,16 +313,18 @@ class mainController(mainListener):
             path_to_file = self.main_model.get_file_path_name()
         else:
             path_to_file = self.main_view.get_path_to_file()
-        self.main_model.save_file(path_to_file)
-        self.main_view.update_path_to_file(self.main_model.get_file_path_name())
+        if path_to_file != '':
+            self.main_model.save_file(path_to_file)
+            self.main_view.update_path_to_file(self.main_model.get_file_path_name())
 
     def save_file_as_clicked(self):
         """
         Save the file into the fif format and display the new path file on the main window.
         """
         path_to_file = self.main_view.get_path_to_file()
-        self.main_model.save_file_as(path_to_file)
-        self.main_view.update_path_to_file(self.main_model.get_file_path_name())
+        if path_to_file != '':
+            self.main_model.save_file_as(path_to_file)
+            self.main_view.update_path_to_file(self.main_model.get_file_path_name())
 
     """
     Edit menu

@@ -264,6 +264,7 @@ class mainModel:
         :param path_to_file: Path to the file.
         :type path_to_file: str
         """
+        print(path_to_file)
         if self.file_type == "Raw":
             self.file_path_name = path_to_file + "-raw.fif"
         else:

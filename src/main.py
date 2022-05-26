@@ -9,7 +9,8 @@ import sys
 
 from PyQt6.QtWidgets import QApplication
 
-from utils.splash_screen import splashScreen
+from main_controller import mainController
+
 from utils.stylesheet import get_stylesheet
 
 __author__ = "Lemahieu Antoine"
@@ -25,11 +26,10 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyleSheet(get_stylesheet())
 
-    splash_screen = splashScreen()
-    splash_screen.show()
-    app.processEvents()     # Allow the splash screen to be displayed while loading the main window
+    # splash_screen = splashScreen()
+    # splash_screen.show()
+    # app.processEvents()     # Allow the splash screen to be displayed while loading the main window
 
-    from main_controller import mainController
     screen_size = app.primaryScreen().size()
-    main_controller = mainController(screen_size, splash_screen)
+    main_controller = mainController(screen_size)
     sys.exit(app.exec())

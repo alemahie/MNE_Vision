@@ -141,29 +141,32 @@ class sourceSpaceConnectivityView(QWidget):
         :param source_space_connectivity_data: The source space connectivity data.
         :type source_space_connectivity_data: list of, list of float
         """
-        labels = get_labels_from_subject("fsaverage", get_project_freesurfer_path())
-        label_colors = [label.color for label in labels]
-        label_names = [label.name for label in labels]
-        lh_labels = [name for name in label_names if name.endswith('lh')]
+        try:
+            labels = get_labels_from_subject("fsaverage", get_project_freesurfer_path())
+            label_colors = [label.color for label in labels]
+            label_names = [label.name for label in labels]
+            lh_labels = [name for name in label_names if name.endswith('lh')]
 
-        label_ypos = list()     # Get the y-location of the label
-        for name in lh_labels:
-            idx = label_names.index(name)
-            ypos = np.mean(labels[idx].pos[:, 1])
-            label_ypos.append(ypos)
+            label_ypos = list()     # Get the y-location of the label
+            for name in lh_labels:
+                idx = label_names.index(name)
+                ypos = np.mean(labels[idx].pos[:, 1])
+                label_ypos.append(ypos)
 
-        # Reorder the labels based on their location
-        lh_labels = [label for (yp, label) in sorted(zip(label_ypos, lh_labels))]
-        rh_labels = [label[:-2] + 'rh' for label in lh_labels]  # For the right hemi
+            # Reorder the labels based on their location
+            lh_labels = [label for (yp, label) in sorted(zip(label_ypos, lh_labels))]
+            rh_labels = [label[:-2] + 'rh' for label in lh_labels]  # For the right hemi
 
-        node_order = list()     # Save the plot order and create a circular layout
-        node_order.extend(lh_labels[::-1])  # reverse the order
-        node_order.extend(rh_labels)
-        node_angles = circular_layout(label_names, node_order, start_pos=90,
-                                      group_boundaries=[0, len(label_names) / 2])
-        title = "Source space connectivity"
-        plot_connectivity_circle(source_space_connectivity_data, label_names, n_lines=self.number_strongest_connections,
-                                 node_angles=node_angles, node_colors=label_colors, title=title)
+            node_order = list()     # Save the plot order and create a circular layout
+            node_order.extend(lh_labels[::-1])  # reverse the order
+            node_order.extend(rh_labels)
+            node_angles = circular_layout(label_names, node_order, start_pos=90,
+                                          group_boundaries=[0, len(label_names) / 2])
+            title = "Source space connectivity"
+            plot_connectivity_circle(source_space_connectivity_data, label_names, n_lines=self.number_strongest_connections,
+                                     node_angles=node_angles, node_colors=label_colors, title=title)
+        except Exception as e:
+            print(e)
 
     """
     Triggers
