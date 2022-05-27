@@ -8,6 +8,7 @@ ERP image view
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
+from utils.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -30,6 +31,7 @@ class erpImageView(QWidget):
         self.all_channels_names = all_channels_names
         self.channels_selector_controller = None
         self.channel_selected = None
+        self.channels_selection_opened = False
 
         self.setWindowTitle("Event Related Potentials Image")
 
@@ -62,7 +64,12 @@ class erpImageView(QWidget):
         """
         Retrieve the parameters and send the information to the controller.
         """
-        self.erp_image_listener.confirm_button_clicked(self.channel_selected)
+        if self.channels_selection_opened:
+            self.erp_image_listener.confirm_button_clicked(self.channel_selected)
+        else:
+            error_message = "Please select a channel in the 'channel selection' menu before starting the computation."
+            error_window = errorWindow(error_message)
+            error_window.show()
 
     def channels_selection_trigger(self):
         """
@@ -73,6 +80,7 @@ class erpImageView(QWidget):
         self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=False,
                                                                        unique_box=True)
         self.channels_selector_controller.set_listener(self.erp_image_listener)
+        self.channels_selection_opened = True
 
     """
     Setters
