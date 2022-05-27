@@ -387,7 +387,7 @@ class mainModel:
         self.main_listener.extract_epochs_computation_finished()
 
     # Source Estimation
-    def source_estimation(self, source_estimation_method, save_data, load_data, n_jobs):
+    def source_estimation(self, source_estimation_method, save_data, load_data, epochs_method, n_jobs):
         """
         Creates the parallel runnable for computing the source estimation of the data.
         :param source_estimation_method: The method used to compute the source estimation
@@ -396,13 +396,18 @@ class mainModel:
         :type save_data: bool
         :param load_data: Boolean telling if the data used for the computation can be read from computer files.
         :type load_data: bool
+        :param epochs_method: On what data the source estimation will be computed. Can be three values :
+        - "single trial" : Compute the source estimation on a single trial that is precised.
+        - "evoked" : Compute the source estimation on the average of all the signals.
+        - "averaged" : Compute the source estimation on every trial, and then compute the average of them.
+        :type: str
         :param n_jobs: Number of processes used to computed the source estimation
         :type n_jobs: int
         """
         pool = QThreadPool.globalInstance()
         self.source_estimation_runnable = sourceEstimationRunnable(source_estimation_method, self.file_data,
                                                                    self.get_file_path_name_without_extension(),
-                                                                   save_data, load_data, n_jobs)
+                                                                   save_data, load_data, epochs_method, n_jobs)
         pool.start(self.source_estimation_runnable)
         self.source_estimation_runnable.signals.finished.connect(self.source_estimation_computation_finished)
         self.source_estimation_runnable.signals.error.connect(self.source_estimation_computation_error)

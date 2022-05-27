@@ -236,12 +236,13 @@ class mainListener(ABC):
     def snr_clicked(self):
         pass
 
+    # Source Estimation
     @abstractmethod
     def source_estimation_clicked(self):
         pass
 
     @abstractmethod
-    def source_estimation_information(self, source_estimation_method, save_data, load_data, n_jobs):
+    def source_estimation_information(self, source_estimation_method, save_data, load_data, epochs_method, n_jobs):
         pass
 
     @abstractmethod

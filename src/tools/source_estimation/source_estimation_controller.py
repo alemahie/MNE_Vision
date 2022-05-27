@@ -37,7 +37,7 @@ class sourceEstimationController(sourceEstimationListener):
         """
         self.source_estimation_view.close()
 
-    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, n_jobs):
+    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, epochs_method, n_jobs):
         """
         Close the window and send the information to the main controller.
         :param source_estimation_method: The method used to compute the source estimation
@@ -46,11 +46,17 @@ class sourceEstimationController(sourceEstimationListener):
         :type save_data: bool
         :param load_data: Boolean telling if the data used for the computation can be read from computer files.
         :type load_data: bool
+        :param epochs_method: On what data the source estimation will be computed. Can be three values :
+        - "single trial" : Compute the source estimation on a single trial that is precised.
+        - "evoked" : Compute the source estimation on the average of all the signals.
+        - "averaged" : Compute the source estimation on every trial, and then compute the average of them.
+        :type: str
         :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
         """
         self.source_estimation_view.close()
-        self.main_listener.source_estimation_information(source_estimation_method, save_data, load_data, n_jobs)
+        self.main_listener.source_estimation_information(source_estimation_method, save_data, load_data, epochs_method,
+                                                         n_jobs)
 
     def plot_source_estimation(self, source_estimation_data):
         """

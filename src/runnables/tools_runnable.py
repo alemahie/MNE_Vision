@@ -5,14 +5,12 @@
 Tools runnable
 """
 
-import time
-
 from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne import make_forward_solution, write_forward_solution, compute_covariance, setup_source_space, \
     write_source_spaces, make_bem_model, make_bem_solution, write_bem_solution, Epochs
 from mne.minimum_norm import read_inverse_operator, make_inverse_operator, apply_inverse, \
-                             write_inverse_operator
+    write_inverse_operator, apply_inverse_epochs
 from mne.preprocessing import ICA
 
 from utils.error_window import errorWindow
@@ -326,7 +324,7 @@ class sourceEstimationWorkerSignals(QObject):
 
 
 class sourceEstimationRunnable(QRunnable):
-    def __init__(self, source_estimation_method, file_data, file_path, write_files, read_files, n_jobs):
+    def __init__(self, source_estimation_method, file_data, file_path, write_files, read_files, epochs_method, n_jobs):
         """
         Runnable for the computation of the source estimation of the given data.
         :param source_estimation_method: The method used to compute the source estimation
@@ -339,6 +337,11 @@ class sourceEstimationRunnable(QRunnable):
         :type write_files: bool
         :param read_files: Boolean telling if the data used for the computation can be read from computer files.
         :type read_files: bool
+        :param epochs_method: On what data the source estimation will be computed. Can be three values :
+        - "single trial" : Compute the source estimation on a single trial that is precised.
+        - "evoked" : Compute the source estimation on the average of all the signals.
+        - "averaged" : Compute the source estimation on every trial, and then compute the average of them.
+        :type: str
         :param n_jobs: Number of processes used to computed the source estimation
         :type n_jobs: int
         """
@@ -349,6 +352,7 @@ class sourceEstimationRunnable(QRunnable):
         self.file_path = file_path
         self.read_files = read_files
         self.write_files = write_files
+        self.epochs_method = epochs_method
         self.n_jobs = n_jobs
         self.subject = "fsaverage"
         self.subjects_dir = get_project_freesurfer_path()
@@ -394,23 +398,68 @@ class sourceEstimationRunnable(QRunnable):
             inv = read_inverse_operator(self.file_path + "-inv.fif", verbose=False)
         else:
             inv = self.create_inverse_operator()
-        stc = self.compute_inverse(inv)
+        stc = self.compute_source_estimation_on_selected_data(inv)
         return stc
 
-    def compute_inverse(self, inv):
+    def compute_source_estimation_on_selected_data(self, inv):
         """
-        Apply the inverse operator on the given data.
+        Call the correct method for applying the inverse operator on the desired signals of the given data.s
         :param inv: The inverse operator.
         :type inv: MNE.InverseOperator
         :return: The source estimation of the evoked response of the data.
         :rtype: MNE.SourceEstimate
         """
-        print("Apply inverse")
+        stc = None
+        if self.epochs_method == "single_trial":
+            stc = self.compute_inverse_single_trial(inv)
+        elif self.epochs_method == "evoked":
+            stc = self.compute_inverse_evoked(inv)
+        elif self.epochs_method == "averaged":
+            stc = self.compute_inverse_averaged(inv)
+        return stc
+
+    def compute_inverse_single_trial(self, inv):
+        """
+        Apply the inverse operator on a single signal of the given data.
+        :param inv: The inverse operator.
+        :type inv: MNE.InverseOperator
+        :return: The source estimation of the evoked response of the data.
+        :rtype: MNE.SourceEstimate
+        """
+        print("Apply inverse on a single signal of data")
+        pass
+
+    def compute_inverse_evoked(self, inv):
+        """
+        Apply the inverse operator on the evoked signal of the given data.
+        :param inv: The inverse operator.
+        :type inv: MNE.InverseOperator
+        :return: The source estimation of the evoked response of the data.
+        :rtype: MNE.SourceEstimate
+        """
+        print("Apply inverse on evoked data")
         evoked = self.file_data.average()
         snr = 3.0
         lambda2 = 1.0 / snr ** 2
         stc = apply_inverse(evoked, inv, lambda2, method=self.source_estimation_method, pick_ori="normal", verbose=False)
         return stc
+
+    def compute_inverse_averaged(self, inv):
+        """
+        Apply the inverse operator on all the signals of the given data and then average to give the final result.
+        :param inv: The inverse operator.
+        :type inv: MNE.InverseOperator
+        :return: The source estimation of the evoked response of the data.
+        :rtype: MNE.SourceEstimate
+        """
+        print("Apply inverse on all data averaged")
+        evoked = self.file_data.average()
+        snr = 3.0
+        lambda2 = 1.0 / snr ** 2
+        stcs = apply_inverse_epochs(self.file_data, inv, lambda2, method=self.source_estimation_method, pick_ori="normal",
+                                    nave=evoked.nave, verbose=False)
+        mean_stc = sum(stcs) / len(stcs)
+        return mean_stc
 
     def create_inverse_operator(self):
         """

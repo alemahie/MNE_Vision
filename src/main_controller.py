@@ -626,7 +626,7 @@ class mainController(mainListener):
             self.source_estimation_controller = sourceEstimationController()
             self.source_estimation_controller.set_listener(self)
 
-    def source_estimation_information(self, source_estimation_method, save_data, load_data, n_jobs):
+    def source_estimation_information(self, source_estimation_method, save_data, load_data, epochs_method, n_jobs):
         """
         Create the waiting window while the computation of the source estimation is done on the dataset.
         :param source_estimation_method: The method used to compute the source estimation
@@ -635,6 +635,11 @@ class mainController(mainListener):
         :type save_data: bool
         :param load_data: Boolean telling if the data used for the computation can be read from computer files.
         :type load_data: bool
+        :param epochs_method: On what data the source estimation will be computed. Can be three values :
+        - "single trial" : Compute the source estimation on a single trial that is precised.
+        - "evoked" : Compute the source estimation on the average of all the signals.
+        - "averaged" : Compute the source estimation on every trial, and then compute the average of them.
+        :type: str
         :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
         """
@@ -642,7 +647,7 @@ class mainController(mainListener):
         finish_method = "source_estimation"
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.source_estimation(source_estimation_method, save_data, load_data, n_jobs)
+        self.main_model.source_estimation(source_estimation_method, save_data, load_data, epochs_method, n_jobs)
 
     def source_estimation_computation_finished(self):
         """

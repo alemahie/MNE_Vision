@@ -8,7 +8,7 @@ Source estimation view
 from multiprocessing import cpu_count
 
 from PyQt6.QtWidgets import QWidget, QComboBox, QPushButton, QLabel, QCheckBox, QButtonGroup, QVBoxLayout, \
-    QHBoxLayout, QSlider
+    QHBoxLayout, QSlider, QFrame, QSizePolicy
 from PyQt6.QtCore import Qt
 
 from mne.viz import plot_source_estimates
@@ -70,6 +70,24 @@ class sourceEstimationView(QWidget):
         self.check_box_layout.addWidget(self.check_box_load)
         self.save_load_widget.setLayout(self.check_box_layout)
 
+        self.epochs_trial_average_widget = QWidget()
+        self.epochs_trial_average_check_box_layout = QVBoxLayout()
+        self.epochs_trial_average_buttons = QButtonGroup()
+        self.check_box_single_trial = QCheckBox()
+        self.check_box_single_trial.setText("Compute source estimation on a single trial (to be implemented)")
+        self.epochs_trial_average_buttons.addButton(self.check_box_single_trial, 0)    # Button with ID 0
+        self.check_box_evoked = QCheckBox()
+        self.check_box_evoked.setChecked(True)
+        self.check_box_evoked.setText("Compute source estimation on the evoked signal")
+        self.epochs_trial_average_buttons.addButton(self.check_box_evoked, 1)   # Button with ID 1
+        self.check_box_all_trials_averaged = QCheckBox()
+        self.check_box_all_trials_averaged.setText("Compute source estimation on all trials averaged")
+        self.epochs_trial_average_buttons.addButton(self.check_box_all_trials_averaged, 2)  # Button with ID 2
+        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_single_trial)
+        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_evoked)
+        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_all_trials_averaged)
+        self.epochs_trial_average_widget.setLayout(self.epochs_trial_average_check_box_layout)
+
         self.n_jobs_widget = QWidget()
         self.n_jobs_layout = QHBoxLayout()
         self.n_jobs_slider = QSlider(Qt.Orientation.Horizontal, self)
@@ -96,6 +114,7 @@ class sourceEstimationView(QWidget):
 
         self.global_layout.addWidget(self.method_widget)
         self.global_layout.addWidget(self.save_load_widget)
+        self.global_layout.addWidget(self.epochs_trial_average_widget)
         self.global_layout.addWidget(self.n_jobs_widget)
         self.global_layout.addWidget(self.cancel_confirm_widget)
 
@@ -106,6 +125,7 @@ class sourceEstimationView(QWidget):
         :type source_estimation_data: MNE.SourceEstimation
         """
         try:
+            print("plot source estimates")
             plot_source_estimates(source_estimation_data, subject=self.subject, subjects_dir=self.subjects_dir,
                                   hemi="both", backend="notebook", time_viewer=True,  smoothing_steps=7)
         except Exception as e:
@@ -127,8 +147,10 @@ class sourceEstimationView(QWidget):
         """
         source_estimation_method = self.method_box.currentText()
         save_data, load_data = self.get_save_load_button_checked()
+        epochs_method = self.get_epochs_trial_average_method()
         n_jobs = self.n_jobs_slider.value()
-        self.source_estimation_listener.confirm_button_clicked(source_estimation_method, save_data, load_data, n_jobs)
+        self.source_estimation_listener.confirm_button_clicked(source_estimation_method, save_data, load_data, epochs_method,
+                                                               n_jobs)
 
     def slider_value_changed_trigger(self):
         """
@@ -172,3 +194,15 @@ class sourceEstimationView(QWidget):
             save_data = False
             load_data = True
         return save_data, load_data
+
+    def get_epochs_trial_average_method(self):
+        checked_button = self.epochs_trial_average_buttons.checkedButton()
+        button_id = self.epochs_trial_average_buttons.id(checked_button)
+        method = None
+        if button_id == 0:
+            method = "single_trial"
+        elif button_id == 1:
+            method = "evoked"
+        elif button_id == 2:
+            method = "averaged"
+        return method
