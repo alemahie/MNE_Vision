@@ -5,8 +5,8 @@
 Filter view
 """
 
-from PyQt6.QtGui import QDoubleValidator
-from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QGridLayout, QLabel
+from PyQt5.QtGui import QDoubleValidator
+from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QGridLayout, QLabel
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
 

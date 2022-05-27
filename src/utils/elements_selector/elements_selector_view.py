@@ -5,7 +5,7 @@
 Multiple selector View
 """
 
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea, QLabel, QCheckBox, QButtonGroup
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea, QLabel, QCheckBox, QButtonGroup
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

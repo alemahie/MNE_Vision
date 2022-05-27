@@ -5,7 +5,7 @@
 Find Events From Channel View
 """
 
-from PyQt6.QtWidgets import QWidget, QGridLayout, QPushButton, QHBoxLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QHBoxLayout, QLabel
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
 

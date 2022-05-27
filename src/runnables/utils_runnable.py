@@ -7,7 +7,7 @@ Utils runnable
 
 import os
 
-from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
+from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne.datasets import fetch_fsaverage
 from mne.datasets.sample import data_path

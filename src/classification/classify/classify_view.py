@@ -5,7 +5,7 @@
 Classify view
 """
 
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QGridLayout, QCheckBox, \
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QGridLayout, QCheckBox, \
     QDoubleSpinBox, QSpinBox
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController

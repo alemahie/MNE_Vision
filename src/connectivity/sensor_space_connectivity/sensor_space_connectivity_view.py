@@ -5,7 +5,7 @@
 Sensor Space Connectivity View
 """
 
-from PyQt6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout
 
 from mne.viz import set_3d_backend
 from mne_connectivity.viz import plot_sensors_connectivity
@@ -57,7 +57,6 @@ class sensorSpaceConnectivityView(QWidget):
         :param sensor_space_connectivity_data: The sensor space connectivity data.
         :type sensor_space_connectivity_data: list of, list of float
         """
-        set_3d_backend("notebook")
         plot_sensors_connectivity(self.file_info, sensor_space_connectivity_data, picks="all")
 
     """

@@ -4,8 +4,8 @@
 """
 Event Values View
 """
-from PyQt6.QtGui import QIntValidator
-from PyQt6.QtWidgets import QWidget, QGridLayout, QPushButton, QVBoxLayout, QLineEdit, QLabel, QHBoxLayout
+from PyQt5.QtGui import QIntValidator
+from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QVBoxLayout, QLineEdit, QLabel, QHBoxLayout
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

@@ -9,8 +9,8 @@ from mne.viz import tight_layout
 
 from matplotlib import pyplot as plt
 
-from PyQt6.QtGui import QDoubleValidator
-from PyQt6.QtWidgets import QPushButton, QWidget, QGridLayout, QComboBox, QLabel, QLineEdit
+from PyQt5.QtGui import QDoubleValidator
+from PyQt5.QtWidgets import QPushButton, QWidget, QGridLayout, QComboBox, QLabel, QLineEdit
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
 from utils.error_window import errorWindow

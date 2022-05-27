@@ -31,23 +31,22 @@ Dependencies
 
 The required dependencies to run MNE-Python are:
 
-- Python
-- keras
-- matplotlib
-- mayavi
-- mne
-- mne_connectivity
-- numpy
-- philistine
-- pyEDFlib
-- PyQt5
-- PyQt6
-- PyQtWebEngine
-- pyriemann
-- scikit_learn
-- scipy
-- seaborn
-- tensorflow
+- Python >= 3.9.13
+- keras >= 2.9.0
+- matplotlib >= 3.5.2
+- mne >= 1.0.3
+- mne_connectivity >= 0.3
+- numpy >= 1.22.4
+- pymatreader >= 0.0.30
+- PyQt5 >= 5.15.6
+- PyQt5-stubs >= 5.15.6.0
+- pyriemann >= 0.2.7
+- pyvista >= 0.34.1
+- pyvistaqt >= 0.9.0
+- scikit_learn >= 1.1.1
+- scipy >= 1.8.1
+- seaborn >= 0.11.2
+- tensorflow >= 2.9.1
 
 Licensing
 ^^^^^^^^^
@@ -63,3 +62,6 @@ MNE_Vision is **GNU-licenced**, for more information please read the GNU General
 .. _Python: https://www.python.org/downloads/
 
 .. |MNE_Vision| image:: image/mne_vision_logo.png
+
+
+.. Packages en plus : philistine, pyEDFlib, PyQtWebEngine

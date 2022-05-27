@@ -5,7 +5,7 @@
 Waiting while processing view
 """
 
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
 
 from utils.progress_bar import ProgressBar
 

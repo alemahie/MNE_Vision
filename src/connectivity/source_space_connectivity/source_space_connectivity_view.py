@@ -9,9 +9,9 @@ import numpy as np
 
 from multiprocessing import cpu_count
 
-from PyQt6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QComboBox, QLabel, QButtonGroup, QCheckBox, \
+from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QComboBox, QLabel, QButtonGroup, QCheckBox, \
     QSlider, QGridLayout, QSpinBox
-from PyQt6.QtCore import Qt
+from PyQt5.QtCore import Qt
 
 from mne.viz import circular_layout
 from mne_connectivity.viz import plot_connectivity_circle

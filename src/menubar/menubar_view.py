@@ -5,8 +5,7 @@
 Main controller
 """
 
-from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QMenuBar, QMenu, QFileDialog
+from PyQt5.QtWidgets import QMenuBar, QMenu, QFileDialog, QAction
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

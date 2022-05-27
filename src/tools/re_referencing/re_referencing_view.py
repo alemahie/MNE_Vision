@@ -7,9 +7,9 @@ Re-referencing View
 
 from multiprocessing import cpu_count
 
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QButtonGroup, QCheckBox, QPushButton, QGridLayout, QHBoxLayout, \
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QButtonGroup, QCheckBox, QPushButton, QGridLayout, QHBoxLayout, \
     QLabel, QSlider
-from PyQt6.QtCore import Qt
+from PyQt5.QtCore import Qt
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
 from utils.error_window import errorWindow

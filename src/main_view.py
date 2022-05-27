@@ -5,7 +5,7 @@
 Main view
 """
 
-from PyQt6.QtWidgets import QMainWindow, QWidget, QGridLayout, QLabel, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QLabel, QFileDialog
 
 from mne.viz import plot_sensors
 

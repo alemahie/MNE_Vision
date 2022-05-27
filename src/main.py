@@ -7,7 +7,7 @@ Main file launching the project.
 
 import sys
 
-from PyQt6.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication
 
 from main_controller import mainController
 

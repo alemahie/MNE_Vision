@@ -5,7 +5,7 @@
 Classification runnable
 """
 
-from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
+from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
 from lib.applePy.classifier import ApplePyClassifier
 

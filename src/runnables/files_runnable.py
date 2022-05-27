@@ -5,7 +5,7 @@
 Files runnable
 """
 
-from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
+from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne import read_epochs, find_events
 from mne.channels import make_standard_montage

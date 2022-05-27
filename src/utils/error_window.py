@@ -5,7 +5,7 @@
 Error Window View
 """
 
-from PyQt6.QtWidgets import QWidget, QMessageBox
+from PyQt5.QtWidgets import QWidget, QMessageBox
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

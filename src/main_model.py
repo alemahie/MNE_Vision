@@ -10,7 +10,7 @@ import numpy as np
 from os.path import getsize, splitext
 from copy import copy
 
-from PyQt6.QtCore import QThreadPool
+from PyQt5.QtCore import QThreadPool
 
 from mne import read_events
 

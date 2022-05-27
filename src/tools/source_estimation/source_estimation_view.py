@@ -7,9 +7,9 @@ Source estimation view
 
 from multiprocessing import cpu_count
 
-from PyQt6.QtWidgets import QWidget, QComboBox, QPushButton, QLabel, QCheckBox, QButtonGroup, QVBoxLayout, \
+from PyQt5.QtWidgets import QWidget, QComboBox, QPushButton, QLabel, QCheckBox, QButtonGroup, QVBoxLayout, \
     QHBoxLayout, QSlider, QFrame, QSizePolicy
-from PyQt6.QtCore import Qt
+from PyQt5.QtCore import Qt
 
 from mne.viz import plot_source_estimates
 
@@ -127,7 +127,7 @@ class sourceEstimationView(QWidget):
         try:
             print("plot source estimates")
             plot_source_estimates(source_estimation_data, subject=self.subject, subjects_dir=self.subjects_dir,
-                                  hemi="both", backend="notebook", time_viewer=True,  smoothing_steps=7)
+                                  hemi="both", backend="pyvistaqt", time_viewer=True,  smoothing_steps=7)
         except Exception as e:
             print(type(e))
             print(e)

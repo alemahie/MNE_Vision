@@ -5,7 +5,7 @@
 Tools runnable
 """
 
-from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
+from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne import make_forward_solution, write_forward_solution, compute_covariance, setup_source_space, \
     write_source_spaces, make_bem_model, make_bem_solution, write_bem_solution, Epochs

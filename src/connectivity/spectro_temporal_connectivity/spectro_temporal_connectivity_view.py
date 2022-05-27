@@ -5,7 +5,7 @@
 Spectro-Temporal Connectivity View
 """
 
-from PyQt6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

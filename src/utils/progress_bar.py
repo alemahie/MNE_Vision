@@ -5,7 +5,7 @@
 Progress bar
 """
 
-from PyQt6.QtWidgets import QProgressBar
+from PyQt5.QtWidgets import QProgressBar
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

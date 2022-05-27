@@ -5,8 +5,8 @@
 Load Data Info View
 """
 
-from PyQt6.QtGui import QDoubleValidator
-from PyQt6.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QComboBox, QLineEdit
+from PyQt5.QtGui import QDoubleValidator
+from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QComboBox, QLineEdit
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
 

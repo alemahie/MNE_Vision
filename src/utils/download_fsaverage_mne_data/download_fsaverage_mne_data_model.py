@@ -5,7 +5,7 @@
 Download fsaverage MNE Data Model
 """
 
-from PyQt6.QtCore import QThreadPool
+from PyQt5.QtCore import QThreadPool
 
 from runnables.utils_runnable import downloadFsaverageMneDataRunnable
 

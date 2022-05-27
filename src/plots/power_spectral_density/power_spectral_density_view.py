@@ -8,8 +8,8 @@ Power spectral density view
 import numpy as np
 from matplotlib import pyplot as plt
 
-from PyQt6.QtGui import QDoubleValidator
-from PyQt6.QtWidgets import QWidget, QGridLayout, QComboBox, QLineEdit, QPushButton, QLabel
+from PyQt5.QtGui import QDoubleValidator
+from PyQt5.QtWidgets import QWidget, QGridLayout, QComboBox, QLineEdit, QPushButton, QLabel
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

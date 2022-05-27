@@ -5,8 +5,8 @@
 Extract Epochs View
 """
 
-from PyQt6.QtGui import QDoubleValidator
-from PyQt6.QtWidgets import QWidget, QPushButton, QLineEdit, QGridLayout, QLabel
+from PyQt5.QtGui import QDoubleValidator
+from PyQt5.QtWidgets import QWidget, QPushButton, QLineEdit, QGridLayout, QLabel
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
