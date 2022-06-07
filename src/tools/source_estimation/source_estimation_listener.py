@@ -27,5 +27,9 @@ class sourceEstimationListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, epochs_method, trial_number, n_jobs):
+    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, epochs_method, trials_selected, n_jobs):
+        pass
+
+    @abstractmethod
+    def get_elements_selected(self, elements_selected, element_type):
         pass

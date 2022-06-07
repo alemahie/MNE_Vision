@@ -624,10 +624,12 @@ class mainController(mainListener):
             self.download_fsaverage_mne_data_controller.set_listener(self)
         else:
             number_of_epochs = self.main_model.get_number_of_epochs()
-            self.source_estimation_controller = sourceEstimationController(number_of_epochs)
+            event_values = self.main_model.get_event_values()
+            event_ids = self.main_model.get_event_ids()
+            self.source_estimation_controller = sourceEstimationController(number_of_epochs, event_values, event_ids)
             self.source_estimation_controller.set_listener(self)
 
-    def source_estimation_information(self, source_estimation_method, save_data, load_data, epochs_method, trial_number,
+    def source_estimation_information(self, source_estimation_method, save_data, load_data, epochs_method, trials_selected,
                                       n_jobs):
         """
         Create the waiting window while the computation of the source estimation is done on the dataset.
@@ -642,8 +644,8 @@ class mainController(mainListener):
         - "evoked" : Compute the source estimation on the average of all the signals.
         - "averaged" : Compute the source estimation on every trial, and then compute the average of them.
         :type: str
-        :param trial_number: The trial's number selected for the "single trial" epochs method.
-        :type trial_number: int
+        :param trials_selected: The indexes of the trials selected for the computation
+        :type trials_selected: list of int
         :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
         """
@@ -651,7 +653,7 @@ class mainController(mainListener):
         finish_method = "source_estimation"
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.source_estimation(source_estimation_method, save_data, load_data, epochs_method, trial_number,
+        self.main_model.source_estimation(source_estimation_method, save_data, load_data, epochs_method, trials_selected,
                                           n_jobs)
 
     def source_estimation_computation_finished(self):

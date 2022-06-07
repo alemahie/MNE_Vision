@@ -324,7 +324,7 @@ class sourceEstimationWorkerSignals(QObject):
 
 
 class sourceEstimationRunnable(QRunnable):
-    def __init__(self, source_estimation_method, file_data, file_path, write_files, read_files, epochs_method, trial_number,
+    def __init__(self, source_estimation_method, file_data, file_path, write_files, read_files, epochs_method, trials_selected,
                  n_jobs):
         """
         Runnable for the computation of the source estimation of the given data.
@@ -343,8 +343,8 @@ class sourceEstimationRunnable(QRunnable):
         - "evoked" : Compute the source estimation on the average of all the signals.
         - "averaged" : Compute the source estimation on every trial, and then compute the average of them.
         :type: str
-        :param trial_number: The trial's number selected for the "single trial" epochs method.
-        :type trial_number: int
+        :param trials_selected: The indexes of the trials selected for the computation
+        :type trials_selected: list of int
         :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
         """
@@ -356,7 +356,7 @@ class sourceEstimationRunnable(QRunnable):
         self.read_files = read_files
         self.write_files = write_files
         self.epochs_method = epochs_method
-        self.trial_number = trial_number
+        self.trials_selected = trials_selected
         self.n_jobs = n_jobs
         self.subject = "fsaverage"
         self.subjects_dir = get_project_freesurfer_path()
@@ -431,7 +431,7 @@ class sourceEstimationRunnable(QRunnable):
         :rtype: MNE.SourceEstimate
         """
         print("Apply inverse on a single signal of data")
-        epoch = self.file_data[self.trial_number]
+        epoch = self.file_data[self.trials_selected[0]]
         evoked = self.file_data.average()
         snr = 3.0
         lambda2 = 1.0 / snr ** 2
@@ -448,7 +448,9 @@ class sourceEstimationRunnable(QRunnable):
         :rtype: MNE.SourceEstimate
         """
         print("Apply inverse on evoked data")
-        evoked = self.file_data.average()
+        mask = self.create_mask_from_indexes_to_keep()
+        data = self.file_data.drop(mask)
+        evoked = data.average()
         snr = 3.0
         lambda2 = 1.0 / snr ** 2
         stc = apply_inverse(evoked, inv, lambda2, method=self.source_estimation_method, pick_ori="normal", verbose=False)
@@ -463,10 +465,12 @@ class sourceEstimationRunnable(QRunnable):
         :rtype: MNE.SourceEstimate
         """
         print("Apply inverse on all data averaged")
-        evoked = self.file_data.average()
+        mask = self.create_mask_from_indexes_to_keep()
+        data = self.file_data.drop(mask)
+        evoked = data.average()
         snr = 3.0
         lambda2 = 1.0 / snr ** 2
-        stcs = apply_inverse_epochs(self.file_data, inv, lambda2, method=self.source_estimation_method, pick_ori="normal",
+        stcs = apply_inverse_epochs(data, inv, lambda2, method=self.source_estimation_method, pick_ori="normal",
                                     nave=evoked.nave, verbose=False)
         mean_stc = sum(stcs) / len(stcs)
         return mean_stc
@@ -559,6 +563,20 @@ class sourceEstimationRunnable(QRunnable):
         if self.write_files:
             write_inverse_operator(self.file_path + "-inv.fif", inverse_operator, verbose=False)
         return inverse_operator
+
+    """
+    Others
+    """
+    def create_mask_from_indexes_to_keep(self):
+        """
+        Create a mask to know which trial to keep and which one to remove for the computation.
+        :return mask: Mask of trials to remove. True means remove, and False means keep.
+        :rtype mask: list of boolean
+        """
+        mask = [True for _ in range(len(self.file_data.events))]
+        for i in self.trials_selected:
+            mask[i] = False
+        return mask
 
     """
     Getters

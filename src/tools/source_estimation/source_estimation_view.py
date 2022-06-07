@@ -13,6 +13,7 @@ from PyQt5.QtCore import Qt
 
 from mne.viz import plot_source_estimates
 
+from utils.elements_selector.elements_selector_controller import multipleSelectorController
 from utils.file_path_search import get_project_freesurfer_path
 
 __author__ = "Lemahieu Antoine"
@@ -25,11 +26,15 @@ __status__ = "Dev"
 
 
 class sourceEstimationView(QWidget):
-    def __init__(self, number_of_epochs, title=None):
+    def __init__(self, number_of_epochs, event_values, event_ids, title=None):
         """
         Window displaying the parameters for computing the source estimation on the dataset.
         :param number_of_epochs: Number of epochs in the dataset.
         :type number_of_epochs: int
+        :param event_values: Event_id associated to each epoch/trial.
+        :type event_values: list of, list of int
+        :param event_ids: Name of the events associated to their id.
+        :type event_ids: dict
         :param title: Title of window
         :type title: str
         """
@@ -37,6 +42,11 @@ class sourceEstimationView(QWidget):
         self.source_estimation_listener = None
         self.subject = "fsaverage"
         self.subjects_dir = get_project_freesurfer_path()
+        self.event_values = event_values
+        self.event_ids = event_ids
+
+        self.events_selector_controller = None
+        self.trials_selected = None
 
         if title is None:
             self.setWindowTitle("Source Estimation")
@@ -78,6 +88,7 @@ class sourceEstimationView(QWidget):
         self.epochs_trial_average_widget = QWidget()
         self.epochs_trial_average_check_box_layout = QGridLayout()
         self.epochs_trial_average_buttons = QButtonGroup()
+
         self.check_box_single_trial = QCheckBox()
         self.check_box_single_trial.setText("Compute source estimation on a single trial (select trial number) : ")
         self.epochs_trial_average_buttons.addButton(self.check_box_single_trial, 0)    # Button with ID 0
@@ -85,21 +96,32 @@ class sourceEstimationView(QWidget):
         self.trial_number_single_trial.setMinimum(1)
         self.trial_number_single_trial.setMaximum(number_of_epochs)
         self.trial_number_single_trial.setValue(1)
+
         self.check_box_evoked = QCheckBox()
         self.check_box_evoked.setChecked(True)
         self.check_box_evoked.setText("Compute source estimation on the evoked signal")
         self.epochs_trial_average_buttons.addButton(self.check_box_evoked, 1)   # Button with ID 1
+
         self.check_box_all_trials_averaged = QCheckBox()
         self.check_box_all_trials_averaged.setText("Compute source estimation on all trials averaged")
         self.epochs_trial_average_buttons.addButton(self.check_box_all_trials_averaged, 2)  # Button with ID 2
+
+        self.trial_selection_label = QLabel("Trials indices to compute (default : all) :")
+        self.trial_selection_indexes = QPushButton("Select by trials indexes")
+        self.trial_selection_indexes.clicked.connect(self.trial_selection_indexes_trigger)
+        self.trial_selection_events = QPushButton("Select by events")
+        self.trial_selection_events.clicked.connect(self.trial_selection_events_trigger)
 
         self.epochs_trial_average_check_box_layout.addWidget(self.check_box_single_trial, 0, 0)
         self.epochs_trial_average_check_box_layout.addWidget(self.trial_number_single_trial, 0, 1)
         self.epochs_trial_average_check_box_layout.addWidget(self.check_box_evoked, 1, 0)
         self.epochs_trial_average_check_box_layout.addWidget(self.check_box_all_trials_averaged, 2, 0)
+        self.epochs_trial_average_check_box_layout.addWidget(self.trial_selection_label, 3, 0)
+        self.epochs_trial_average_check_box_layout.addWidget(self.trial_selection_indexes, 3, 1)
+        self.epochs_trial_average_check_box_layout.addWidget(self.trial_selection_events, 4, 1)
         self.epochs_trial_average_widget.setLayout(self.epochs_trial_average_check_box_layout)
 
-        # N Jobs Slider
+        # Number of Jobs Slider
         self.n_jobs_widget = QWidget()
         self.n_jobs_layout = QHBoxLayout()
         self.n_jobs_slider = QSlider(Qt.Orientation.Horizontal, self)
@@ -162,10 +184,38 @@ class sourceEstimationView(QWidget):
         source_estimation_method = self.method_box.currentText()
         save_data, load_data = self.get_save_load_button_checked()
         epochs_method = self.get_epochs_trial_average_method()
-        trial_number = self.trial_number_single_trial.value()-1
         n_jobs = self.n_jobs_slider.value()
+        if epochs_method == "single_trial":
+            trials_selected = [self.trial_number_single_trial.value()]
+        else:
+            if self.trials_selected is None:
+                trials_selected = [i for i in range(len(self.event_values))]
+            else:
+                trials_selected = self.trials_selected
         self.source_estimation_listener.confirm_button_clicked(source_estimation_method, save_data, load_data, epochs_method,
-                                                               trial_number, n_jobs)
+                                                               trials_selected, n_jobs)
+
+    def trial_selection_indexes_trigger(self):
+        """
+        Open the multiple selector window.
+        The user can select the trials indexes he wants the source estimation to be computed on.
+        """
+        title = "Select the trial's events used for computing the source estimation:"
+        indexes_list = [str(i+1) for i in range(len(self.event_values))]
+        self.events_selector_controller = multipleSelectorController(indexes_list, title, box_checked=True,
+                                                                     element_type="indexes")
+        self.events_selector_controller.set_listener(self.source_estimation_listener)
+
+    def trial_selection_events_trigger(self):
+        """
+        Open the multiple selector window.
+        The user can select the events he wants the source estimation to be computed on.
+        """
+        title = "Select the trial's events used for computing the source estimation:"
+        events_ids_list = list(self.event_ids.keys())
+        self.events_selector_controller = multipleSelectorController(events_ids_list, title, box_checked=True,
+                                                                     element_type="events")
+        self.events_selector_controller.set_listener(self.source_estimation_listener)
 
     def slider_value_changed_trigger(self):
         """
@@ -184,6 +234,30 @@ class sourceEstimationView(QWidget):
         :type listener: sourceEstimationController
         """
         self.source_estimation_listener = listener
+
+    def set_trials_selected(self, elements_selected, element_type):
+        """
+        Set the channels selected in the multiple selector window.
+        :param elements_selected: Trials or Events selected.
+        :type elements_selected: list of str
+        :param element_type: Type of the element selected, used in case multiple element selector windows can be open in
+        a window. Can thus distinguish the returned elements.
+        :type element_type: str
+        """
+        trials_to_use = []
+        if element_type == "indexes":
+            for trial in elements_selected:
+                trials_to_use.append(int(trial)-1)  # -1 To get index in the list, not "position"
+        elif element_type == "events":
+            # Get ids of the events selected
+            event_ids_selected = []
+            for event in elements_selected:
+                event_ids_selected.append(self.event_ids[event])
+            # Get indexes of the trials if their event is selected.
+            for i in range(len(self.event_values)):
+                if self.event_values[i][2] in event_ids_selected:
+                    trials_to_use.append(i)
+        self.trials_selected = trials_to_use
 
     """
     Getters

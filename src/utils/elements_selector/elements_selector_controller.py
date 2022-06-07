@@ -18,7 +18,7 @@ __status__ = "Dev"
 
 
 class multipleSelectorController(multipleSelectorListener):
-    def __init__(self, all_elements_names, title, box_checked=True, unique_box=False):
+    def __init__(self, all_elements_names, title, box_checked=True, unique_box=False, element_type=None):
         """
         Controller for the multiple selector.
         Create a new window where we can select some elements.
@@ -30,10 +30,15 @@ class multipleSelectorController(multipleSelectorListener):
         :type box_checked: bool
         :param unique_box: Can only check a single element from all the elements.
         :type unique_box: bool
+        :param element_type: Type of the element selected, used in case multiple element selector windows can be open in
+        a window. Can thus distinguish the returned elements.
+        :type element_type: str
         """
         self.main_listener = None
         self.multiple_selector_view = multipleSelectorView(all_elements_names, title, box_checked, unique_box)
         self.multiple_selector_view.set_listener(self)
+
+        self.element_type = element_type
 
         self.multiple_selector_view.show()
 
@@ -49,7 +54,10 @@ class multipleSelectorController(multipleSelectorListener):
         :param elements_selected: All the elements selected.
         :type elements_selected: list of str
         """
-        self.main_listener.get_elements_selected(elements_selected)
+        if self.element_type is None:
+            self.main_listener.get_elements_selected(elements_selected)
+        else:
+            self.main_listener.get_elements_selected(elements_selected, self.element_type)
         self.multiple_selector_view.close()
 
     """

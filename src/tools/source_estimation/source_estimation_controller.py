@@ -8,6 +8,8 @@ Source estimation controller
 from tools.source_estimation.source_estimation_view import sourceEstimationView
 from tools.source_estimation.source_estimation_listener import sourceEstimationListener
 
+from utils.error_window import errorWindow
+
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
@@ -18,17 +20,21 @@ __status__ = "Dev"
 
 
 class sourceEstimationController(sourceEstimationListener):
-    def __init__(self, number_of_epochs, title=None):
+    def __init__(self, number_of_epochs, event_values, event_ids, title=None):
         """
         Controller for computing the source estimation on the dataset.
         Create a new window for specifying some parameters.
         :param number_of_epochs: Number of epochs in the dataset.
         :type number_of_epochs: int
+        :param event_values: Event_id associated to each epoch/trial.
+        :type event_values: list of, list of int
+        :param event_ids: Name of the events associated to their id.
+        :type event_ids: dict
         :param title: Title of window
         :type title: str
         """
         self.main_listener = None
-        self.source_estimation_view = sourceEstimationView(number_of_epochs, title)
+        self.source_estimation_view = sourceEstimationView(number_of_epochs, event_values, event_ids, title)
         self.source_estimation_view.set_listener(self)
 
         self.source_estimation_view.show()
@@ -39,7 +45,7 @@ class sourceEstimationController(sourceEstimationListener):
         """
         self.source_estimation_view.close()
 
-    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, epochs_method, trial_number, n_jobs):
+    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, epochs_method, trials_selected, n_jobs):
         """
         Close the window and send the information to the main controller.
         :param source_estimation_method: The method used to compute the source estimation
@@ -53,14 +59,14 @@ class sourceEstimationController(sourceEstimationListener):
         - "evoked" : Compute the source estimation on the average of all the signals.
         - "averaged" : Compute the source estimation on every trial, and then compute the average of them.
         :type: str
-        :param trial_number: The trial's number selected for the "single trial" epochs method.
-        :type trial_number: int
+        :param trials_selected: The indexes of the trials selected for the computation
+        :type trials_selected: list of int
         :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
         """
         self.source_estimation_view.close()
-        self.main_listener.source_estimation_information(source_estimation_method, save_data, load_data, epochs_method, trial_number,
-                                                         n_jobs)
+        self.main_listener.source_estimation_information(source_estimation_method, save_data, load_data, epochs_method,
+                                                         trials_selected, n_jobs)
 
     def plot_source_estimation(self, source_estimation_data):
         """
@@ -69,6 +75,26 @@ class sourceEstimationController(sourceEstimationListener):
         :type source_estimation_data: MNE.SourceEstimation
         """
         self.source_estimation_view.plot_source_estimation(source_estimation_data)
+
+    """
+    Getters
+    """
+    def get_elements_selected(self, elements_selected, element_type):
+        """
+        Get the elements selected by the user in the multiple elements' selector.
+        :param elements_selected: Elements selected in the multiple elements' selector.
+        :type elements_selected: list of str
+        :param element_type: Type of the element selected, used in case multiple element selector windows can be open in
+        a window. Can thus distinguish the returned elements.
+        :type element_type: str
+        """
+        if len(elements_selected) == 0:
+            error_message = "Please select at least one element in the list. \n The source estimation can not be " \
+                            "computed on 0 trials"
+            error_window = errorWindow(error_message)
+            error_window.show()
+        else:
+            self.source_estimation_view.set_trials_selected(elements_selected, element_type)
 
     """
     Setters
