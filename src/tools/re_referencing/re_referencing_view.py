@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QButtonGroup, QCheckBox, QPush
 from PyQt5.QtCore import Qt
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
-from utils.error_window import errorWindow
+from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

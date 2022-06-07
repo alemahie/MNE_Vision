@@ -12,7 +12,7 @@ from copy import copy
 from edit.event_values.event_values_listener import eventValuesListener
 from edit.event_values.event_values_view import eventValuesView
 
-from utils.error_window import errorWindow
+from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

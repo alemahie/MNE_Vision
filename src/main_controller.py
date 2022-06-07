@@ -41,7 +41,7 @@ from classification.classify.classify_controller import classifyController
 
 from utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller import downloadFsaverageMneDataController
 from utils.waiting_while_processing.waiting_while_processing_controller import waitingWhileProcessingController
-from utils.error_window import errorWindow
+from utils.view.error_window import errorWindow
 from utils.file_path_search import get_project_freesurfer_path
 
 __author__ = "Lemahieu Antoine"
@@ -298,11 +298,70 @@ class mainController(mainListener):
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     # Export
-    def export_data_to_file_clicked(self):
-        print("export data")
+    def export_data_to_csv_file_clicked(self, path_to_file):
+        """
+        Check if the path to the file is correct.
+        Export the data to a CSV file.
+        :param path_to_file: Path to the file.
+        :type path_to_file: str
+        """
+        if path_to_file != '':
+            processing_title = "Export data into a CSV file, please wait."
+            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title)
+            self.waiting_while_processing_controller.set_listener(self)
+            self.main_model.export_data_to_csv_file_clicked(path_to_file)
+
+    def export_data_csv_computation_finished(self):
+        """
+        Close the waiting window when the exportation of the data into a CSV file is done.
+        """
+        processing_title_finished = "Exportation of the data into a CSV file is finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def export_data_to_set_file_clicked(self, path_to_file):
+        """
+        Check if the path to the file is correct.
+        Export the data to a SET file.
+        :param path_to_file: Path to the file.
+        :type path_to_file: str
+        """
+        if path_to_file != '':
+            processing_title = "Export data into a SET file, please wait."
+            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title)
+            self.waiting_while_processing_controller.set_listener(self)
+            self.main_model.export_data_to_set_file_clicked(path_to_file)
+
+    def export_data_set_computation_finished(self):
+        """
+        Close the waiting window when the exportation of the data into a SET file is done.
+        """
+        processing_title_finished = "Exportation of the data into a SET file is finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     def export_events_to_file_clicked(self):
-        print("export events")
+        """
+        Check if the path to the file is correct.
+        Export the events to a TXT file.
+        """
+        file_type = self.main_model.get_file_type()
+        if file_type == "Epochs":
+            path_to_file = self.main_view.get_export_path()
+            if path_to_file != '':
+                processing_title = "Export events into a TXT file, please wait."
+                self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title)
+                self.waiting_while_processing_controller.set_listener(self)
+                self.main_model.export_events_to_file_clicked(path_to_file)
+        else:
+            error_message = "You can only export events when processing a epochs file."
+            error_window = errorWindow(error_message)
+            error_window.show()
+
+    def export_events_txt_computation_finished(self):
+        """
+        Close the waiting window when the exportation of the events of the dataset into a TXT file is done.
+        """
+        processing_title_finished = "Exportation of the events into a TXT file is finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     # Save
     def save_file_clicked(self):
@@ -312,7 +371,7 @@ class mainController(mainListener):
         if self.main_model.is_fif_file():
             path_to_file = self.main_model.get_file_path_name()
         else:
-            path_to_file = self.main_view.get_path_to_file()
+            path_to_file = self.main_view.get_save_path()
         if path_to_file != '':
             self.main_model.save_file(path_to_file)
             self.main_view.update_path_to_file(self.main_model.get_file_path_name())
@@ -321,7 +380,7 @@ class mainController(mainListener):
         """
         Save the file into the fif format and display the new path file on the main window.
         """
-        path_to_file = self.main_view.get_path_to_file()
+        path_to_file = self.main_view.get_save_path()
         if path_to_file != '':
             self.main_model.save_file_as(path_to_file)
             self.main_view.update_path_to_file(self.main_model.get_file_path_name())

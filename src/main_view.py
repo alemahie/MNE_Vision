@@ -241,11 +241,20 @@ class mainView(QMainWindow):
     """
     Getters
     """
-    def get_path_to_file(self):
+    def get_save_path(self):
         """
         Get the path to the file when wanting to save the dataset.
         :return: The path to the file.
         :rtype: str
         """
         path_to_file = QFileDialog().getSaveFileName(self, "Save file as")
+        return path_to_file[0]
+
+    def get_export_path(self):
+        """
+        Get the path to the file when wanting to export the events.
+        :return: The path to the file.
+        :rtype: str
+        """
+        path_to_file = QFileDialog().getSaveFileName(self, "Export events to TXT file")
         return path_to_file[0]

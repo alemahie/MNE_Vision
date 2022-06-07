@@ -12,7 +12,7 @@ from copy import copy
 from edit.channel_location.channel_location_listener import channelLocationListener
 from edit.channel_location.channel_location_view import channelLocationView
 
-from utils.error_window import errorWindow
+from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

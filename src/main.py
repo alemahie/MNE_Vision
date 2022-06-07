@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QApplication
 
 from main_controller import mainController
 
-from utils.stylesheet import get_stylesheet
+from utils.view.stylesheet import get_stylesheet
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

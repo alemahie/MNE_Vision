@@ -307,3 +307,132 @@ class findEventsFromChannelRunnable(QRunnable):
         :rtype: list of int
         """
         return self.read_events
+
+
+# Export Data to CSV file
+class exportDataCSVWorkerSignals(QObject):
+    """
+    Contain the signals used by the export data CSV runnable.
+    """
+    finished = pyqtSignal()
+
+
+class exportDataCSVRunnable(QRunnable):
+    def __init__(self, file_data, path_to_file):
+        """
+        Runnable for exporting the data of the dataset into a CSV file.
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param path_to_file: Path to the exportation file.
+        :type path_to_file: str
+        """
+        super().__init__()
+        self.signals = exportDataCSVWorkerSignals()
+
+        self.file_data = file_data
+        self.path_to_file = path_to_file
+
+    def run(self):
+        """
+        Launch the exportation of the data of the dataset into a CSV file.
+        Notifies the main model that the computation is finished.
+        """
+        data = self.file_data.get_data()
+        time_points = self.file_data.times
+
+        file = open(self.path_to_file + ".csv", "x")
+        # Write header
+        file.write("Time")
+        for channel in self.file_data.ch_names:
+            file.write(", " + channel)
+        file.write("\n")
+        # Write data
+        for i in range(len(data)):  # Epoch
+            for j in range(len(data[0][0])):   # Time
+                file.write(str(time_points[j]))
+                for k in range(len(data[0])):    # Channel
+                    file.write(", " + str(data[i][i][j]))
+                file.write("\n")
+        file.close()
+        self.signals.finished.emit()
+
+
+# Export Data to SET file
+class exportDataSETWorkerSignals(QObject):
+    """
+    Contain the signals used by the export data CSV runnable.
+    """
+    finished = pyqtSignal()
+
+
+class exportDataSETRunnable(QRunnable):
+    def __init__(self, file_data, path_to_file):
+        """
+        Runnable for exporting the data of the dataset into a SET file.
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param path_to_file: Path to the exportation file.
+        :type path_to_file: str
+        """
+        super().__init__()
+        self.signals = exportDataSETWorkerSignals()
+
+        self.file_data = file_data
+        self.path_to_file = path_to_file
+
+    def run(self):
+        """
+        Launch the exportation of the data of the dataset into a SET file.
+        Notifies the main model that the computation is finished.
+        """
+        try:
+            self.file_data.export(self.path_to_file + ".set", fmt="eeglab")
+        except Exception as e:
+            print(e)
+            print(type(e))
+        self.signals.finished.emit()
+
+
+# Export Events to TXT file
+class exportEventsTXTWorkerSignals(QObject):
+    """
+    Contain the signals used by the export events TXT runnable.
+    """
+    finished = pyqtSignal()
+
+
+class exportEventsTXTRunnable(QRunnable):
+    def __init__(self, file_data, path_to_file):
+        """
+        Runnable for exporting the events of the dataset into a TXT file.
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param path_to_file: Path to the exportation file.
+        :type path_to_file: str
+        """
+        super().__init__()
+        self.signals = exportEventsTXTWorkerSignals()
+
+        self.file_data = file_data
+        self.path_to_file = path_to_file
+
+    def run(self):
+        """
+        Launch the exportation of the events of the dataset into a TXT file.
+        Notifies the main model that the computation is finished.
+        """
+        event_values = self.file_data.events
+        event_ids = self.file_data.event_id
+        file = open(self.path_to_file + ".txt", "x")
+        file.write("Number, Type, Latency \n")
+        for i in range(len(event_values)):
+            latency = event_values[i][0]
+            event_id = event_values[i][2]
+            file.write(str(i) + ", ")   # Event number
+            for key in event_ids.keys():
+                if event_ids[key] == event_id:  # Find correct key / event name
+                    file.write(key + ", ")
+                    break
+            file.write(str(latency) + "\n")
+        file.close()
+        self.signals.finished.emit()

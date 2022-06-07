@@ -13,7 +13,7 @@ from mne.minimum_norm import read_inverse_operator, make_inverse_operator, apply
     write_inverse_operator, apply_inverse_epochs
 from mne.preprocessing import ICA
 
-from utils.error_window import errorWindow
+from utils.view.error_window import errorWindow
 from utils.file_path_search import get_project_freesurfer_path
 
 __author__ = "Lemahieu Antoine"

@@ -98,11 +98,27 @@ class mainListener(ABC):
 
     # Export
     @abstractmethod
-    def export_data_to_file_clicked(self):
+    def export_data_to_csv_file_clicked(self, path_to_file):
+        pass
+
+    @abstractmethod
+    def export_data_csv_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def export_data_to_set_file_clicked(self, path_to_file):
+        pass
+
+    @abstractmethod
+    def export_data_set_computation_finished(self):
         pass
 
     @abstractmethod
     def export_events_to_file_clicked(self):
+        pass
+
+    @abstractmethod
+    def export_events_txt_computation_finished(self):
         pass
 
     # Save

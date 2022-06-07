@@ -35,10 +35,10 @@ class menubarView(QMenuBar):
         self.file_menu.addMenu(self.events_menu)
         self.events_menu.setEnabled(False)
         self.export_menu = None
-        # self.export_menu = QMenu("Export", self)
-        # self.create_export_menu()
-        # self.file_menu.addMenu(self.export_menu)
-        # self.export_menu.setEnabled(False)
+        self.export_menu = QMenu("Export", self)
+        self.create_export_menu()
+        self.file_menu.addMenu(self.export_menu)
+        self.export_menu.setEnabled(False)
         self.create_file_menu()
 
         # Edit menu
@@ -97,10 +97,14 @@ class menubarView(QMenuBar):
         self.events_menu.addAction(find_events_from_channel_action)
 
     def create_export_menu(self):
-        export_data_to_file_action = QAction("Export data to file", self)
-        export_data_to_file_action.triggered.connect(self.export_data_to_file_trigger)
-        self.export_menu.addAction(export_data_to_file_action)
-        export_events_to_file_action = QAction("Export events to file", self)
+        export_data_to_csv_file_action = QAction("Export data to CSV file", self)
+        export_data_to_csv_file_action.triggered.connect(self.export_data_to_csv_file_trigger)
+        self.export_menu.addAction(export_data_to_csv_file_action)
+        export_data_to_set_file_action = QAction("Export data to SET file", self)
+        export_data_to_set_file_action.triggered.connect(self.export_data_to_set_file_trigger)
+        self.export_menu.addAction(export_data_to_set_file_action)
+        self.export_menu.addSeparator()
+        export_events_to_file_action = QAction("Export events to TXT file", self)
         export_events_to_file_action.triggered.connect(self.export_events_to_file_trigger)
         self.export_menu.addAction(export_events_to_file_action)
 
@@ -234,7 +238,7 @@ class menubarView(QMenuBar):
         """
         menu_actions = self.file_menu.actions()
         self.events_menu.setEnabled(True)
-        # self.export_menu.setEnabled(True)
+        self.export_menu.setEnabled(True)
         for action in menu_actions:
             if action.text() == "Save" or action.text() == "Save As":
                 action.setEnabled(True)
@@ -267,8 +271,13 @@ class menubarView(QMenuBar):
     def find_events_from_channel_trigger(self):
         self.menubar_listener.find_events_from_channel_clicked()
 
-    def export_data_to_file_trigger(self):
-        self.menubar_listener.export_data_to_file_clicked()
+    def export_data_to_csv_file_trigger(self):
+        path_to_file = QFileDialog().getSaveFileName(self, "Export data to CSV file")
+        self.menubar_listener.export_data_to_csv_file_clicked(path_to_file[0])
+
+    def export_data_to_set_file_trigger(self):
+        path_to_file = QFileDialog().getSaveFileName(self, "Export data to SET file")
+        self.menubar_listener.export_data_to_set_file_clicked(path_to_file[0])
 
     def export_events_to_file_trigger(self):
         self.menubar_listener.export_events_to_file_clicked()

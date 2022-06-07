@@ -8,7 +8,7 @@ ERP image view
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
-from utils.error_window import errorWindow
+from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

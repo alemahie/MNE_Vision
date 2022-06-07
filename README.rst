@@ -45,6 +45,7 @@ Dependencies
 The required dependencies to run MNE-Python are:
 
 - Python >= 3.9.13
+- eeglabio >= 0.0.1.post7
 - keras >= 2.9.0
 - matplotlib >= 3.5.2
 - mne >= 1.0.3

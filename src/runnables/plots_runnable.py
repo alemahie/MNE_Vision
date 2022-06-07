@@ -10,7 +10,7 @@ from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne.time_frequency import psd_welch, psd_multitaper, tfr_morlet, tfr_multitaper, tfr_stockwell
 
-from utils.error_window import errorWindow
+from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

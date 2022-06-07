@@ -8,7 +8,7 @@ Source estimation controller
 from tools.source_estimation.source_estimation_view import sourceEstimationView
 from tools.source_estimation.source_estimation_listener import sourceEstimationListener
 
-from utils.error_window import errorWindow
+from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

@@ -10,9 +10,9 @@ from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 from mne import compute_covariance, setup_source_space, write_source_spaces, make_bem_model, make_bem_solution, \
     write_bem_solution, make_forward_solution, write_forward_solution, extract_label_time_course
 from mne.minimum_norm import make_inverse_operator, write_inverse_operator, read_inverse_operator, apply_inverse_epochs
-from mne_connectivity import envelope_correlation, phase_slope_index, spectral_connectivity_epochs
+from mne_connectivity import envelope_correlation, spectral_connectivity_epochs
 
-from utils.error_window import errorWindow
+from utils.view.error_window import errorWindow
 from utils.file_path_search import get_project_freesurfer_path, get_labels_from_subject
 
 __author__ = "Lemahieu Antoine"

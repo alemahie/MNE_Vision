@@ -15,6 +15,7 @@ from mne.viz import plot_source_estimates
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
 from utils.file_path_search import get_project_freesurfer_path
+from utils.view.separator import create_layout_separator
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -150,7 +151,9 @@ class sourceEstimationView(QWidget):
         # Layout
         self.global_layout.addWidget(self.method_widget)
         self.global_layout.addWidget(self.save_load_widget)
+        self.global_layout.addWidget(create_layout_separator())
         self.global_layout.addWidget(self.epochs_trial_average_widget)
+        self.global_layout.addWidget(create_layout_separator())
         self.global_layout.addWidget(self.n_jobs_widget)
         self.global_layout.addWidget(self.cancel_confirm_widget)
 
@@ -163,7 +166,7 @@ class sourceEstimationView(QWidget):
         try:
             print("plot source estimates")
             plot_source_estimates(source_estimation_data, subject=self.subject, subjects_dir=self.subjects_dir,
-                                  hemi="both", backend="pyvistaqt", time_viewer=True,  smoothing_steps=7)
+                                  hemi="both", backend="pyvistaqt", time_viewer=True, smoothing_steps=7)
         except Exception as e:
             print(type(e))
             print(e)

@@ -17,7 +17,8 @@ from mne import read_events
 from runnables.tools_runnable import filterRunnable, icaRunnable, sourceEstimationRunnable, resamplingRunnable, \
     reReferencingRunnable, extractEpochsRunnable
 from runnables.files_runnable import openCntFileRunnable, openSetFileRunnable, openFifFileRunnable, \
-    findEventsFromChannelRunnable, loadDataInfoRunnable
+    findEventsFromChannelRunnable, loadDataInfoRunnable, exportDataCSVRunnable, exportDataSETRunnable, \
+    exportEventsTXTRunnable
 from runnables.plots_runnable import powerSpectralDensityRunnable, timeFrequencyRunnable
 from runnables.connectivity_runnable import envelopeCorrelationRunnable, sourceSpaceConnectivityRunnable, \
     sensorSpaceConnectivityRunnable
@@ -26,7 +27,7 @@ from runnables.classification_runnable import classifyRunnable
 from exceptions.exceptions import EventFileError
 
 from utils.file_path_search import get_directory_path_from_file_path
-from utils.error_window import errorWindow
+from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -69,6 +70,9 @@ class mainModel:
         self.open_set_file_runnable = None
         self.load_data_info_runnable = None
         self.find_events_from_channel_runnable = None
+        self.export_data_csv_runnable = None
+        self.export_data_set_runnable = None
+        self.export_events_txt_runnable = None
 
         self.filter_runnable = None
         self.resampling_runnable = None
@@ -240,6 +244,52 @@ class mainModel:
         Notifies the main controller that the computation had an error.
         """
         self.main_listener.find_events_from_channel_computation_error()
+
+    # Export
+    def export_data_to_csv_file_clicked(self, path_to_file):
+        """
+        Check if the path to the file is correct.
+        Export the data to a CSV file.
+        :param path_to_file: Path to the file.
+        :type path_to_file: str
+        """
+        pool = QThreadPool.globalInstance()
+        self.export_data_csv_runnable = exportDataCSVRunnable(self.file_data, path_to_file)
+        pool.start(self.export_data_csv_runnable)
+        self.export_data_csv_runnable.signals.finished.connect(self.export_data_csv_computation_finished)
+
+    def export_data_csv_computation_finished(self):
+        self.main_listener.export_data_csv_computation_finished()
+
+    def export_data_to_set_file_clicked(self, path_to_file):
+        """
+        Check if the path to the file is correct.
+        Export the data to a SET file.
+        :param path_to_file: Path to the file.
+        :type path_to_file: str
+        """
+        pool = QThreadPool.globalInstance()
+        self.export_data_set_runnable = exportDataSETRunnable(self.file_data, path_to_file)
+        pool.start(self.export_data_set_runnable)
+        self.export_data_set_runnable.signals.finished.connect(self.export_data_set_computation_finished)
+
+    def export_data_set_computation_finished(self):
+        self.main_listener.export_data_set_computation_finished()
+
+    def export_events_to_file_clicked(self, path_to_file):
+        """
+        Check if the path to the file is correct.
+        Export the events to a TXT file.
+        :param path_to_file: Path to the file.
+        :type path_to_file: str
+        """
+        pool = QThreadPool.globalInstance()
+        self.export_events_txt_runnable = exportEventsTXTRunnable(self.file_data, path_to_file)
+        pool.start(self.export_events_txt_runnable)
+        self.export_events_txt_runnable.signals.finished.connect(self.export_events_txt_computation_finished)
+
+    def export_events_txt_computation_finished(self):
+        self.main_listener.export_events_txt_computation_finished()
 
     # Save
     def save_file(self, path_to_file):
@@ -788,9 +838,10 @@ class mainModel:
         :return: The size of the dataset.
         :rtype: float
         """
-        if self.file_path_name[-3:] == "set":
+        # if self.file_path_name[-3:] == "set":
+        try:
             return round(getsize(self.file_path_name[:-3] + "fdt") / (1024 ** 2), 3)
-        else:
+        except:
             return round(getsize(self.file_path_name) / (1024 ** 2), 3)
 
     def get_all_channels_names(self):

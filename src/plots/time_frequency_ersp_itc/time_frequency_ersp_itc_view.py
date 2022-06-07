@@ -13,7 +13,7 @@ from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import QPushButton, QWidget, QGridLayout, QComboBox, QLabel, QLineEdit
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
-from utils.error_window import errorWindow
+from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

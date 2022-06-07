@@ -44,7 +44,11 @@ class menubarListener(ABC):
         pass
 
     @abstractmethod
-    def export_data_to_file_clicked(self):
+    def export_data_to_csv_file_clicked(self, path_to_file):
+        pass
+
+    @abstractmethod
+    def export_data_to_set_file_clicked(self, path_to_file):
         pass
 
     @abstractmethod
