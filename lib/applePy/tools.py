@@ -110,3 +110,7 @@ class PSDfiltering(BaseEstimator, TransformerMixin):
             psd_frequencies.append(signal_psd)
         psd_frequencies = np.asarray(psd_frequencies)
         return psd_frequencies
+
+
+def source_estimation():
+    return None

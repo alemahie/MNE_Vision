@@ -8,7 +8,7 @@ Source estimation view
 from multiprocessing import cpu_count
 
 from PyQt5.QtWidgets import QWidget, QComboBox, QPushButton, QLabel, QCheckBox, QButtonGroup, QVBoxLayout, \
-    QHBoxLayout, QSlider, QFrame, QSizePolicy
+    QHBoxLayout, QSlider, QGridLayout, QSpinBox
 from PyQt5.QtCore import Qt
 
 from mne.viz import plot_source_estimates
@@ -25,9 +25,11 @@ __status__ = "Dev"
 
 
 class sourceEstimationView(QWidget):
-    def __init__(self, title=None):
+    def __init__(self, number_of_epochs, title=None):
         """
         Window displaying the parameters for computing the source estimation on the dataset.
+        :param number_of_epochs: Number of epochs in the dataset.
+        :type number_of_epochs: int
         :param title: Title of window
         :type title: str
         """
@@ -44,6 +46,7 @@ class sourceEstimationView(QWidget):
         self.global_layout = QVBoxLayout()
         self.setLayout(self.global_layout)
 
+        # Method
         self.method_widget = QWidget()
         self.method_layout = QHBoxLayout()
         self.method_box = QComboBox()
@@ -52,6 +55,7 @@ class sourceEstimationView(QWidget):
         self.method_layout.addWidget(self.method_box)
         self.method_widget.setLayout(self.method_layout)
 
+        # How to compute
         self.save_load_widget = QWidget()
         self.check_box_layout = QVBoxLayout()
         self.save_load_buttons = QButtonGroup()
@@ -70,12 +74,17 @@ class sourceEstimationView(QWidget):
         self.check_box_layout.addWidget(self.check_box_load)
         self.save_load_widget.setLayout(self.check_box_layout)
 
+        # What to compute
         self.epochs_trial_average_widget = QWidget()
-        self.epochs_trial_average_check_box_layout = QVBoxLayout()
+        self.epochs_trial_average_check_box_layout = QGridLayout()
         self.epochs_trial_average_buttons = QButtonGroup()
         self.check_box_single_trial = QCheckBox()
-        self.check_box_single_trial.setText("Compute source estimation on a single trial (to be implemented)")
+        self.check_box_single_trial.setText("Compute source estimation on a single trial (select trial number) : ")
         self.epochs_trial_average_buttons.addButton(self.check_box_single_trial, 0)    # Button with ID 0
+        self.trial_number_single_trial = QSpinBox()
+        self.trial_number_single_trial.setMinimum(1)
+        self.trial_number_single_trial.setMaximum(number_of_epochs)
+        self.trial_number_single_trial.setValue(1)
         self.check_box_evoked = QCheckBox()
         self.check_box_evoked.setChecked(True)
         self.check_box_evoked.setText("Compute source estimation on the evoked signal")
@@ -83,11 +92,14 @@ class sourceEstimationView(QWidget):
         self.check_box_all_trials_averaged = QCheckBox()
         self.check_box_all_trials_averaged.setText("Compute source estimation on all trials averaged")
         self.epochs_trial_average_buttons.addButton(self.check_box_all_trials_averaged, 2)  # Button with ID 2
-        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_single_trial)
-        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_evoked)
-        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_all_trials_averaged)
+
+        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_single_trial, 0, 0)
+        self.epochs_trial_average_check_box_layout.addWidget(self.trial_number_single_trial, 0, 1)
+        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_evoked, 1, 0)
+        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_all_trials_averaged, 2, 0)
         self.epochs_trial_average_widget.setLayout(self.epochs_trial_average_check_box_layout)
 
+        # N Jobs Slider
         self.n_jobs_widget = QWidget()
         self.n_jobs_layout = QHBoxLayout()
         self.n_jobs_slider = QSlider(Qt.Orientation.Horizontal, self)
@@ -102,6 +114,7 @@ class sourceEstimationView(QWidget):
         self.n_jobs_layout.addWidget(self.n_jobs_label)
         self.n_jobs_widget.setLayout(self.n_jobs_layout)
 
+        # Cancel confirm
         self.cancel_confirm_widget = QWidget()
         self.cancel_confirm_layout = QHBoxLayout()
         self.cancel = QPushButton("&Cancel", self)
@@ -112,6 +125,7 @@ class sourceEstimationView(QWidget):
         self.cancel_confirm_layout.addWidget(self.confirm)
         self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
 
+        # Layout
         self.global_layout.addWidget(self.method_widget)
         self.global_layout.addWidget(self.save_load_widget)
         self.global_layout.addWidget(self.epochs_trial_average_widget)
@@ -148,9 +162,10 @@ class sourceEstimationView(QWidget):
         source_estimation_method = self.method_box.currentText()
         save_data, load_data = self.get_save_load_button_checked()
         epochs_method = self.get_epochs_trial_average_method()
+        trial_number = self.trial_number_single_trial.value()-1
         n_jobs = self.n_jobs_slider.value()
         self.source_estimation_listener.confirm_button_clicked(source_estimation_method, save_data, load_data, epochs_method,
-                                                               n_jobs)
+                                                               trial_number, n_jobs)
 
     def slider_value_changed_trigger(self):
         """

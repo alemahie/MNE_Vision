@@ -324,7 +324,8 @@ class sourceEstimationWorkerSignals(QObject):
 
 
 class sourceEstimationRunnable(QRunnable):
-    def __init__(self, source_estimation_method, file_data, file_path, write_files, read_files, epochs_method, n_jobs):
+    def __init__(self, source_estimation_method, file_data, file_path, write_files, read_files, epochs_method, trial_number,
+                 n_jobs):
         """
         Runnable for the computation of the source estimation of the given data.
         :param source_estimation_method: The method used to compute the source estimation
@@ -342,7 +343,9 @@ class sourceEstimationRunnable(QRunnable):
         - "evoked" : Compute the source estimation on the average of all the signals.
         - "averaged" : Compute the source estimation on every trial, and then compute the average of them.
         :type: str
-        :param n_jobs: Number of processes used to computed the source estimation
+        :param trial_number: The trial's number selected for the "single trial" epochs method.
+        :type trial_number: int
+        :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
         """
         super().__init__()
@@ -353,6 +356,7 @@ class sourceEstimationRunnable(QRunnable):
         self.read_files = read_files
         self.write_files = write_files
         self.epochs_method = epochs_method
+        self.trial_number = trial_number
         self.n_jobs = n_jobs
         self.subject = "fsaverage"
         self.subjects_dir = get_project_freesurfer_path()
@@ -427,7 +431,13 @@ class sourceEstimationRunnable(QRunnable):
         :rtype: MNE.SourceEstimate
         """
         print("Apply inverse on a single signal of data")
-        pass
+        epoch = self.file_data[self.trial_number]
+        evoked = self.file_data.average()
+        snr = 3.0
+        lambda2 = 1.0 / snr ** 2
+        stc = apply_inverse_epochs(epoch, inv, lambda2, method=self.source_estimation_method, pick_ori="normal",
+                                   nave=evoked.nave, verbose=False)[0]
+        return stc
 
     def compute_inverse_evoked(self, inv):
         """

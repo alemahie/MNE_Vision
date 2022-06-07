@@ -242,7 +242,8 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def source_estimation_information(self, source_estimation_method, save_data, load_data, epochs_method, n_jobs):
+    def source_estimation_information(self, source_estimation_method, save_data, load_data, epochs_method, trial_number,
+                                      n_jobs):
         pass
 
     @abstractmethod

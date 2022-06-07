@@ -18,15 +18,17 @@ __status__ = "Dev"
 
 
 class sourceEstimationController(sourceEstimationListener):
-    def __init__(self, title=None):
+    def __init__(self, number_of_epochs, title=None):
         """
         Controller for computing the source estimation on the dataset.
         Create a new window for specifying some parameters.
+        :param number_of_epochs: Number of epochs in the dataset.
+        :type number_of_epochs: int
         :param title: Title of window
         :type title: str
         """
         self.main_listener = None
-        self.source_estimation_view = sourceEstimationView(title)
+        self.source_estimation_view = sourceEstimationView(number_of_epochs, title)
         self.source_estimation_view.set_listener(self)
 
         self.source_estimation_view.show()
@@ -37,7 +39,7 @@ class sourceEstimationController(sourceEstimationListener):
         """
         self.source_estimation_view.close()
 
-    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, epochs_method, n_jobs):
+    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, epochs_method, trial_number, n_jobs):
         """
         Close the window and send the information to the main controller.
         :param source_estimation_method: The method used to compute the source estimation
@@ -51,11 +53,13 @@ class sourceEstimationController(sourceEstimationListener):
         - "evoked" : Compute the source estimation on the average of all the signals.
         - "averaged" : Compute the source estimation on every trial, and then compute the average of them.
         :type: str
+        :param trial_number: The trial's number selected for the "single trial" epochs method.
+        :type trial_number: int
         :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
         """
         self.source_estimation_view.close()
-        self.main_listener.source_estimation_information(source_estimation_method, save_data, load_data, epochs_method,
+        self.main_listener.source_estimation_information(source_estimation_method, save_data, load_data, epochs_method, trial_number,
                                                          n_jobs)
 
     def plot_source_estimation(self, source_estimation_data):
