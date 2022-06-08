@@ -26,16 +26,7 @@ To do so you can you can open a terminal in the directory where MNE_Vision is st
 
 This requires Python to be installed, if you don't have python installed you can download it from `here <https://www.python.org/downloads/>`_.
 
-Secondly, you will need to install the "libeep" module, for that open a terminal and go to the directory "libeep" under the "lib" directory of the MNE_Vision project.
-From there launch the command :
-
-.. code-block:: console
-
-	$ pip install -e .
-	
-This will install the "libeep" module.
-
-Finally, you may need to add the "lib" directory of the MNE_Vision project to your environment variables.
+Secondly, you may need to add the "lib" directory of the MNE_Vision project to your environment variables.
 For that, you can follow the `this tutorial <https://docs.oracle.com/en/database/oracle/machine-learning/oml4r/1.5.1/oread/creating-and-modifying-environment-variables-on-windows.html>`_ on how to add an environment variable.
 Under the "System Variables" tab, you can add (or modify if it already exists) the variable "PYTHONPATH" and add the path to the "lib" directory "path\to\MNE_VISION\lib".
 
@@ -79,3 +70,6 @@ MNE_Vision is **GNU-licenced**, for more information please read the GNU General
 
 
 .. Packages en plus : philistine, pyEDFlib, PyQtWebEngine
+
+.. Secondly, you will need to install the "libeep" module, for that open a terminal and go to the directory "libeep" under the "lib" directory of the MNE_Vision project.
+.. From there launch the command : code-block:: console $ pip install -e . This will install the "libeep" module.
