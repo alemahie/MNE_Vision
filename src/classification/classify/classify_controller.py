@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
-Channel location controller
+Classify Controller
 """
 
 from classification.classify.classify_listener import classifyListener
 from classification.classify.classify_view import classifyView
+
+from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -18,15 +20,19 @@ __status__ = "Dev"
 
 
 class classifyController(classifyListener):
-    def __init__(self, number_of_channels):
+    def __init__(self, number_of_channels, event_values, event_ids):
         """
         Controller for computing the classification on the dataset.
         Create a new window for specifying some parameters.
         :param number_of_channels: The number of channels in the dataset.
         :type number_of_channels: int
+        :param event_values: Event_id associated to each epoch/trial.
+        :type event_values: list of, list of int
+        :param event_ids: Name of the events associated to their id.
+        :type event_ids: dict
         """
         self.main_listener = None
-        self.classify_view = classifyView(number_of_channels)
+        self.classify_view = classifyView(number_of_channels, event_values, event_ids)
         self.classify_view.set_listener(self)
 
         self.classify_view.show()
@@ -37,7 +43,8 @@ class classifyController(classifyListener):
         """
         self.classify_view.close()
 
-    def confirm_button_clicked(self, pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning, cross_val_number):
+    def confirm_button_clicked(self, pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning,
+                               cross_val_number, trials_selected):
         """
         Close the window and send the information to the main controller.
         :param pipeline_selected: The pipeline(s) used for the classification of the dataset.
@@ -52,10 +59,12 @@ class classifyController(classifyListener):
         :type hyper_tuning: boolean
         :param cross_val_number: Number of cross-validation fold used by the pipelines on the dataset.
         :type cross_val_number: int
+        :param trials_selected: The indexes of the trials selected for the computation
+        :type trials_selected: list of int
         """
         self.classify_view.close()
         self.main_listener.classify_information(pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning,
-                                                cross_val_number)
+                                                cross_val_number, trials_selected)
 
     def plot_results(self, classifier):
         """
@@ -68,13 +77,22 @@ class classifyController(classifyListener):
     """
     Getters
     """
-    def get_elements_selected(self, elements_selected):
+    def get_elements_selected(self, elements_selected, element_type):
         """
         Get the elements selected by the user in the multiple elements' selector.
         :param elements_selected: Elements selected in the multiple elements' selector.
         :type elements_selected: list of str
+        :param element_type: Type of the element selected, used in case multiple element selector windows can be open in
+        a window. Can thus distinguish the returned elements.
+        :type element_type: str
         """
-        self.classify_view.set_pipeline_selected(elements_selected)
+        if len(elements_selected) == 0:
+            error_message = "Please select at least one element in the list. \n The source estimation can not be " \
+                            "computed on 0 trials"
+            error_window = errorWindow(error_message)
+            error_window.show()
+        else:
+            self.classify_view.check_element_type(elements_selected, element_type)
 
     """
     Setters

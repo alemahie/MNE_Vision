@@ -5,6 +5,8 @@
 Classification runnable
 """
 
+from copy import deepcopy
+
 from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
 from lib.applePy.classifier import ApplePyClassifier
@@ -28,7 +30,7 @@ class classifyWorkerSignals(QObject):
 
 class classifyRunnable(QRunnable):
     def __init__(self, file_data, directory_path, pipeline_selected, feature_selection, number_of_channels_to_select,
-                 hyper_tuning, cross_val_number):
+                 hyper_tuning, cross_val_number, trials_selected):
         """
         Runnable for the computation of the classification of the dataset.
         Create the pipelines were the classification will be performed and launch the classification depending on the
@@ -49,29 +51,43 @@ class classifyRunnable(QRunnable):
         :type hyper_tuning: bool
         :param cross_val_number: Number of cross-validation fold used by the pipelines on the dataset.
         :type cross_val_number: int
+        :param trials_selected: The indexes of the trials selected for the computation
+        :type trials_selected: list of int
         """
         super().__init__()
         self.signals = classifyWorkerSignals()
 
         self.classifier = None
-        self.file_data = file_data
+        self.file_data = deepcopy(file_data)
         self.directory_path = directory_path
         self.pipeline_selected = pipeline_selected
         self.feature_selection = feature_selection
         self.number_of_channels_to_select = number_of_channels_to_select
         self.hyper_tuning = hyper_tuning
         self.cross_val_number = cross_val_number
+        self.trials_selected = trials_selected
 
     def run(self):
         """
         Create the classifier and launch the computation of the classification.
         Notifies the main model that the computation is finished.
         """
+        self.transform_file_data_with_trials_selected()
         self.classifier = ApplePyClassifier(used_pipelines=self.pipeline_selected)
         self.classifier.classify(self.file_data, dataset_path=self.directory_path, classify_test=False, test_dataset_size=5,
                                  independent_features_selection=self.feature_selection, channels_to_select=self.number_of_channels_to_select,
                                  tune_hypers=self.hyper_tuning, use_groups=False, cv_value=self.cross_val_number)
         self.signals.finished.emit()
+
+    def transform_file_data_with_trials_selected(self):
+        """
+        Create a mask to know which trial to keep and which one to remove for the computation.
+        Apply this mask on the data to keep only the trials/epochs selected by the user.
+        """
+        mask = [True for _ in range(len(self.file_data.events))]
+        for i in self.trials_selected:
+            mask[i] = False
+        self.file_data.drop(mask)
 
     def get_classifier(self):
         """

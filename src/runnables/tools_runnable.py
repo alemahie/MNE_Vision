@@ -5,6 +5,8 @@
 Tools runnable
 """
 
+from copy import deepcopy
+
 from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne import make_forward_solution, write_forward_solution, compute_covariance, setup_source_space, \
@@ -353,7 +355,7 @@ class sourceEstimationRunnable(QRunnable):
         super().__init__()
         self.signals = sourceEstimationWorkerSignals()
         self.source_estimation_method = source_estimation_method
-        self.file_data = file_data
+        self.file_data = deepcopy(file_data)
         self.file_path = file_path
         self.read_files = read_files
         self.write_files = write_files

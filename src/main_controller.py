@@ -1068,10 +1068,13 @@ class mainController(mainListener):
         Create the controller for classifying the dataset.
         """
         number_of_channels = self.main_model.get_number_of_channels()
-        self.classify_controller = classifyController(number_of_channels)
+        event_values = self.main_model.get_event_values()
+        event_ids = self.main_model.get_event_ids()
+        self.classify_controller = classifyController(number_of_channels, event_values, event_ids)
         self.classify_controller.set_listener(self)
 
-    def classify_information(self, pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning, cross_val_number):
+    def classify_information(self, pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning,
+                             cross_val_number, trials_selected):
         """
         Create the waiting window while the classification is done on the dataset.
         :param pipeline_selected: The pipeline(s) used for the classification of the dataset.
@@ -1086,12 +1089,15 @@ class mainController(mainListener):
         :type hyper_tuning: boolean
         :param cross_val_number: Number of cross-validation fold used by the pipelines on the dataset.
         :type cross_val_number: int
+        :param trials_selected: The indexes of the trials selected for the computation
+        :type trials_selected: list of int
         """
         processing_title = "Classification running, please wait."
         finish_method = "classify"
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.classify(pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning, cross_val_number)
+        self.main_model.classify(pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning,
+                                 cross_val_number, trials_selected)
 
     def classify_computation_finished(self):
         """
