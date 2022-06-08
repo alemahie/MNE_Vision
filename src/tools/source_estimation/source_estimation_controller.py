@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
-Source estimation controller
+Source Estimation Controller
 """
 
 from tools.source_estimation.source_estimation_view import sourceEstimationView
 from tools.source_estimation.source_estimation_listener import sourceEstimationListener
+from tools.source_estimation.additional_parameters.source_estimation_additional_parameters_controller import \
+    sourceEstimationAdditionalParametersController
 
 from utils.view.error_window import errorWindow
 
@@ -37,6 +39,9 @@ class sourceEstimationController(sourceEstimationListener):
         self.source_estimation_view = sourceEstimationView(number_of_epochs, event_values, event_ids, title)
         self.source_estimation_view.set_listener(self)
 
+        self.source_estimation_additional_parameters_controller = None
+        self.export_path = None
+
         self.source_estimation_view.show()
 
     def cancel_button_clicked(self):
@@ -66,7 +71,22 @@ class sourceEstimationController(sourceEstimationListener):
         """
         self.source_estimation_view.close()
         self.main_listener.source_estimation_information(source_estimation_method, save_data, load_data, epochs_method,
-                                                         trials_selected, n_jobs)
+                                                         trials_selected, n_jobs, self.export_path)
+
+    def additional_parameters_clicked(self):
+        """
+        Create a new window for specifying some additional parameters for the computation of the source estimation.
+        """
+        self.source_estimation_additional_parameters_controller = sourceEstimationAdditionalParametersController()
+        self.source_estimation_additional_parameters_controller.set_listener(self)
+
+    def additional_parameters_information(self, export_path):
+        """
+        Retrieve the exportation path for the source estimation data computed.
+        :param export_path: Path where the source estimation data will be stored.
+        :type export_path: str
+        """
+        self.export_path = export_path
 
     def plot_source_estimation(self, source_estimation_data):
         """

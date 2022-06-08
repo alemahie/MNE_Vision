@@ -18,7 +18,7 @@ __status__ = "Dev"
 
 class sourceEstimationListener(ABC):
     """
-    Listener doing the connection between the controller and the view for computing the source estimationo on the dataset.
+    Listener doing the connection between the controller and the view for computing the source estimation on the dataset.
     It retrieves the information from the view to send it to the controller.
     """
 
@@ -28,6 +28,14 @@ class sourceEstimationListener(ABC):
 
     @abstractmethod
     def confirm_button_clicked(self, source_estimation_method, save_data, load_data, epochs_method, trials_selected, n_jobs):
+        pass
+
+    @abstractmethod
+    def additional_parameters_clicked(self):
+        pass
+
+    @abstractmethod
+    def additional_parameters_information(self, export_path):
         pass
 
     @abstractmethod

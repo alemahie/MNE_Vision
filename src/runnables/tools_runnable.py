@@ -325,7 +325,7 @@ class sourceEstimationWorkerSignals(QObject):
 
 class sourceEstimationRunnable(QRunnable):
     def __init__(self, source_estimation_method, file_data, file_path, write_files, read_files, epochs_method, trials_selected,
-                 n_jobs):
+                 n_jobs, export_path):
         """
         Runnable for the computation of the source estimation of the given data.
         :param source_estimation_method: The method used to compute the source estimation
@@ -347,6 +347,8 @@ class sourceEstimationRunnable(QRunnable):
         :type trials_selected: list of int
         :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
+        :param export_path: Path where the source estimation data will be stored.
+        :type export_path: str
         """
         super().__init__()
         self.signals = sourceEstimationWorkerSignals()
@@ -358,6 +360,7 @@ class sourceEstimationRunnable(QRunnable):
         self.epochs_method = epochs_method
         self.trials_selected = trials_selected
         self.n_jobs = n_jobs
+        self.export_path = export_path
         self.subject = "fsaverage"
         self.subjects_dir = get_project_freesurfer_path()
 
@@ -374,6 +377,7 @@ class sourceEstimationRunnable(QRunnable):
         """
         try:
             self.source_estimation_data = self.mne_source_estimation_computation()
+            self.check_data_export()
             self.signals.finished.emit()
         except FileNotFoundError as error:
             error_message = "An error as occurred during the computation of the source estimation. \n" \
@@ -389,6 +393,9 @@ class sourceEstimationRunnable(QRunnable):
             error_window.show()
             self.signals.error.emit()
 
+    """
+    Source estimation methods
+    """
     def mne_source_estimation_computation(self):
         """
         Launch the computation of the source space if it is not provided.
@@ -577,6 +584,29 @@ class sourceEstimationRunnable(QRunnable):
         for i in self.trials_selected:
             mask[i] = False
         return mask
+
+    def check_data_export(self):
+        """
+        Check if the source estimation data must be exported.
+        If it is the case, create the file and write the data in it.
+        """
+        if self.export_path is not None:
+            data = self.source_estimation_data.data
+            times = self.source_estimation_data.times
+
+            file = open(self.export_path + ".txt", "x")
+            # Write header
+            file.write("Time")
+            for i in range(len(data)):
+                file.write(", Dipole " + str(i+1))
+            file.write("\n")
+            # Write data
+            for i in range(len(times)):     # Times
+                file.write(str(times[i]))
+                for j in range(len(data)):  # Dipoles
+                    file.write(", " + str(data[j][i]))
+                file.write("\n")
+            file.close()
 
     """
     Getters

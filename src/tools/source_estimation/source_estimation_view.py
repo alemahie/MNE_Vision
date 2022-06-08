@@ -107,7 +107,7 @@ class sourceEstimationView(QWidget):
         self.check_box_all_trials_averaged.setText("Compute source estimation on all trials averaged")
         self.epochs_trial_average_buttons.addButton(self.check_box_all_trials_averaged, 2)  # Button with ID 2
 
-        self.trial_selection_label = QLabel("Trials indices to compute (default : all) :")
+        self.trial_selection_label = QLabel("Trials indexes to compute (default : all) :")
         self.trial_selection_indexes = QPushButton("Select by trials indexes")
         self.trial_selection_indexes.clicked.connect(self.trial_selection_indexes_trigger)
         self.trial_selection_events = QPushButton("Select by events")
@@ -137,6 +137,14 @@ class sourceEstimationView(QWidget):
         self.n_jobs_layout.addWidget(self.n_jobs_label)
         self.n_jobs_widget.setLayout(self.n_jobs_layout)
 
+        # Additional parameters
+        self.additional_parameters_widget = QWidget()
+        self.additional_parameters_layout = QHBoxLayout()
+        self.additional_parameters_button = QPushButton("Additional Parameters")
+        self.additional_parameters_button.clicked.connect(self.additional_parameters_trigger)
+        self.additional_parameters_layout.addWidget(self.additional_parameters_button)
+        self.additional_parameters_widget.setLayout(self.additional_parameters_layout)
+
         # Cancel confirm
         self.cancel_confirm_widget = QWidget()
         self.cancel_confirm_layout = QHBoxLayout()
@@ -155,6 +163,8 @@ class sourceEstimationView(QWidget):
         self.global_layout.addWidget(self.epochs_trial_average_widget)
         self.global_layout.addWidget(create_layout_separator())
         self.global_layout.addWidget(self.n_jobs_widget)
+        self.global_layout.addWidget(self.additional_parameters_widget)
+        self.global_layout.addWidget(create_layout_separator())
         self.global_layout.addWidget(self.cancel_confirm_widget)
 
     def plot_source_estimation(self, source_estimation_data):
@@ -219,6 +229,12 @@ class sourceEstimationView(QWidget):
         self.events_selector_controller = multipleSelectorController(events_ids_list, title, box_checked=True,
                                                                      element_type="events")
         self.events_selector_controller.set_listener(self.source_estimation_listener)
+
+    def additional_parameters_trigger(self):
+        """
+        Open a new window asking for additional parameters about the source estimation computation
+        """
+        self.source_estimation_listener.additional_parameters_clicked()
 
     def slider_value_changed_trigger(self):
         """
