@@ -29,3 +29,11 @@ class envelopeCorrelationListener(ABC):
     @abstractmethod
     def confirm_button_clicked(self):
         pass
+
+    @abstractmethod
+    def additional_parameters_clicked(self):
+        pass
+
+    @abstractmethod
+    def additional_parameters_information(self, export_path):
+        pass

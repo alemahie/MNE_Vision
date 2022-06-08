@@ -7,9 +7,8 @@ Source Estimation Controller
 
 from tools.source_estimation.source_estimation_view import sourceEstimationView
 from tools.source_estimation.source_estimation_listener import sourceEstimationListener
-from tools.source_estimation.additional_parameters.source_estimation_additional_parameters_controller import \
-    sourceEstimationAdditionalParametersController
 
+from utils.data_exportation.data_exportation_controller import dataExportationController
 from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
@@ -39,7 +38,7 @@ class sourceEstimationController(sourceEstimationListener):
         self.source_estimation_view = sourceEstimationView(number_of_epochs, event_values, event_ids, title)
         self.source_estimation_view.set_listener(self)
 
-        self.source_estimation_additional_parameters_controller = None
+        self.export_data_controller = None
         self.export_path = None
 
         self.source_estimation_view.show()
@@ -77,8 +76,8 @@ class sourceEstimationController(sourceEstimationListener):
         """
         Create a new window for specifying some additional parameters for the computation of the source estimation.
         """
-        self.source_estimation_additional_parameters_controller = sourceEstimationAdditionalParametersController()
-        self.source_estimation_additional_parameters_controller.set_listener(self)
+        self.export_data_controller = dataExportationController()
+        self.export_data_controller.set_listener(self)
 
     def additional_parameters_information(self, export_path):
         """

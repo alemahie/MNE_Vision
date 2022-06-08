@@ -137,13 +137,13 @@ class sourceEstimationView(QWidget):
         self.n_jobs_layout.addWidget(self.n_jobs_label)
         self.n_jobs_widget.setLayout(self.n_jobs_layout)
 
-        # Additional parameters
-        self.additional_parameters_widget = QWidget()
-        self.additional_parameters_layout = QHBoxLayout()
-        self.additional_parameters_button = QPushButton("Additional Parameters")
-        self.additional_parameters_button.clicked.connect(self.additional_parameters_trigger)
-        self.additional_parameters_layout.addWidget(self.additional_parameters_button)
-        self.additional_parameters_widget.setLayout(self.additional_parameters_layout)
+        # Exportation
+        self.data_exportation_widget = QWidget()
+        self.data_exportation_layout = QHBoxLayout()
+        self.data_exportation_button = QPushButton("Data exportation")
+        self.data_exportation_button.clicked.connect(self.data_exportation_trigger)
+        self.data_exportation_layout.addWidget(self.data_exportation_button)
+        self.data_exportation_widget.setLayout(self.data_exportation_layout)
 
         # Cancel confirm
         self.cancel_confirm_widget = QWidget()
@@ -163,7 +163,7 @@ class sourceEstimationView(QWidget):
         self.global_layout.addWidget(self.epochs_trial_average_widget)
         self.global_layout.addWidget(create_layout_separator())
         self.global_layout.addWidget(self.n_jobs_widget)
-        self.global_layout.addWidget(self.additional_parameters_widget)
+        self.global_layout.addWidget(self.data_exportation_widget)
         self.global_layout.addWidget(create_layout_separator())
         self.global_layout.addWidget(self.cancel_confirm_widget)
 
@@ -230,9 +230,9 @@ class sourceEstimationView(QWidget):
                                                                      element_type="events")
         self.events_selector_controller.set_listener(self.source_estimation_listener)
 
-    def additional_parameters_trigger(self):
+    def data_exportation_trigger(self):
         """
-        Open a new window asking for additional parameters about the source estimation computation
+        Open a new window asking for the path for the exportation of the source estimation computation data/
         """
         self.source_estimation_listener.additional_parameters_clicked()
 

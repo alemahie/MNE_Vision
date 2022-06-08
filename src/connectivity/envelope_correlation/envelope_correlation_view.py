@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLab
 
 from mne_connectivity.viz import plot_connectivity_circle
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -50,6 +50,15 @@ class envelopeCorrelationView(QWidget):
         self.lines_layout.addWidget(self.all_connections_check_box, 1, 1)
         self.lines_widget.setLayout(self.lines_layout)
 
+        # Exportation
+        self.data_exportation_widget = QWidget()
+        self.data_exportation_layout = QHBoxLayout()
+        self.data_exportation_button = QPushButton("Data exportation")
+        self.data_exportation_button.clicked.connect(self.data_exportation_trigger)
+        self.data_exportation_layout.addWidget(self.data_exportation_button)
+        self.data_exportation_widget.setLayout(self.data_exportation_layout)
+
+        # Cancel Confirm
         self.cancel_confirm_widget = QWidget()
         self.cancel_confirm_layout = QHBoxLayout()
         self.cancel = QPushButton("&Cancel", self)
@@ -61,6 +70,7 @@ class envelopeCorrelationView(QWidget):
         self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
 
         self.vertical_layout.addWidget(self.lines_widget)
+        self.vertical_layout.addWidget(self.data_exportation_widget)
         self.vertical_layout.addWidget(self.cancel_confirm_widget)
         self.setLayout(self.vertical_layout)
 
@@ -112,6 +122,12 @@ class envelopeCorrelationView(QWidget):
         else:
             self.number_strongest_connections = int(self.number_strongest_connections_line.text())
         self.envelope_correlation_listener.confirm_button_clicked()
+
+    def data_exportation_trigger(self):
+        """
+        Open a new window asking for the path for the exportation of the envelope correlation data
+        """
+        self.envelope_correlation_listener.additional_parameters_clicked()
 
     """
     Setters

@@ -17,6 +17,7 @@ from mne.viz import circular_layout
 from mne_connectivity.viz import plot_connectivity_circle
 
 from utils.file_path_search import get_labels_from_subject, get_project_freesurfer_path
+from utils.view.separator import create_layout_separator
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -45,6 +46,7 @@ class sourceSpaceConnectivityView(QWidget):
         self.global_layout = QVBoxLayout()
         self.setLayout(self.global_layout)
 
+        # Connectivity method
         self.connectivity_method_widget = QWidget()
         self.connectivity_method_layout = QHBoxLayout()
         self.connectivity_method_box = QComboBox()
@@ -53,6 +55,7 @@ class sourceSpaceConnectivityView(QWidget):
         self.connectivity_method_layout.addWidget(self.connectivity_method_box)
         self.connectivity_method_widget.setLayout(self.connectivity_method_layout)
 
+        # Spectrum method
         self.spectrum_estimation_method_widget = QWidget()
         self.spectrum_estimation_method_layout = QHBoxLayout()
         self.spectrum_estimation_method_box = QComboBox()
@@ -61,6 +64,7 @@ class sourceSpaceConnectivityView(QWidget):
         self.spectrum_estimation_method_layout.addWidget(self.spectrum_estimation_method_box)
         self.spectrum_estimation_method_widget.setLayout(self.spectrum_estimation_method_layout)
 
+        # Plot parameters
         self.lines_widget = QWidget()
         self.lines_layout = QGridLayout()
         self.number_strongest_connections_line = QSpinBox()
@@ -74,6 +78,7 @@ class sourceSpaceConnectivityView(QWidget):
         self.lines_layout.addWidget(self.all_connections_check_box, 1, 1)
         self.lines_widget.setLayout(self.lines_layout)
 
+        # Method
         self.method_widget = QWidget()
         self.method_layout = QHBoxLayout()
         self.method_box = QComboBox()
@@ -82,6 +87,7 @@ class sourceSpaceConnectivityView(QWidget):
         self.method_layout.addWidget(self.method_box)
         self.method_widget.setLayout(self.method_layout)
 
+        # Save load
         self.save_load_widget = QWidget()
         self.check_box_layout = QVBoxLayout()
         self.save_load_buttons = QButtonGroup()
@@ -100,6 +106,7 @@ class sourceSpaceConnectivityView(QWidget):
         self.check_box_layout.addWidget(self.check_box_load)
         self.save_load_widget.setLayout(self.check_box_layout)
 
+        # Number jobs slider
         self.n_jobs_widget = QWidget()
         self.n_jobs_layout = QHBoxLayout()
         self.n_jobs_slider = QSlider(Qt.Orientation.Horizontal, self)
@@ -114,6 +121,15 @@ class sourceSpaceConnectivityView(QWidget):
         self.n_jobs_layout.addWidget(self.n_jobs_label)
         self.n_jobs_widget.setLayout(self.n_jobs_layout)
 
+        # Exportation
+        self.data_exportation_widget = QWidget()
+        self.data_exportation_layout = QHBoxLayout()
+        self.data_exportation_button = QPushButton("Data exportation")
+        self.data_exportation_button.clicked.connect(self.data_exportation_trigger)
+        self.data_exportation_layout.addWidget(self.data_exportation_button)
+        self.data_exportation_widget.setLayout(self.data_exportation_layout)
+
+        # Cancel Confirm
         self.cancel_confirm_widget = QWidget()
         self.cancel_confirm_layout = QHBoxLayout()
         self.cancel = QPushButton("&Cancel", self)
@@ -126,10 +142,14 @@ class sourceSpaceConnectivityView(QWidget):
 
         self.global_layout.addWidget(self.connectivity_method_widget)
         # self.global_layout.addWidget(self.spectrum_estimation_method_widget)
-        self.global_layout.addWidget(self.lines_widget)
         self.global_layout.addWidget(self.method_widget)
         self.global_layout.addWidget(self.save_load_widget)
+        self.global_layout.addWidget(create_layout_separator())
+        self.global_layout.addWidget(self.lines_widget)
+        self.global_layout.addWidget(create_layout_separator())
         self.global_layout.addWidget(self.n_jobs_widget)
+        self.global_layout.addWidget(self.data_exportation_widget)
+        self.global_layout.addWidget(create_layout_separator())
         self.global_layout.addWidget(self.cancel_confirm_widget)
 
     """
@@ -192,6 +212,12 @@ class sourceSpaceConnectivityView(QWidget):
         n_jobs = self.n_jobs_slider.value()
         self.source_space_connectivity_listener.confirm_button_clicked(connectivity_method, spectrum_estimation_method,
                                                                        source_estimation_method, save_data, load_data, n_jobs)
+
+    def data_exportation_trigger(self):
+        """
+        Open a new window asking for the path for the exportation of the source space connectivity data
+        """
+        self.source_space_connectivity_listener.additional_parameters_clicked()
 
     def slider_value_changed_trigger(self):
         """

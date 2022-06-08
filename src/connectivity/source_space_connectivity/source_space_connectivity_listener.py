@@ -31,3 +31,11 @@ class sourceSpaceConnectivityListener(ABC):
     def confirm_button_clicked(self, connectivity_method, spectrum_estimation_method, source_estimation_method, save_data,
                                load_data, n_jobs):
         pass
+
+    @abstractmethod
+    def additional_parameters_clicked(self):
+        pass
+
+    @abstractmethod
+    def additional_parameters_information(self, export_path):
+        pass

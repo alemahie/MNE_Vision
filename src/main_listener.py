@@ -349,7 +349,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def envelope_correlation_information(self):
+    def envelope_correlation_information(self, export_path):
         pass
 
     @abstractmethod
@@ -366,7 +366,7 @@ class mainListener(ABC):
 
     @abstractmethod
     def source_space_connectivity_information(self, connectivity_method, spectrum_estimation_method, source_estimation_method,
-                                              save_data, load_data, n_jobs):
+                                              save_data, load_data, n_jobs, export_path):
         pass
 
     @abstractmethod
@@ -382,7 +382,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def sensor_space_connectivity_information(self):
+    def sensor_space_connectivity_information(self, export_path):
         pass
 
     @abstractmethod

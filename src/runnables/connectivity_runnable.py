@@ -33,16 +33,19 @@ class envelopeCorrelationWorkerSignals(QObject):
 
 
 class envelopeCorrelationRunnable(QRunnable):
-    def __init__(self, file_data):
+    def __init__(self, file_data, export_path):
         """
         Runnable for the computation of the envelope correlation of the dataset.
         :param file_data: MNE data of the dataset.
         :type file_data: MNE.Epochs/MNE.Raw
+        :param export_path: Path where the envelope correlation data will be stored.
+        :type export_path: str
         """
         super().__init__()
         self.signals = envelopeCorrelationWorkerSignals()
 
         self.file_data = file_data
+        self.export_path = export_path
         self.envelope_correlation_data = None
 
     def run(self):
@@ -53,12 +56,40 @@ class envelopeCorrelationRunnable(QRunnable):
         try:
             correlation_data = envelope_correlation(self.file_data).combine()
             self.envelope_correlation_data = correlation_data.get_data(output="dense")[:, :, 0]
+            self.check_data_export()
 
             # correlation_data = phase_slope_index(self.file_data)
             # self.envelope_correlation_data = correlation_data.get_data(output="dense")[:, :, 0]
         except Exception as e:
             print(e)
         self.signals.finished.emit()
+
+    def check_data_export(self):
+        """
+        Check if the envelope correlation data must be exported.
+        If it is the case, create the file and write the data in it.
+        """
+        if self.export_path is not None:
+            data = self.envelope_correlation_data
+            channels = self.file_data.ch_names
+
+            file = open(self.export_path + ".txt", "x")
+            # Write header
+            for i in range(len(channels)):
+                if i != len(channels)-1:
+                    file.write(channels[i] + ", ")
+                else:
+                    file.write(channels[i])
+            file.write("\n")
+            # Write data
+            for i in range(len(data)):     # Channels 1
+                for j in range(len(data)):  # Channels 2
+                    if j != len(data)-1:
+                        file.write(str(data[i][j]) + ", ")
+                    else:
+                        file.write(str(data[i][j]))
+                file.write("\n")
+            file.close()
 
     """
     Getters
@@ -84,7 +115,7 @@ class sourceSpaceConnectivityWorkerSignals(QObject):
 # noinspection PyUnresolvedReferences
 class sourceSpaceConnectivityRunnable(QRunnable):
     def __init__(self, file_data, file_path, connectivity_method, spectrum_estimation_method, source_estimation_method,
-                 save_data, load_data, n_jobs):
+                 save_data, load_data, n_jobs, export_path):
         """
         Runnable for the computation of the source space connectivity of the dataset.
         :param file_data: MNE data of the dataset.
@@ -105,6 +136,8 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         :type load_data: bool
         :param n_jobs: Number of processes used to computed the source estimation
         :type n_jobs: int
+        :param export_path: Path where the source space connectivity data will be stored.
+        :type export_path: str
         """
         super().__init__()
         self.signals = sourceSpaceConnectivityWorkerSignals()
@@ -117,6 +150,7 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         self.write_files = save_data
         self.read_files = load_data
         self.n_jobs = n_jobs
+        self.export_path = export_path
         self.subject = "fsaverage"
         self.subjects_dir = get_project_freesurfer_path()
 
@@ -134,6 +168,7 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         try:
             correlation_data = self.compute_envelope_correlation_with_source_space()
             self.source_space_connectivity_data = correlation_data.get_data(output="dense")[:, :, 0]
+            self.check_data_export()
             self.signals.finished.emit()
         except FileNotFoundError as error:
             error_message = "An error as occurred during the computation of the source space for the envelope correlation. \n" \
@@ -152,6 +187,35 @@ class sourceSpaceConnectivityRunnable(QRunnable):
     """
     Utils
     """
+    def check_data_export(self):
+        """
+        Check if the source space connectivity data must be exported.
+        If it is the case, create the file and write the data in it.
+        """
+        if self.export_path is not None:
+            data = self.source_space_connectivity_data
+            labels = get_labels_from_subject("fsaverage", get_project_freesurfer_path())
+            label_names = [label.name for label in labels]
+
+            file = open(self.export_path + ".txt", "x")
+            # Write header
+            for i in range(len(label_names)):
+                if i != len(label_names)-1:
+                    file.write(label_names[i] + ", ")
+                else:
+                    file.write(label_names[i])
+            file.write("\n")
+            # Write data
+            for i in range(len(data)):     # Source space area 1
+                for j in range(len(data)):  # Source space area 2
+                    if j != len(data)-1:
+                        file.write(str(data[i][j]) + ", ")
+                    else:
+                        file.write(str(data[i][j]))
+                file.write("\n")
+            file.close()
+
+
     def compute_envelope_correlation_with_source_space(self):
         """
         Launch the computation of the source space if it is not provided.
@@ -303,21 +367,24 @@ class sensorSpaceConnectivityWorkerSignals(QObject):
 
 # noinspection PyUnresolvedReferences
 class sensorSpaceConnectivityRunnable(QRunnable):
-    def __init__(self, file_data):
+    def __init__(self, file_data, export_path):
         """
         Runnable for the computation of the sensor space connectivity of the dataset.
         :param file_data: MNE data of the dataset.
         :type file_data: MNE.Epochs/MNE.Raw
+        :param export_path: Path where the sensor space connectivity data will be stored.
+        :type export_path: str
         """
         super().__init__()
         self.signals = sensorSpaceConnectivityWorkerSignals()
 
         self.file_data = file_data
+        self.export_path = export_path
         self.sensor_space_connectivity_data = None
 
     def run(self):
         """
-        Launch the computation of the envelope correlation on the given data.
+        Launch the computation of the sensor space connectivity on the given data.
         Notifies the main model that the computation is finished.
         """
         try:
@@ -325,9 +392,37 @@ class sensorSpaceConnectivityRunnable(QRunnable):
             connectivity_data = spectral_connectivity_epochs(self.file_data, method='pli', mode='multitaper', sfreq=sfreq,
                                                              faverage=True,  mt_adaptive=False, n_jobs=1)
             self.sensor_space_connectivity_data = connectivity_data.get_data(output='dense')[:, :, 0]
+            self.check_data_export()
             self.signals.finished.emit()
         except Exception as e:
             print(e)
+
+    def check_data_export(self):
+        """
+        Check if the sensor space connectivity data must be exported.
+        If it is the case, create the file and write the data in it.
+        """
+        if self.export_path is not None:
+            data = self.sensor_space_connectivity_data
+            channels = self.file_data.ch_names
+
+            file = open(self.export_path + ".txt", "x")
+            # Write header
+            for i in range(len(channels)):
+                if i != len(channels) - 1:
+                    file.write(channels[i] + ", ")
+                else:
+                    file.write(channels[i])
+            file.write("\n")
+            # Write data
+            for i in range(len(data)):  # Channels 1
+                for j in range(len(data)):  # Channels 2
+                    if j != len(data) - 1:
+                        file.write(str(data[i][j]) + ", ")
+                    else:
+                        file.write(str(data[i][j]))
+                file.write("\n")
+            file.close()
 
     """
     Getters

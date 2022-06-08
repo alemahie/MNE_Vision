@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Source Estimation Additional Parameters Listener
+Data Exportation Listener
 """
 
 from abc import ABC, abstractmethod
@@ -16,10 +16,9 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class sourceEstimationAdditionalParametersListener(ABC):
+class dataExportationListener(ABC):
     """
-    Listener doing the connection between the controller and the view for retrieving the additional information for the
-    computation of the source estimation on the dataset.
+    Listener doing the connection between the controller and the view for retrieving the path for the data exportation.
     It retrieves the information from the view to send it to the controller.
     """
 

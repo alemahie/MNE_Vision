@@ -8,6 +8,8 @@ Source Space Connectivity Controller
 from connectivity.source_space_connectivity.source_space_connectivity_listener import sourceSpaceConnectivityListener
 from connectivity.source_space_connectivity.source_space_connectivity_view import sourceSpaceConnectivityView
 
+from utils.data_exportation.data_exportation_controller import dataExportationController
+
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
@@ -28,6 +30,9 @@ class sourceSpaceConnectivityController(sourceSpaceConnectivityListener):
         self.main_listener = None
         self.source_space_connectivity_view = sourceSpaceConnectivityView(number_of_channels)
         self.source_space_connectivity_view.set_listener(self)
+
+        self.export_data_controller = None
+        self.export_path = None
 
         self.source_space_connectivity_view.show()
 
@@ -58,8 +63,26 @@ class sourceSpaceConnectivityController(sourceSpaceConnectivityListener):
         """
         self.source_space_connectivity_view.close()
         self.main_listener.source_space_connectivity_information(connectivity_method, spectrum_estimation_method, source_estimation_method,
-                                                                 save_data, load_data, n_jobs)
+                                                                 save_data, load_data, n_jobs, self.export_path)
 
+    def additional_parameters_clicked(self):
+        """
+        Create a new window for specifying the exportation path of the computation of the envelope correlation.
+        """
+        self.export_data_controller = dataExportationController()
+        self.export_data_controller.set_listener(self)
+
+    def additional_parameters_information(self, export_path):
+        """
+        Retrieve the exportation path for the source space connectivity data computed.
+        :param export_path: Path where the source space connectivity data will be stored.
+        :type export_path: str
+        """
+        self.export_path = export_path
+
+    """
+    Plot
+    """
     def plot_source_space_connectivity(self, source_space_connectivity_data):
         """
         Send the information to the view to plot the source space connectivity.

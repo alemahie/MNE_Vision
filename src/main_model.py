@@ -545,12 +545,14 @@ class mainModel:
     """
     Connectivity menu
     """
-    def envelope_correlation(self):
+    def envelope_correlation(self, export_path):
         """
         Creates the parallel runnable for computing the envelope correlation between the channels of the dataset.
+        :param export_path: Path where the envelope correlation data will be stored.
+        :type export_path: str
         """
         pool = QThreadPool.globalInstance()
-        self.envelope_correlation_runnable = envelopeCorrelationRunnable(self.file_data)
+        self.envelope_correlation_runnable = envelopeCorrelationRunnable(self.file_data, export_path)
         pool.start(self.envelope_correlation_runnable)
         self.envelope_correlation_runnable.signals.finished.connect(self.envelope_correlation_computation_finished)
 
@@ -561,7 +563,7 @@ class mainModel:
         self.main_listener.envelope_correlation_computation_finished()
 
     def source_space_connectivity(self, connectivity_method, spectrum_estimation_method, source_estimation_method, save_data,
-                                  load_data, n_jobs):
+                                  load_data, n_jobs, export_path):
         """
         Creates the parallel runnable for computing the connectivity inside the source space of the dataset.
         :param connectivity_method: Method used for computing the source space connectivity.
@@ -578,12 +580,14 @@ class mainModel:
         :type load_data: bool
         :param n_jobs: Number of processes used to computed the source estimation
         :type n_jobs: int
+        :param export_path: Path where the source space connectivity data will be stored.
+        :type export_path: str
         """
         pool = QThreadPool.globalInstance()
         self.source_space_connectivity_runnable = sourceSpaceConnectivityRunnable(self.file_data, self.get_file_path_name_without_extension(),
                                                                                   connectivity_method, spectrum_estimation_method,
                                                                                   source_estimation_method, save_data, load_data,
-                                                                                  n_jobs)
+                                                                                  n_jobs, export_path)
         pool.start(self.source_space_connectivity_runnable)
         self.source_space_connectivity_runnable.signals.finished.connect(self.source_space_connectivity_computation_finished)
         self.source_space_connectivity_runnable.signals.error.connect(self.source_space_connectivity_computation_error)
@@ -600,12 +604,14 @@ class mainModel:
         """
         self.main_listener.source_estimation_computation_error()
 
-    def sensor_space_connectivity(self):
+    def sensor_space_connectivity(self, export_path):
         """
         Creates the parallel runnable for computing the connectivity of the sensor space of the dataset.
+        :param export_path: Path where the sensor space connectivity data will be stored.
+        :type export_path: str
         """
         pool = QThreadPool.globalInstance()
-        self.sensor_space_connectivity_runnable = sensorSpaceConnectivityRunnable(self.file_data)
+        self.sensor_space_connectivity_runnable = sensorSpaceConnectivityRunnable(self.file_data, export_path)
         pool.start(self.sensor_space_connectivity_runnable)
         self.sensor_space_connectivity_runnable.signals.finished.connect(self.sensor_space_connectivity_computation_finished)
 

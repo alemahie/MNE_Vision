@@ -35,6 +35,15 @@ class sensorSpaceConnectivityView(QWidget):
 
         self.vertical_layout = QVBoxLayout()
 
+        # Exportation
+        self.data_exportation_widget = QWidget()
+        self.data_exportation_layout = QHBoxLayout()
+        self.data_exportation_button = QPushButton("Data exportation")
+        self.data_exportation_button.clicked.connect(self.data_exportation_trigger)
+        self.data_exportation_layout.addWidget(self.data_exportation_button)
+        self.data_exportation_widget.setLayout(self.data_exportation_layout)
+
+        # Cancel Confirm
         self.cancel_confirm_widget = QWidget()
         self.cancel_confirm_layout = QHBoxLayout()
         self.cancel = QPushButton("&Cancel", self)
@@ -45,6 +54,7 @@ class sensorSpaceConnectivityView(QWidget):
         self.cancel_confirm_layout.addWidget(self.confirm)
         self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
 
+        self.vertical_layout.addWidget(self.data_exportation_widget)
         self.vertical_layout.addWidget(self.cancel_confirm_widget)
         self.setLayout(self.vertical_layout)
 
@@ -74,6 +84,12 @@ class sensorSpaceConnectivityView(QWidget):
         """
         self.sensor_space_connectivity_listener.confirm_button_clicked()
 
+    def data_exportation_trigger(self):
+        """
+        Open a new window asking for the path for the exportation of the sensor space connectivity data.
+        """
+        self.sensor_space_connectivity_listener.additional_parameters_clicked()
+
     """
     Setters
     """
@@ -81,6 +97,6 @@ class sensorSpaceConnectivityView(QWidget):
         """
         Set the listener to the controller.
         :param listener: Listener to the controller.
-        :type listener: sensorSpaceConnectivityView
+        :type listener: sensorSpaceConnectivityController
         """
         self.sensor_space_connectivity_listener = listener

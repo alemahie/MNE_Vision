@@ -57,7 +57,7 @@ class classifyView(QWidget):
         self.cross_validation_number.setMinimum(1)
         self.cross_validation_number.setDecimals(0)
 
-        self.grid_layout.addWidget(QLabel("Feature selection : "), 0, 0)
+        self.grid_layout.addWidget(QLabel("Pipeline selection : "), 0, 0)
         self.grid_layout.addWidget(self.pipeline_selection_button, 0, 1)
         self.grid_layout.addWidget(QLabel("Feature selection : "), 1, 0)
         self.grid_layout.addWidget(self.feature_selection, 1, 1)

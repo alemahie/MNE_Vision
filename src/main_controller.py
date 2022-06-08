@@ -926,15 +926,17 @@ class mainController(mainListener):
         self.envelope_correlation_controller = envelopeCorrelationController(number_of_channels)
         self.envelope_correlation_controller.set_listener(self)
 
-    def envelope_correlation_information(self):
+    def envelope_correlation_information(self, export_path):
         """
         Create the waiting window while the computation of the envelope correlation is done on the dataset.
+        :param export_path: Path where the envelope correlation data will be stored.
+        :type export_path: str
         """
         processing_title = "Envelope correlation running, please wait."
         finish_method = "envelope_correlation"
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.envelope_correlation()
+        self.main_model.envelope_correlation(export_path)
 
     def envelope_correlation_computation_finished(self):
         """
@@ -966,7 +968,7 @@ class mainController(mainListener):
             self.source_space_connectivity_controller.set_listener(self)
 
     def source_space_connectivity_information(self, connectivity_method, spectrum_estimation_method, source_estimation_method,
-                                              save_data, load_data, n_jobs):
+                                              save_data, load_data, n_jobs, export_path):
         """
         Create the waiting window while the computation of the source space connectivity is done on the dataset.
         :param connectivity_method: Method used for computing the source space connectivity.
@@ -983,13 +985,15 @@ class mainController(mainListener):
         :type load_data: bool
         :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
+        :param export_path: Path where the source space connectivity data will be stored.
+        :type export_path: str
         """
         processing_title = "Source Space Connectivity running, please wait."
         finish_method = "source_space_connectivity"
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.source_space_connectivity(connectivity_method, spectrum_estimation_method, source_estimation_method,
-                                                  save_data, load_data, n_jobs)
+                                                  save_data, load_data, n_jobs, export_path)
 
     def source_space_connectivity_computation_finished(self):
         """
@@ -1022,15 +1026,17 @@ class mainController(mainListener):
         self.sensor_space_connectivity_controller = sensorSpaceConnectivityController(file_info)
         self.sensor_space_connectivity_controller.set_listener(self)
 
-    def sensor_space_connectivity_information(self):
+    def sensor_space_connectivity_information(self, export_path):
         """
         Create the waiting window while the computation of the sensor space connectivity is done on the dataset.
+        :param export_path: Path where the sensor space connectivity data will be stored.
+        :type export_path: str
         """
         processing_title = "Sensor Space Connectivity running, please wait."
         finish_method = "sensor_space_connectivity"
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.sensor_space_connectivity()
+        self.main_model.sensor_space_connectivity(export_path)
 
     def sensor_space_connectivity_computation_finished(self):
         """

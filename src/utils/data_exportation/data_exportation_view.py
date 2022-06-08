@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Source estimation additional parameters
+Data Exportation View
 """
 
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QCheckBox, QLabel, QLineEdit, QFileDialog
@@ -16,23 +16,24 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class sourceEstimationAdditionalParametersView(QWidget):
+class dataExportationView(QWidget):
     def __init__(self):
         """
-
+        Window displaying the parameters for exporting the data.
         """
         super().__init__()
-        self.source_estimation_additional_parameters_listener = None
+        self.data_exportation_listener = None
         self.export_data_path = None
 
         self.global_layout = QVBoxLayout()
         self.setLayout(self.global_layout)
+        self.setWindowTitle("Data Exportation")
 
         # Exportation
         self.export_data_widget = QWidget()
         self.export_data_layout = QVBoxLayout()
         self.export_data_check_box = QCheckBox()
-        self.export_data_check_box.setText("Export the source estimation data into a TXT file after the computation : ")
+        self.export_data_check_box.setText("Export the data into a TXT file after the computation : ")
         self.export_data_layout.addWidget(self.export_data_check_box)
         self.export_data_widget.setLayout(self.export_data_layout)
 
@@ -51,9 +52,9 @@ class sourceEstimationAdditionalParametersView(QWidget):
         self.cancel_confirm_widget = QWidget()
         self.cancel_confirm_layout = QHBoxLayout()
         self.cancel = QPushButton("&Cancel", self)
-        self.cancel.clicked.connect(self.cancel_source_estimation_trigger)
+        self.cancel.clicked.connect(self.cancel_data_exportation_trigger)
         self.confirm = QPushButton("&Confirm", self)
-        self.confirm.clicked.connect(self.confirm_source_estimation_trigger)
+        self.confirm.clicked.connect(self.confirm_data_exportation_trigger)
         self.cancel_confirm_layout.addWidget(self.cancel)
         self.cancel_confirm_layout.addWidget(self.confirm)
         self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
@@ -65,13 +66,13 @@ class sourceEstimationAdditionalParametersView(QWidget):
     """
     Triggers
     """
-    def cancel_source_estimation_trigger(self):
+    def cancel_data_exportation_trigger(self):
         """
         Send the information to the controller that the computation is cancelled.
         """
-        self.source_estimation_additional_parameters_listener.cancel_button_clicked()
+        self.data_exportation_listener.cancel_button_clicked()
 
-    def confirm_source_estimation_trigger(self):
+    def confirm_data_exportation_trigger(self):
         """
         Retrieve the parameters and send the information to the controller.
         """
@@ -79,13 +80,13 @@ class sourceEstimationAdditionalParametersView(QWidget):
             export_path = self.export_data_path
         else:
             export_path = None
-        self.source_estimation_additional_parameters_listener.confirm_button_clicked(export_path)
+        self.data_exportation_listener.confirm_button_clicked(export_path)
 
     def export_data_path_clicked(self):
         """
-        Get the path to the file when wanting to export the source estimation data.
+        Get the path to the file when wanting to export the data.
         """
-        path_to_file = QFileDialog().getSaveFileName(self, "Export source estimation data to TXT file")
+        path_to_file = QFileDialog().getSaveFileName(self, "Export data to TXT file")
         self.export_data_path = path_to_file[0]
         self.export_data_path_line.setText(self.export_data_path)
 
@@ -96,6 +97,6 @@ class sourceEstimationAdditionalParametersView(QWidget):
         """
         Set the listener to the controller.
         :param listener: Listener to the controller.
-        :type listener: sourceEstimationAdditionalParametersController
+        :type listener: controller
         """
-        self.source_estimation_additional_parameters_listener = listener
+        self.data_exportation_listener = listener
