@@ -83,6 +83,7 @@ class menubarView(QMenuBar):
         self.open_menu.addSeparator()
         open_cnt_file_action = QAction("CNT File", self)
         open_cnt_file_action.triggered.connect(self.open_cnt_file_trigger)
+        open_cnt_file_action.setEnabled(False)
         self.open_menu.addAction(open_cnt_file_action)
         open_set_file_action = QAction("SET File", self)
         open_set_file_action.triggered.connect(self.open_set_file_trigger)

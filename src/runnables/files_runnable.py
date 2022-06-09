@@ -9,7 +9,7 @@ from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne import read_epochs, find_events
 from mne.channels import make_standard_montage
-from mne.io import read_raw_fif, read_raw_eeglab, read_epochs_eeglab
+from mne.io import read_raw_fif, read_raw_eeglab, read_epochs_eeglab, read_raw_cnt
 
 from utils import cnt_file_reader
 
@@ -117,6 +117,9 @@ class openCntFileRunnable(QRunnable):
             self.file_type = "Raw"
         except TypeError:
             print("Error")
+        except Exception as e:
+            print(e)
+            print(type(e))
         self.signals.finished.emit()
 
     def get_file_data(self):
