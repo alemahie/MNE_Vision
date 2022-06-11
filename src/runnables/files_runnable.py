@@ -11,7 +11,7 @@ from mne import read_epochs, find_events
 from mne.channels import make_standard_montage
 from mne.io import read_raw_fif, read_raw_eeglab, read_epochs_eeglab
 
-from utils.cnt_file_reader import get_raw_from_cnt
+from utils.cnt_reader.cnt_file_reader import get_raw_from_cnt
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"

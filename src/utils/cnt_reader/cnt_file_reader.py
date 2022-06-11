@@ -11,7 +11,7 @@ from mne.channels import make_standard_montage
 
 import numpy as np
 
-from utils.libeep.libeep import cnt_file
+from utils.cnt_reader.libeep import cnt_file
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -44,7 +44,6 @@ def get_raw_from_cnt(path_to_file):
     montage = make_standard_montage('standard_1005')
     cnt_raw.set_montage(montage)
 
-    cnt_raw = None
     return cnt_raw
 
 

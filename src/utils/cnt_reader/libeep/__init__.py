@@ -1,4 +1,4 @@
-from . import pyeep
+from utils.cnt_reader.libeep import pyeep
 from typing import List, Union, Tuple, Any
 from pathlib import Path
 
@@ -72,7 +72,7 @@ class cnt_file:
             info = (
                 pyeep.get_channel_label(f._handle, index),
                 pyeep.get_channel_reference(f._handle, index),
-                pyeep.get_channel_unit(f._handle, index),
+                "uV"#pyeep.get_channel_unit(f._handle, index),
             )
         return info
 
