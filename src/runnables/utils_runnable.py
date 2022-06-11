@@ -42,8 +42,14 @@ class downloadFsaverageMneDataRunnable(QRunnable):
         Launch the computation of the filtering on the given data.
         Notifies the main model that the computation is finished.
         """
-        os.mkdir(os.path.expanduser('~') + "/mne_data")
-        os.mkdir(os.path.expanduser('~') + "/mne_data/MNE-fsaverage-data")
+        try:
+            os.mkdir(os.path.expanduser('~') + "/mne_data")
+        except:
+            pass
+        try:
+            os.mkdir(os.path.expanduser('~') + "/mne_data/MNE-fsaverage-data")
+        except:
+            pass
         subjects_dir = str(data_path()) + "/subjects/"
         fetch_fsaverage(subjects_dir=subjects_dir)
         self.signals.finished.emit()

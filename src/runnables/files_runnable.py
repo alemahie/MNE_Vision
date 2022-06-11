@@ -9,9 +9,9 @@ from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne import read_epochs, find_events
 from mne.channels import make_standard_montage
-from mne.io import read_raw_fif, read_raw_eeglab, read_epochs_eeglab, read_raw_cnt
+from mne.io import read_raw_fif, read_raw_eeglab, read_epochs_eeglab
 
-from utils import cnt_file_reader
+from utils.cnt_file_reader import get_raw_from_cnt
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -23,6 +23,9 @@ __status__ = "Dev"
 
 
 # Open FIF File
+from utils.view.error_window import errorWindow
+
+
 class openFifFileWorkerSignals(QObject):
     """
     Contain the signals used by the open FIF file runnable.
@@ -113,10 +116,12 @@ class openCntFileRunnable(QRunnable):
         Notifies the main model that the computation is finished.
         """
         try:
-            self.file_data = cnt_file_reader.get_raw_from_cnt(self.path_to_file)
+            self.file_data = get_raw_from_cnt(self.path_to_file)
             self.file_type = "Raw"
         except TypeError:
-            print("Error")
+            error_message = "An error has occurred during the reading of the CNT file."
+            error_window = errorWindow(error_message)
+            error_window.show()
         except Exception as e:
             print(e)
             print(type(e))
