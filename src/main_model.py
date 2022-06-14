@@ -382,6 +382,7 @@ class mainModel:
         self.re_referencing_runnable = reReferencingRunnable(references, self.file_data, n_jobs)
         pool.start(self.re_referencing_runnable)
         self.re_referencing_runnable.signals.finished.connect(self.re_referencing_computation_finished)
+        self.re_referencing_runnable.signals.error.connect(self.re_referencing_computation_error)
 
     def re_referencing_computation_finished(self):
         """
@@ -391,6 +392,12 @@ class mainModel:
         self.file_data = self.re_referencing_runnable.get_file_data()
         self.references = self.re_referencing_runnable.get_references()
         self.main_listener.re_referencing_computation_finished()
+
+    def re_referencing_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.re_referencing_computation_error()
 
     # ICA decomposition
     def ica_data_decomposition(self, ica_method):
@@ -426,6 +433,7 @@ class mainModel:
         self.extract_epochs_runnable = extractEpochsRunnable(self.file_data, self.read_events, tmin, tmax)
         pool.start(self.extract_epochs_runnable)
         self.extract_epochs_runnable.signals.finished.connect(self.extract_epochs_computation_finished)
+        self.extract_epochs_runnable.signals.error.connect(self.extract_epochs_computation_error)
 
     def extract_epochs_computation_finished(self):
         """
@@ -435,6 +443,12 @@ class mainModel:
         self.file_type = "Epochs"
         self.file_data = self.extract_epochs_runnable.get_file_data()
         self.main_listener.extract_epochs_computation_finished()
+
+    def extract_epochs_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.extract_epochs_computation_error()
 
     # Source Estimation
     def source_estimation(self, source_estimation_method, save_data, load_data, epochs_method, trials_selected, n_jobs,
@@ -502,12 +516,19 @@ class mainModel:
                                                                             maximum_frequency, minimum_time, maximum_time)
         pool.start(self.power_spectral_density_runnable)
         self.power_spectral_density_runnable.signals.finished.connect(self.power_spectral_density_computation_finished)
+        self.power_spectral_density_runnable.signals.error.connect(self.power_spectral_density_computation_error)
 
     def power_spectral_density_computation_finished(self):
         """
         Notifies the main controller that the computation is done.
         """
         self.main_listener.plot_spectra_maps_computation_finished()
+
+    def power_spectral_density_computation_error(self):
+        """
+        Notifies the main controller that an error has occurred during the computation
+        """
+        self.main_listener.plot_spectra_maps_computation_error()
 
     def time_frequency(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
         """
@@ -681,6 +702,9 @@ class mainModel:
         self.file_data_tmp = None
         self.file_type_tmp = None
         self.file_path_name_tmp = None
+        self.ica_decomposition = "No"
+        self.references = "Unknown"
+        self.read_events = None     # Events info read from file or channel, used to transform raw to epochs
 
     """
     Getters
@@ -871,6 +895,14 @@ class mainModel:
         :rtype: Epochs/Raw
         """
         return self.file_data
+
+    def get_read_events(self):
+        """
+        Gets the read events obtained after the epochs' importation.
+        :return: The read events.
+        :rtype: list of int
+        """
+        return self.read_events
 
     """
     Temporaries

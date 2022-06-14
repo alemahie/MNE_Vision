@@ -245,6 +245,10 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def extract_epochs_computation_error(self):
+        pass
+
+    @abstractmethod
     def extract_epochs_finished(self):
         pass
 
@@ -299,6 +303,10 @@ class mainListener(ABC):
 
     @abstractmethod
     def plot_spectra_maps_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def plot_spectra_maps_computation_error(self):
         pass
 
     @abstractmethod

@@ -30,6 +30,14 @@ Secondly, you may need to add the "lib" directory of the MNE_Vision project to y
 For that, you can follow the `this tutorial <https://docs.oracle.com/en/database/oracle/machine-learning/oml4r/1.5.1/oread/creating-and-modifying-environment-variables-on-windows.html>`_ on how to add an environment variable.
 Under the "System Variables" tab, you can add (or modify if it already exists) the variable "PYTHONPATH" and add the path to the "lib" directory "path\to\MNE_VISION\lib".
 
+Finally, MNE Vision can be launch in a terminal from the directory "path\to\MNE_VISION\" and type :
+
+.. code-block:: console
+
+    $ python3 src/main.py
+	
+Note : Depending on how python is installed, python3 might need to be replaced by python if python3 is not reconised.
+
 Dependencies
 ^^^^^^^^^^^^
 

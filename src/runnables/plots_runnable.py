@@ -27,6 +27,7 @@ class powerSpectralDensityWorkerSignals(QObject):
     Contain the signals used by the power spectral density runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class powerSpectralDensityRunnable(QRunnable):
@@ -63,13 +64,19 @@ class powerSpectralDensityRunnable(QRunnable):
         Launch the computation of the power spectral density on the given data.
         Notifies the main model that the computation is finished.
         """
-        if self.method_psd == "Welch":
-            self.psds, self.freqs = psd_welch(self.file_data, fmin=self.minimum_frequency, fmax=self.maximum_frequency,
-                                              tmin=self.tmin, tmax=self.tmax)
-        elif self.method_psd == "Multitaper":
-            self.psds, self.freqs = psd_multitaper(self.file_data, fmin=self.minimum_frequency, fmax=self.maximum_frequency,
-                                                   tmin=self.tmin, tmax=self.tmax)
-        self.signals.finished.emit()
+        try:
+            if self.method_psd == "Welch":
+                self.psds, self.freqs = psd_welch(self.file_data, fmin=self.minimum_frequency, fmax=self.maximum_frequency,
+                                                  tmin=self.tmin, tmax=self.tmax)
+            elif self.method_psd == "Multitaper":
+                self.psds, self.freqs = psd_multitaper(self.file_data, fmin=self.minimum_frequency, fmax=self.maximum_frequency,
+                                                       tmin=self.tmin, tmax=self.tmax)
+            self.signals.finished.emit()
+        except Exception as error:
+            error_message = "An error has occured during the computation of the PSD"
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.signals.error.emit()
 
     def get_psds(self):
         """

@@ -395,9 +395,10 @@ class exportDataSETRunnable(QRunnable):
         """
         try:
             self.file_data.export(self.path_to_file + ".set", fmt="eeglab")
-        except Exception as e:
-            print(e)
-            print(type(e))
+        except:
+            error_message = "An error has occurred"
+            error_window = errorWindow(error_message=error_message)
+            error_window.show()
         self.signals.finished.emit()
 
 

@@ -573,6 +573,13 @@ class mainController(mainListener):
         """
         processing_title_finished = "Re-referencing finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+        
+    def re_referencing_computation_error(self):
+        """
+        Close the waiting window because the re-referencing had an error.
+        """
+        processing_title_finished = "Re-referencing had an error."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     def re_referencing_finished(self):
         """
@@ -624,8 +631,21 @@ class mainController(mainListener):
         """
         Create the controller for extracting epochs from the dataset.
         """
-        self.extract_epochs_controller = extractEpochsController()
-        self.extract_epochs_controller.set_listener(self)
+        read_events = self.main_model.get_read_events()
+        file_type = self.main_model.get_file_type()
+        if file_type == "Raw":
+            if read_events is not None:
+                self.extract_epochs_controller = extractEpochsController()
+                self.extract_epochs_controller.set_listener(self)
+            else:
+                error_message = "You must read the events from a channel or a file under the 'file' menu, before " \
+                                "extracting the epochs"
+                error_window = errorWindow(error_message)
+                error_window.show()
+        else:
+            error_message = "You can not extract epochs when you already are in an epoched file"
+            error_window = errorWindow(error_message)
+            error_window.show()
 
     def extract_epochs_information(self, tmin, tmax):
         """
@@ -646,6 +666,13 @@ class mainController(mainListener):
         Close the waiting window when the extraction of epochs is done on the dataset.
         """
         processing_title_finished = "Epochs extraction finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def extract_epochs_computation_error(self):
+        """
+        Close the waiting window because the extraction of epochs had an error.
+        """
+        processing_title_finished = "Epochs extraction had an error."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     def extract_epochs_finished(self):
@@ -682,11 +709,17 @@ class mainController(mainListener):
             self.download_fsaverage_mne_data_controller = downloadFsaverageMneDataController()
             self.download_fsaverage_mne_data_controller.set_listener(self)
         else:
-            number_of_epochs = self.main_model.get_number_of_epochs()
-            event_values = self.main_model.get_event_values()
-            event_ids = self.main_model.get_event_ids()
-            self.source_estimation_controller = sourceEstimationController(number_of_epochs, event_values, event_ids)
-            self.source_estimation_controller.set_listener(self)
+            file_type = self.main_model.get_file_type()
+            if file_type == "Epochs":
+                number_of_epochs = self.main_model.get_number_of_epochs()
+                event_values = self.main_model.get_event_values()
+                event_ids = self.main_model.get_event_ids()
+                self.source_estimation_controller = sourceEstimationController(number_of_epochs, event_values, event_ids)
+                self.source_estimation_controller.set_listener(self)
+            else:
+                error_message = "You can not compute the source estimation on a raw file"
+                error_window = errorWindow(error_message)
+                error_window.show()
 
     def source_estimation_information(self, source_estimation_method, save_data, load_data, epochs_method, trials_selected,
                                       n_jobs, export_path):
@@ -815,6 +848,13 @@ class mainController(mainListener):
         Close the waiting window when the computation of the power spectral density is done on the dataset.
         """
         processing_title_finished = "PSD finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def plot_spectra_maps_computation_error(self):
+        """
+        Close the waiting window when the computation of the power spectral density is done on the dataset.
+        """
+        processing_title_finished = "An error has occurred during the computation of the PSD"
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     def plot_spectra_maps_finished(self):

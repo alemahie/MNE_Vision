@@ -90,7 +90,7 @@ class resamplingRunnable(QRunnable):
         :type file_data: MNE.Epochs/MNE.Raw
         """
         super().__init__()
-        self.signals = filterWorkerSignals()
+        self.signals = resamplingWorkerSignals()
         self.frequency = frequency
         self.file_data = file_data
 
@@ -123,6 +123,7 @@ class reReferencingWorkerSignals(QObject):
     Contain the signals used by the re-referencing runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class reReferencingRunnable(QRunnable):
@@ -138,7 +139,7 @@ class reReferencingRunnable(QRunnable):
         :type n_jobs: int
         """
         super().__init__()
-        self.signals = filterWorkerSignals()
+        self.signals = reReferencingWorkerSignals()
         self.references = references
         self.file_data = file_data
         self.n_jobs = n_jobs
@@ -152,18 +153,20 @@ class reReferencingRunnable(QRunnable):
         in infinity, which requires some information of the source space to be done.
         Notifies the main model that the computation is finished.
         """
-        if self.references == "infinity":
-            try:
+        try:
+            if self.references == "infinity":
                 src = self.compute_source_space()
                 bem = self.compute_bem_solution()
                 fwd = self.compute_forward_solution(src, bem)
                 self.file_data.set_eeg_reference('REST', forward=fwd)
-            except Exception as e:
-                print(e)
-                print(type(e))
-        else:
-            self.file_data.set_eeg_reference(ref_channels=self.references)
-        self.signals.finished.emit()
+            else:
+                self.file_data.set_eeg_reference(ref_channels=self.references)
+            self.signals.finished.emit()
+        except Exception as error:
+            error_message = "An error has occured during the computation of the re-referencing."
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.signals.error.emit()
 
     def compute_source_space(self):
         """
@@ -244,16 +247,22 @@ class icaRunnable(QRunnable):
         super().__init__()
         self.signals = icaWorkerSignals()
         self.ica_method = ica_method
-        self.file_data = file_data
+        self.file_data = deepcopy(file_data)
 
     def run(self):
         """
         Launch the computation of the ICA decomposition on the given data.
         Notifies the main model that the computation is finished.
         """
-        ica = ICA(method=self.ica_method)
-        ica.fit(self.file_data)
-        self.signals.finished.emit()
+        try:
+            ica = ICA(method=self.ica_method)
+            ica.fit(self.file_data)
+            ica.apply(self.file_data)
+            self.signals.finished.emit()
+        except Exception as e:
+            error_message = "An error as occurred during the computation of the ICA."
+            error_window = errorWindow(error_message)
+            error_window.show()
 
     """
     Getters
@@ -273,6 +282,7 @@ class extractEpochsWorkerSignals(QObject):
     Contain the signals used by the extract epochs runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class extractEpochsRunnable(QRunnable):
@@ -301,8 +311,14 @@ class extractEpochsRunnable(QRunnable):
         Launch the computation of the extraction of the epochs on the given data.
         Notifies the main model that the computation is finished.
         """
-        self.file_data = Epochs(self.file_data, self.events, tmin=self.tmin, tmax=self.tmax, preload=True)
-        self.signals.finished.emit()
+        try:
+            self.file_data = Epochs(self.file_data, self.events, tmin=self.tmin, tmax=self.tmax, preload=True)
+            self.signals.finished.emit()
+        except Exception as error:
+            error_message = "An error has occurred during the epoch extraction"
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.signals.error.emit()
 
     """
     Getters
