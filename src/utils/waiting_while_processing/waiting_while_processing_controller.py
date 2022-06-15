@@ -25,29 +25,40 @@ class waitingWhileProcessingController(waitingWhileProcessingListener):
         :param processing_title: The title displayed on the window.
         :type processing_title: str
         :param finish_method: The method to call when the computation is finished.
-        :type finish_method: str
+        :type finish_method: function
         """
         self.main_listener = None
+
         self.finish_method = finish_method
+        self.error = False
+
         self.waiting_while_processing_view = waitingWhileProcessingView(processing_title)
         self.waiting_while_processing_view.set_listener(self)
 
         self.waiting_while_processing_view.show()
 
-    def stop_progress_bar(self, processing_title_finished):
+    def stop_progress_bar(self, processing_title_finished, error=False):
         """
         Stop the progress bar of the waiting window.
         :param processing_title_finished: The title displayed on the window.
         :type processing_title_finished: str
+        :param error: Set to True if an error occurred, avoid to call the finish method.
+        :type error: bool
         """
+        self.error = error
         self.waiting_while_processing_view.stop_progress_bar(processing_title_finished)
 
     def continue_button_clicked(self):
         """
-        Close the window and send the information to the main controller.
+        Close the window and send the information to the main controller if no error occurred and a method is provided.
         """
         self.waiting_while_processing_view.close()
-        self.main_listener.waiting_while_processing_finished(self.finish_method)
+        if not self.error and self.finish_method is not None:
+            try:
+                self.finish_method()
+            except Exception as e:
+                print(e)
+                print(type(e))
 
     """
     Setters
@@ -59,11 +70,3 @@ class waitingWhileProcessingController(waitingWhileProcessingListener):
         :type listener: mainController
         """
         self.main_listener = listener
-
-    def set_finish_method(self, finish_method):
-        """
-        Set the finish method.
-        :param finish_method: The method to call when the computation is finished.
-        :type finish_method: str
-        """
-        self.finish_method = finish_method

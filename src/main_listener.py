@@ -37,6 +37,10 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def open_fif_file_computation_error(self):
+        pass
+
+    @abstractmethod
     def open_fif_file_finished(self):
         pass
 
@@ -50,6 +54,10 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def open_cnt_file_computation_error(self):
+        pass
+
+    @abstractmethod
     def open_cnt_file_finished(self):
         pass
 
@@ -60,6 +68,10 @@ class mainListener(ABC):
 
     @abstractmethod
     def open_set_file_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def open_set_file_computation_error(self):
         pass
 
     @abstractmethod
@@ -96,7 +108,7 @@ class mainListener(ABC):
     def find_events_from_channel_computation_error(self):
         pass
 
-    # Export
+    # Export CSV
     @abstractmethod
     def export_data_to_csv_file_clicked(self, path_to_file):
         pass
@@ -106,6 +118,11 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def export_data_csv_computation_error(self):
+        pass
+
+    # Export SET
+    @abstractmethod
     def export_data_to_set_file_clicked(self, path_to_file):
         pass
 
@@ -114,11 +131,20 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def export_data_set_computation_error(self):
+        pass
+
+    # Export events
+    @abstractmethod
     def export_events_to_file_clicked(self):
         pass
 
     @abstractmethod
     def export_events_txt_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def export_events_txt_computation_error(self):
         pass
 
     # Save
@@ -164,6 +190,7 @@ class mainListener(ABC):
     """ 
     Tools Menu
     """
+    # Filter
     @abstractmethod
     def filter_clicked(self):
         pass
@@ -177,9 +204,14 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def filter_computation_error(self):
+        pass
+
+    @abstractmethod
     def filter_finished(self):
         pass
 
+    # Resampling
     @abstractmethod
     def resampling_clicked(self):
         pass
@@ -193,9 +225,14 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def resampling_computation_error(self):
+        pass
+
+    @abstractmethod
     def resampling_finished(self):
         pass
 
+    # Re-referencing
     @abstractmethod
     def re_referencing_clicked(self):
         pass
@@ -209,13 +246,19 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def re_referencing_computation_error(self):
+        pass
+
+    @abstractmethod
     def re_referencing_finished(self):
         pass
 
+    # Inspect data
     @abstractmethod
     def inspect_reject_data_clicked(self):
         pass
 
+    # ICA decomposition
     @abstractmethod
     def ica_decomposition_clicked(self):
         pass
@@ -225,13 +268,18 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def ica_decomposition_computation_finished(self):
+    def ica_data_decomposition_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def ica_data_decomposition_computation_error(self):
         pass
 
     @abstractmethod
     def ica_decomposition_finished(self):
         pass
 
+    # Extract epochs
     @abstractmethod
     def extract_epochs_clicked(self):
         pass
@@ -252,6 +300,7 @@ class mainListener(ABC):
     def extract_epochs_finished(self):
         pass
 
+    # SNR
     @abstractmethod
     def snr_clicked(self):
         pass
@@ -277,6 +326,7 @@ class mainListener(ABC):
     """
     Plot Menu
     """
+    # Channel locations
     @abstractmethod
     def plot_channel_locations_clicked(self):
         pass
@@ -285,6 +335,7 @@ class mainListener(ABC):
     def plot_data_clicked(self):
         pass
 
+    # Topographies
     @abstractmethod
     def plot_topographies_clicked(self):
         pass
@@ -293,6 +344,7 @@ class mainListener(ABC):
     def plot_topographies_information(self, time_points, mode):
         pass
 
+    # Spectra maps
     @abstractmethod
     def plot_spectra_maps_clicked(self):
         pass
@@ -313,6 +365,7 @@ class mainListener(ABC):
     def plot_spectra_maps_finished(self):
         pass
 
+    # ERP image
     @abstractmethod
     def plot_ERP_image_clicked(self):
         pass
@@ -321,6 +374,7 @@ class mainListener(ABC):
     def plot_ERP_image_information(self, channels_selected):
         pass
 
+    # ERPs
     @abstractmethod
     def plot_ERPs_clicked(self):
         pass
@@ -329,6 +383,7 @@ class mainListener(ABC):
     def plot_ERPs_information(self, channel_selected):
         pass
 
+    # Time frequency
     @abstractmethod
     def plot_time_frequency_clicked(self):
         pass
@@ -352,6 +407,7 @@ class mainListener(ABC):
     """
     Connectivity Menu
     """
+    # Envelope correlation
     @abstractmethod
     def envelope_correlation_clicked(self):
         pass
@@ -365,9 +421,14 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def envelope_correlation_computation_error(self):
+        pass
+
+    @abstractmethod
     def envelope_correlation_finished(self):
         pass
 
+    # Source space connectivity
     @abstractmethod
     def source_space_connectivity_clicked(self):
         pass
@@ -385,6 +446,7 @@ class mainListener(ABC):
     def source_space_connectivity_finished(self):
         pass
 
+    # Sensor space connectivity
     @abstractmethod
     def sensor_space_connectivity_clicked(self):
         pass
@@ -398,9 +460,14 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def sensor_space_connectivity_computation_error(self):
+        pass
+
+    @abstractmethod
     def sensor_space_connectivity_finished(self):
         pass
 
+    # Spectro temporal connectivity
     @abstractmethod
     def spectro_temporal_connectivity_clicked(self):
         pass
@@ -426,16 +493,16 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
+    def classify_computation_error(self):
+        pass
+
+    @abstractmethod
     def classify_finished(self):
         pass
 
     """
     Others 
     """
-    @abstractmethod
-    def waiting_while_processing_finished(self, finish_method):
-        pass
-
     @abstractmethod
     def download_fsaverage_mne_data_information(self):
         pass

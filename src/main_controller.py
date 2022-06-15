@@ -123,8 +123,7 @@ class mainController(mainListener):
         """
         if path_to_file != '':
             processing_title = "FIF file reading running, please wait."
-            finish_method = "open_fif_file"
-            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.open_fif_file_finished)
             self.waiting_while_processing_controller.set_listener(self)
             self.main_model.open_fif_file(path_to_file)
 
@@ -134,6 +133,13 @@ class mainController(mainListener):
         """
         processing_title_finished = "FIF file reading finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def open_fif_file_computation_error(self):
+        """
+        Close the waiting window because the opening of the FIF file had an error.
+        """
+        processing_title_finished = "The opening of the FIF file had an error."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def open_fif_file_finished(self):
         """
@@ -151,8 +157,7 @@ class mainController(mainListener):
         """
         if path_to_file != '':
             processing_title = "CNT file reading running, please wait."
-            finish_method = "open_cnt_file"
-            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.open_cnt_file_finished)
             self.waiting_while_processing_controller.set_listener(self)
             self.main_model.open_cnt_file(path_to_file)
 
@@ -162,6 +167,13 @@ class mainController(mainListener):
         """
         processing_title_finished = "CNT file reading finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def open_cnt_file_computation_error(self):
+        """
+        Close the waiting window because the opening of the ANT eego CNT file had an error.
+        """
+        processing_title_finished = "The opening of the ANT eego CNT file had an error."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def open_cnt_file_finished(self):
         """
@@ -179,8 +191,7 @@ class mainController(mainListener):
         """
         if path_to_file != '':
             processing_title = "SET file reading running, please wait."
-            finish_method = "open_set_file"
-            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.open_set_file_finished)
             self.waiting_while_processing_controller.set_listener(self)
             self.main_model.open_set_file(path_to_file)
 
@@ -190,6 +201,13 @@ class mainController(mainListener):
         """
         processing_title_finished = "SET file reading finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def open_set_file_computation_error(self):
+        """
+        Close the waiting window because the opening of the SET file had an error.
+        """
+        processing_title_finished = "The opening of the SET file had an error."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def open_set_file_finished(self):
         """
@@ -221,8 +239,7 @@ class mainController(mainListener):
         :type tmax: float
         """
         processing_title = "Loading selected data info, please wait."
-        finish_method = "load_data_info"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.load_data_info_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.load_data_info(montage, channels_selected, tmin, tmax)
 
@@ -294,10 +311,9 @@ class mainController(mainListener):
         Close the waiting window and display an error message because an error occurred during the computation.
         """
         processing_title_finished = "An error as occurred when trying to find events from the provided channel, please try again."
-        self.waiting_while_processing_controller.set_finish_method("error")
-        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
-    # Export
+    # Export CSV
     def export_data_to_csv_file_clicked(self, path_to_file):
         """
         Check if the path to the file is correct.
@@ -318,6 +334,14 @@ class mainController(mainListener):
         processing_title_finished = "Exportation of the data into a CSV file is finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
+    def export_data_csv_computation_error(self):
+        """
+        Close the waiting window because the exportation of the data into a CSV file had an error.
+        """
+        processing_title_finished = "The exportation of the data into a CSV file had an error."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
+
+    # Export SET
     def export_data_to_set_file_clicked(self, path_to_file):
         """
         Check if the path to the file is correct.
@@ -338,6 +362,14 @@ class mainController(mainListener):
         processing_title_finished = "Exportation of the data into a SET file is finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
+    def export_data_set_computation_error(self):
+        """
+        Close the waiting window because the exportation of the data into a SET file had an error.
+        """
+        processing_title_finished = "The exportation of the data into a SET file had an error."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
+
+    # Export events
     def export_events_to_file_clicked(self):
         """
         Check if the path to the file is correct.
@@ -362,6 +394,13 @@ class mainController(mainListener):
         """
         processing_title_finished = "Exportation of the events into a TXT file is finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def export_events_txt_computation_error(self):
+        """
+        Close the waiting window because the exportation of the data into a TXT file had an error.
+        """
+        processing_title_finished = "The exportation of the events into a TXT file had an error."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     # Save
     def save_file_clicked(self):
@@ -388,6 +427,7 @@ class mainController(mainListener):
     """
     Edit menu
     """
+    # Dataset info
     def dataset_info_clicked(self):
         """
         Create the controller for displaying some information about the dataset.
@@ -398,6 +438,7 @@ class mainController(mainListener):
         self.dataset_info_controller = datasetInfoController(sampling_rate, number_of_frames, start_time)
         self.dataset_info_controller.set_listener(self)
 
+    # Event values
     def event_values_clicked(self):
         """
         Create the controller for displaying information about the event of the dataset.
@@ -430,6 +471,7 @@ class mainController(mainListener):
         number_of_events = self.main_model.get_number_of_events()
         self.main_view.update_number_of_events(number_of_events)
 
+    # Channel location
     def channel_location_clicked(self):
         """
         Create the controller for displaying information about the channel locations of the dataset.
@@ -450,6 +492,7 @@ class mainController(mainListener):
         self.main_model.set_channel_locations(channel_locations, channel_names)
         self.main_model.set_channel_names(channel_names)
 
+    # Select data
     def select_data_clicked(self):
         pass
 
@@ -479,8 +522,7 @@ class mainController(mainListener):
         :type channels_selected: list of str
         """
         processing_title = "Filtering running, please wait."
-        finish_method = "filtering"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.filter_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.filter(low_frequency, high_frequency, channels_selected)
 
@@ -490,6 +532,13 @@ class mainController(mainListener):
         """
         processing_title_finished = "Filtering finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def filter_computation_error(self):
+        """
+        Close the waiting window because the filtering had an error.
+        """
+        processing_title_finished = "The filtering had an error."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def filter_finished(self):
         """
@@ -514,8 +563,7 @@ class mainController(mainListener):
         :type frequency: int
         """
         processing_title = "Resampling running, please wait."
-        finish_method = "resampling"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.resampling_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.resampling(frequency)
 
@@ -525,6 +573,13 @@ class mainController(mainListener):
         """
         processing_title_finished = "Resampling finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def resampling_computation_error(self):
+        """
+        Close the waiting window because the resampling had an error.
+        """
+        processing_title_finished = "The resampling had an error."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def resampling_finished(self):
         """
@@ -562,8 +617,7 @@ class mainController(mainListener):
             self.download_fsaverage_mne_data_controller.set_listener(self)
         else:
             processing_title = "Re-referencing running, please wait."
-            finish_method = "re-referencing"
-            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.re_referencing_finished)
             self.waiting_while_processing_controller.set_listener(self)
             self.main_model.re_referencing(references, n_jobs)
 
@@ -579,7 +633,7 @@ class mainController(mainListener):
         Close the waiting window because the re-referencing had an error.
         """
         processing_title_finished = "Re-referencing had an error."
-        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def re_referencing_finished(self):
         """
@@ -607,17 +661,23 @@ class mainController(mainListener):
         :type ica_method: str
         """
         processing_title = "ICA decomposition running, please wait."
-        finish_method = "ica_decomposition"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.ica_decomposition_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.ica_data_decomposition(ica_method)
 
-    def ica_decomposition_computation_finished(self):
+    def ica_data_decomposition_computation_finished(self):
         """
         Close the waiting window when the computation the ICA decomposition is done on the dataset.
         """
         processing_title_finished = "ICA decomposition finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def ica_data_decomposition_computation_error(self):
+        """
+        Close the waiting window because the ICA decomposition had an error.
+        """
+        processing_title_finished = "ICA decomposition had an error."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def ica_decomposition_finished(self):
         """
@@ -656,8 +716,7 @@ class mainController(mainListener):
         :type tmax: float
         """
         processing_title = "Epochs extraction running, please wait."
-        finish_method = "extract_epochs"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.extract_epochs_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.extract_epochs(tmin, tmax)
 
@@ -673,7 +732,7 @@ class mainController(mainListener):
         Close the waiting window because the extraction of epochs had an error.
         """
         processing_title_finished = "Epochs extraction had an error."
-        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def extract_epochs_finished(self):
         """
@@ -694,10 +753,7 @@ class mainController(mainListener):
 
     # Signal-to-noise ratio
     def snr_clicked(self):
-        """
-
-        """
-        print("SNR")
+        pass
 
     # Source Estimation
     def source_estimation_clicked(self):
@@ -744,8 +800,7 @@ class mainController(mainListener):
         :type export_path: str
         """
         processing_title = "Source estimation running, please wait."
-        finish_method = "source_estimation"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.source_estimation_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.source_estimation(source_estimation_method, save_data, load_data, epochs_method, trials_selected,
                                           n_jobs, export_path)
@@ -762,8 +817,7 @@ class mainController(mainListener):
         Close the waiting window and display an error message because an error occurred during the computation.
         """
         processing_title_finished = "An error as occurred during the computation of the source estimation, please try again."
-        self.waiting_while_processing_controller.set_finish_method("error")
-        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def source_estimation_finished(self):
         """
@@ -775,6 +829,7 @@ class mainController(mainListener):
     """
     Plot menu
     """
+    # Plot channel locations
     def plot_channel_locations_clicked(self):
         """
         Create the controller for plotting the channels' locations of the dataset.
@@ -782,6 +837,7 @@ class mainController(mainListener):
         file_data = self.main_model.get_file_data()
         self.main_view.plot_channel_locations(file_data)
 
+    # Plot data
     def plot_data_clicked(self):
         """
         Plot the data of the dataset.
@@ -795,6 +851,7 @@ class mainController(mainListener):
             event_ids = self.main_model.get_event_ids()
             self.main_view.plot_data(file_data, file_type, events=event_values, event_id=event_ids)
 
+    # Topographies
     def plot_topographies_clicked(self):
         """
         Create the controller for plotting the topographies of the dataset.
@@ -838,8 +895,7 @@ class mainController(mainListener):
         :type maximum_time: float
         """
         processing_title = "PSD running, please wait."
-        finish_method = "plot_spectra_maps"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.plot_spectra_maps_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.power_spectral_density(method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time)
 
@@ -855,7 +911,7 @@ class mainController(mainListener):
         Close the waiting window when the computation of the power spectral density is done on the dataset.
         """
         processing_title_finished = "An error has occurred during the computation of the PSD"
-        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def plot_spectra_maps_finished(self):
         """
@@ -925,8 +981,7 @@ class mainController(mainListener):
         :type n_cycles: int
         """
         processing_title = "Time frequency analysis running, please wait."
-        finish_method = "time_frequency"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.plot_time_frequency_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.time_frequency(method_tfr, channel_selected, min_frequency, max_frequency, n_cycles)
 
@@ -942,8 +997,7 @@ class mainController(mainListener):
         Close the waiting window and display an error message because an error occurred during the computation.
         """
         processing_title_finished = "An error as occurred during the time frequency analysis, please try again."
-        self.waiting_while_processing_controller.set_finish_method("error")
-        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def plot_time_frequency_finished(self):
         """
@@ -973,8 +1027,7 @@ class mainController(mainListener):
         :type export_path: str
         """
         processing_title = "Envelope correlation running, please wait."
-        finish_method = "envelope_correlation"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.envelope_correlation_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.envelope_correlation(export_path)
 
@@ -984,6 +1037,13 @@ class mainController(mainListener):
         """
         processing_title_finished = "Envelope correlation finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def envelope_correlation_computation_error(self):
+        """
+        Close the waiting window and display an error message because an error occurred during the computation.
+        """
+        processing_title_finished = "An error as occurred during the computation of the envelope correlation, please try again."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def envelope_correlation_finished(self):
         """
@@ -1029,8 +1089,7 @@ class mainController(mainListener):
         :type export_path: str
         """
         processing_title = "Source Space Connectivity running, please wait."
-        finish_method = "source_space_connectivity"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.source_space_connectivity_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.source_space_connectivity(connectivity_method, spectrum_estimation_method, source_estimation_method,
                                                   save_data, load_data, n_jobs, export_path)
@@ -1047,8 +1106,7 @@ class mainController(mainListener):
         Close the waiting window and display an error message because an error occurred during the computation.
         """
         processing_title_finished = "An error as occurred during the computation of the source space connectivity, please try again."
-        self.waiting_while_processing_controller.set_finish_method("error")
-        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def source_space_connectivity_finished(self):
         """
@@ -1073,8 +1131,7 @@ class mainController(mainListener):
         :type export_path: str
         """
         processing_title = "Sensor Space Connectivity running, please wait."
-        finish_method = "sensor_space_connectivity"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.sensor_space_connectivity_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.sensor_space_connectivity(export_path)
 
@@ -1084,6 +1141,13 @@ class mainController(mainListener):
         """
         processing_title_finished = "Sensor Space Connectivity finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def sensor_space_connectivity_computation_error(self):
+        """
+        Close the waiting window and display an error message because an error occurred during the computation.
+        """
+        processing_title_finished = "An error as occurred during the computation of the sensor space connectivity, please try again."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def sensor_space_connectivity_finished(self):
         """
@@ -1133,8 +1197,7 @@ class mainController(mainListener):
         :type trials_selected: list of int
         """
         processing_title = "Classification running, please wait."
-        finish_method = "classify"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.classify_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.classify(pipeline_selected, feature_selection, number_of_channels_to_select, hyper_tuning,
                                  cross_val_number, trials_selected)
@@ -1145,6 +1208,13 @@ class mainController(mainListener):
         """
         processing_title_finished = "Classification finished."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def classify_computation_error(self):
+        """
+        Close the waiting window and display an error message because an error occurred during the computation.
+        """
+        processing_title_finished = "An error as occurred during the computation of the classification, please try again."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def classify_finished(self):
         """
@@ -1164,53 +1234,13 @@ class mainController(mainListener):
         self.main_view.display_info(all_info)
         self.menubar_controller.enable_menu_when_file_loaded()
 
-    def waiting_while_processing_finished(self, finish_method):
-        """
-        When the waiting window is closed, call the correct method depending on the controller/method that has been called
-        earlier.
-        :param finish_method: The method to call.
-        :type finish_method: str
-        """
-        if finish_method == "open_fif_file":
-            self.open_cnt_file_finished()
-        elif finish_method == "open_cnt_file":
-            self.open_cnt_file_finished()
-        elif finish_method == "open_set_file":
-            self.open_set_file_finished()
-        elif finish_method == "load_data_info":
-            self.load_data_info_finished()
-        elif finish_method == "filtering":
-            self.filter_finished()
-        elif finish_method == "resampling":
-            self.resampling_finished()
-        elif finish_method == "re-referencing":
-            self.re_referencing_finished()
-        elif finish_method == "ica_decomposition":
-            self.ica_decomposition_finished()
-        elif finish_method == "extract_epochs":
-            self.extract_epochs_finished()
-        elif finish_method == "source_estimation":
-            self.source_estimation_finished()
-        elif finish_method == "plot_spectra_maps":
-            self.plot_spectra_maps_finished()
-        elif finish_method == "time_frequency":
-            self.plot_time_frequency_finished()
-        elif finish_method == "envelope_correlation":
-            self.envelope_correlation_finished()
-        elif finish_method == "source_space_connectivity":
-            self.source_space_connectivity_finished()
-        elif finish_method == "sensor_space_connectivity":
-            self.sensor_space_connectivity_finished()
-        elif finish_method == "classify":
-            self.classify_finished()
-
+    # Download fsaverage
     def download_fsaverage_mne_data_information(self):
         """
         Create the waiting window while the download of the fsaverage and sample datasets is done.
         """
         processing_title = "Downloading, please wait."
-        finish_method = "downloading"
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, finish_method)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title)
         self.waiting_while_processing_controller.set_listener(self)
         self.download_fsaverage_mne_data_controller.download_fsaverage_mne_data()
 

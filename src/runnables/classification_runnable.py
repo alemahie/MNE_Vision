@@ -11,6 +11,9 @@ from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
 from lib.applePy.classifier import ApplePyClassifier
 
+from utils.view.error_window import errorWindow
+
+
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
@@ -20,12 +23,12 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-# Classify
 class classifyWorkerSignals(QObject):
     """
     Contain the signals used by the classification runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class classifyRunnable(QRunnable):
@@ -72,12 +75,18 @@ class classifyRunnable(QRunnable):
         Create the classifier and launch the computation of the classification.
         Notifies the main model that the computation is finished.
         """
-        self.transform_file_data_with_trials_selected()
-        self.classifier = ApplePyClassifier(used_pipelines=self.pipeline_selected)
-        self.classifier.classify(self.file_data, dataset_path=self.directory_path, classify_test=False, test_dataset_size=5,
-                                 independent_features_selection=self.feature_selection, channels_to_select=self.number_of_channels_to_select,
-                                 tune_hypers=self.hyper_tuning, use_groups=False, cv_value=self.cross_val_number)
-        self.signals.finished.emit()
+        try:
+            self.transform_file_data_with_trials_selected()
+            self.classifier = ApplePyClassifier(used_pipelines=self.pipeline_selected)
+            self.classifier.classify(self.file_data, dataset_path=self.directory_path, classify_test=False, test_dataset_size=5,
+                                     independent_features_selection=self.feature_selection, channels_to_select=self.number_of_channels_to_select,
+                                     tune_hypers=self.hyper_tuning, use_groups=False, cv_value=self.cross_val_number)
+            self.signals.finished.emit()
+        except Exception as error:
+            error_message = "An error as occurred during the computation of the classification."
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.signals.error.emit()
 
     def transform_file_data_with_trials_selected(self):
         """

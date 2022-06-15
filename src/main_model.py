@@ -104,6 +104,7 @@ class mainModel:
         self.open_fif_file_runnable = openFifFileRunnable(path_to_file)
         pool.start(self.open_fif_file_runnable)
         self.open_fif_file_runnable.signals.finished.connect(self.open_fif_file_computation_finished)
+        self.open_fif_file_runnable.signals.error.connect(self.open_fif_file_computation_error)
 
     def open_fif_file_computation_finished(self):
         """
@@ -114,6 +115,12 @@ class mainModel:
         self.file_type_tmp = self.open_fif_file_runnable.get_file_type()
         self.file_path_name_tmp = self.open_fif_file_runnable.get_path_to_file()
         self.main_listener.open_fif_file_computation_finished()
+
+    def open_fif_file_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.open_fif_file_computation_error()
 
     # Open CNT File
     def open_cnt_file(self, path_to_file):
@@ -126,6 +133,7 @@ class mainModel:
         self.open_cnt_file_runnable = openCntFileRunnable(path_to_file)
         pool.start(self.open_cnt_file_runnable)
         self.open_cnt_file_runnable.signals.finished.connect(self.open_cnt_file_computation_finished)
+        self.open_cnt_file_runnable.signals.error.connect(self.open_cnt_file_computation_error)
 
     def open_cnt_file_computation_finished(self):
         """
@@ -136,6 +144,12 @@ class mainModel:
         self.file_type_tmp = self.open_cnt_file_runnable.get_file_type()
         self.file_path_name_tmp = self.open_cnt_file_runnable.get_path_to_file()
         self.main_listener.open_cnt_file_computation_finished()
+
+    def open_cnt_file_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.open_cnt_file_computation_error()
 
     # Open SET File
     def open_set_file(self, path_to_file):
@@ -148,6 +162,7 @@ class mainModel:
         self.open_set_file_runnable = openSetFileRunnable(path_to_file)
         pool.start(self.open_set_file_runnable)
         self.open_set_file_runnable.signals.finished.connect(self.open_set_file_computation_finished)
+        self.open_set_file_runnable.signals.error.connect(self.open_set_file_computation_error)
 
     def open_set_file_computation_finished(self):
         """
@@ -158,6 +173,12 @@ class mainModel:
         self.file_type_tmp = self.open_set_file_runnable.get_file_type()
         self.file_path_name_tmp = self.open_set_file_runnable.get_path_to_file()
         self.main_listener.open_set_file_computation_finished()
+
+    def open_set_file_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.open_set_file_computation_error()
 
     # Data Info
     def load_data_info(self, montage, channels_selected, tmin, tmax):
@@ -245,7 +266,7 @@ class mainModel:
         """
         self.main_listener.find_events_from_channel_computation_error()
 
-    # Export
+    # Export CSV
     def export_data_to_csv_file_clicked(self, path_to_file):
         """
         Check if the path to the file is correct.
@@ -257,10 +278,22 @@ class mainModel:
         self.export_data_csv_runnable = exportDataCSVRunnable(self.file_data, path_to_file)
         pool.start(self.export_data_csv_runnable)
         self.export_data_csv_runnable.signals.finished.connect(self.export_data_csv_computation_finished)
+        self.export_data_csv_runnable.signals.error.connect(self.export_data_csv_computation_error)
 
     def export_data_csv_computation_finished(self):
+        """
+        Retrieves the data from the runnable when the data are exported into a CSV file.
+        Notifies the main controller that the computation is done.
+        """
         self.main_listener.export_data_csv_computation_finished()
 
+    def export_data_csv_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.export_data_csv_computation_error()
+
+    # Export SET
     def export_data_to_set_file_clicked(self, path_to_file):
         """
         Check if the path to the file is correct.
@@ -272,10 +305,22 @@ class mainModel:
         self.export_data_set_runnable = exportDataSETRunnable(self.file_data, path_to_file)
         pool.start(self.export_data_set_runnable)
         self.export_data_set_runnable.signals.finished.connect(self.export_data_set_computation_finished)
+        self.export_data_set_runnable.signals.error.connect(self.export_data_set_computation_error)
 
     def export_data_set_computation_finished(self):
+        """
+        Retrieves the data from the runnable when the data are exported into a SET file.
+        Notifies the main controller that the computation is done.
+        """
         self.main_listener.export_data_set_computation_finished()
 
+    def export_data_set_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.export_data_set_computation_error()
+
+    # Export events
     def export_events_to_file_clicked(self, path_to_file):
         """
         Check if the path to the file is correct.
@@ -287,9 +332,20 @@ class mainModel:
         self.export_events_txt_runnable = exportEventsTXTRunnable(self.file_data, path_to_file)
         pool.start(self.export_events_txt_runnable)
         self.export_events_txt_runnable.signals.finished.connect(self.export_events_txt_computation_finished)
+        self.export_events_txt_runnable.signals.error.connect(self.export_events_txt_computation_error)
 
     def export_events_txt_computation_finished(self):
+        """
+        Retrieves the data from the runnable when the events are exported into a TXT file.
+        Notifies the main controller that the computation is done.
+        """
         self.main_listener.export_events_txt_computation_finished()
+
+    def export_events_txt_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.export_events_txt_computation_error()
 
     # Save
     def save_file(self, path_to_file):
@@ -339,6 +395,7 @@ class mainModel:
         self.filter_runnable = filterRunnable(low_frequency, high_frequency, channels_selected, self.file_data)
         pool.start(self.filter_runnable)
         self.filter_runnable.signals.finished.connect(self.filter_computation_finished)
+        self.filter_runnable.signals.error.connect(self.filter_computation_error)
 
     def filter_computation_finished(self):
         """
@@ -347,6 +404,12 @@ class mainModel:
         """
         self.file_data = self.filter_runnable.get_file_data()
         self.main_listener.filter_computation_finished()
+
+    def filter_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.filter_computation_error()
 
     # Resampling
     def resampling(self, new_frequency):
@@ -359,6 +422,7 @@ class mainModel:
         self.resampling_runnable = resamplingRunnable(new_frequency, self.file_data)
         pool.start(self.resampling_runnable)
         self.resampling_runnable.signals.finished.connect(self.resampling_computation_finished)
+        self.resampling_runnable.signals.error.connect(self.resampling_computation_error)
 
     def resampling_computation_finished(self):
         """
@@ -367,6 +431,12 @@ class mainModel:
         """
         self.file_data = self.resampling_runnable.get_file_data()
         self.main_listener.resampling_computation_finished()
+
+    def resampling_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.resampling_computation_error()
 
     # Re-referencing
     def re_referencing(self, references, n_jobs):
@@ -410,6 +480,7 @@ class mainModel:
         self.ica_data_decomposition_runnable = icaRunnable(ica_method, self.file_data)
         pool.start(self.ica_data_decomposition_runnable)
         self.ica_data_decomposition_runnable.signals.finished.connect(self.ica_data_decomposition_computation_finished)
+        self.ica_data_decomposition_runnable.signals.error.connect(self.ica_data_decomposition_computation_error)
 
     def ica_data_decomposition_computation_finished(self):
         """
@@ -418,7 +489,13 @@ class mainModel:
         """
         self.file_data = self.ica_data_decomposition_runnable.get_file_data()
         self.ica_decomposition = "Yes"
-        self.main_listener.ica_decomposition_computation_finished()
+        self.main_listener.ica_data_decomposition_computation_finished()
+
+    def ica_data_decomposition_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.ica_data_decomposition_computation_error()
 
     # Extract Epochs
     def extract_epochs(self, tmin, tmax):
@@ -497,6 +574,7 @@ class mainModel:
     """
     Plot menu
     """
+    # PSD
     def power_spectral_density(self, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
         """
         Creates the parallel runnable for computing the power spectral density.
@@ -530,6 +608,7 @@ class mainModel:
         """
         self.main_listener.plot_spectra_maps_computation_error()
 
+    # Time frequency
     def time_frequency(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
         """
         Creates the parallel runnable for computing a time-frequency analysis of the data.
@@ -566,6 +645,7 @@ class mainModel:
     """
     Connectivity menu
     """
+    # Envelope correlation
     def envelope_correlation(self, export_path):
         """
         Creates the parallel runnable for computing the envelope correlation between the channels of the dataset.
@@ -576,13 +656,21 @@ class mainModel:
         self.envelope_correlation_runnable = envelopeCorrelationRunnable(self.file_data, export_path)
         pool.start(self.envelope_correlation_runnable)
         self.envelope_correlation_runnable.signals.finished.connect(self.envelope_correlation_computation_finished)
+        self.envelope_correlation_runnable.signals.error.connect(self.envelope_correlation_computation_error)
 
     def envelope_correlation_computation_finished(self):
         """
-        Notifies the main controller that the computation is done.
+        Notifies the main controller that the computation of the envelope correlation is done.
         """
         self.main_listener.envelope_correlation_computation_finished()
 
+    def envelope_correlation_computation_error(self):
+        """
+        Notifies the main controller that an error has occurred during the computation
+        """
+        self.main_listener.envelope_correlation_computation_error()
+
+    # Source space connectivity
     def source_space_connectivity(self, connectivity_method, spectrum_estimation_method, source_estimation_method, save_data,
                                   load_data, n_jobs, export_path):
         """
@@ -625,6 +713,7 @@ class mainModel:
         """
         self.main_listener.source_estimation_computation_error()
 
+    # Sensor space connectivity
     def sensor_space_connectivity(self, export_path):
         """
         Creates the parallel runnable for computing the connectivity of the sensor space of the dataset.
@@ -635,12 +724,19 @@ class mainModel:
         self.sensor_space_connectivity_runnable = sensorSpaceConnectivityRunnable(self.file_data, export_path)
         pool.start(self.sensor_space_connectivity_runnable)
         self.sensor_space_connectivity_runnable.signals.finished.connect(self.sensor_space_connectivity_computation_finished)
+        self.sensor_space_connectivity_runnable.signals.error.connect(self.sensor_space_connectivity_computation_error)
 
     def sensor_space_connectivity_computation_finished(self):
         """
         Notifies the main controller that the computation is done.
         """
         self.main_listener.sensor_space_connectivity_computation_finished()
+
+    def sensor_space_connectivity_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.sensor_space_connectivity_computation_error()
 
     """
     Classification menu
@@ -671,12 +767,19 @@ class mainModel:
                                                   hyper_tuning, cross_val_number, trials_selected)
         pool.start(self.classify_runnable)
         self.classify_runnable.signals.finished.connect(self.classify_computation_finished)
+        self.classify_runnable.signals.error.connect(self.classify_computation_error)
 
     def classify_computation_finished(self):
         """
         Notifies the main controller that the computation is done.
         """
         self.main_listener.classify_computation_finished()
+
+    def classify_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.classify_computation_error()
 
     """
     Others

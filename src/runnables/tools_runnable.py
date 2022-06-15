@@ -33,6 +33,7 @@ class filterWorkerSignals(QObject):
     Contain the signals used by the filter runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class filterRunnable(QRunnable):
@@ -50,6 +51,7 @@ class filterRunnable(QRunnable):
         """
         super().__init__()
         self.signals = filterWorkerSignals()
+
         self.low_frequency = low_frequency
         self.high_frequency = high_frequency
         self.channels_selected = channels_selected
@@ -60,8 +62,14 @@ class filterRunnable(QRunnable):
         Launch the computation of the filtering on the given data.
         Notifies the main model that the computation is finished.
         """
-        self.file_data.filter(l_freq=self.low_frequency, h_freq=self.high_frequency, picks=self.channels_selected)
-        self.signals.finished.emit()
+        try:
+            self.file_data.filter(l_freq=self.low_frequency, h_freq=self.high_frequency, picks=self.channels_selected)
+            self.signals.finished.emit()
+        except Exception as error:
+            error_message = "An error has occurred during the filtering."
+            error_window = errorWindow(error_message=error_message, detailed_message=str(error))
+            error_window.show()
+            self.signals.error.emit()
 
     def get_file_data(self):
         """
@@ -78,6 +86,7 @@ class resamplingWorkerSignals(QObject):
     Contain the signals used by the resampling runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class resamplingRunnable(QRunnable):
@@ -99,14 +108,20 @@ class resamplingRunnable(QRunnable):
         Launch the computation of the resampling on the given data.
         Notifies the main model that the computation is finished.
         """
-        old_frequency = self.file_data.info.get("sfreq")
-        new_frequency = self.frequency
-        self.file_data.resample(new_frequency)
-        number_of_frames = len(self.file_data.times)
-        self.file_data.events[0][0] *= (new_frequency/old_frequency)
-        for i in range(1, len(self.file_data.events)):
-            self.file_data.events[i][0] = self.file_data.events[i-1][0] + number_of_frames
-        self.signals.finished.emit()
+        try:
+            old_frequency = self.file_data.info.get("sfreq")
+            new_frequency = self.frequency
+            self.file_data.resample(new_frequency)
+            number_of_frames = len(self.file_data.times)
+            self.file_data.events[0][0] *= (new_frequency/old_frequency)
+            for i in range(1, len(self.file_data.events)):
+                self.file_data.events[i][0] = self.file_data.events[i-1][0] + number_of_frames
+            self.signals.finished.emit()
+        except Exception as error:
+            error_message = "An error has occurred during the resampling."
+            error_window = errorWindow(error_message=error_message, detailed_message=str(error))
+            error_window.show()
+            self.signals.error.emit()
 
     def get_file_data(self):
         """
@@ -163,7 +178,7 @@ class reReferencingRunnable(QRunnable):
                 self.file_data.set_eeg_reference(ref_channels=self.references)
             self.signals.finished.emit()
         except Exception as error:
-            error_message = "An error has occured during the computation of the re-referencing."
+            error_message = "An error has occurred during the computation of the re-referencing."
             error_window = errorWindow(error_message, detailed_message=str(error))
             error_window.show()
             self.signals.error.emit()
@@ -233,6 +248,7 @@ class icaWorkerSignals(QObject):
     Contain the signals used by the ICA Decomposition runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class icaRunnable(QRunnable):
@@ -259,10 +275,11 @@ class icaRunnable(QRunnable):
             ica.fit(self.file_data)
             ica.apply(self.file_data)
             self.signals.finished.emit()
-        except Exception as e:
+        except Exception as error:
             error_message = "An error as occurred during the computation of the ICA."
-            error_window = errorWindow(error_message)
+            error_window = errorWindow(error_message, detailed_message=str(error))
             error_window.show()
+            self.signals.error.emit()
 
     """
     Getters
@@ -406,8 +423,7 @@ class sourceEstimationRunnable(QRunnable):
             self.signals.error.emit()
         except Exception as error:
             error_message = "An error as occurred during the computation of the source estimation."
-            detailed_message = str(error)
-            error_window = errorWindow(error_message, detailed_message)
+            error_window = errorWindow(error_message, detailed_message=str(error))
             error_window.show()
             self.signals.error.emit()
 

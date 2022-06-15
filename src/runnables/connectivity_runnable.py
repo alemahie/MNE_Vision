@@ -30,6 +30,7 @@ class envelopeCorrelationWorkerSignals(QObject):
     Contain the signals used by the envelope correlation runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class envelopeCorrelationRunnable(QRunnable):
@@ -60,9 +61,12 @@ class envelopeCorrelationRunnable(QRunnable):
 
             # correlation_data = phase_slope_index(self.file_data)
             # self.envelope_correlation_data = correlation_data.get_data(output="dense")[:, :, 0]
-        except Exception as e:
-            print(e)
-        self.signals.finished.emit()
+            self.signals.finished.emit()
+        except Exception as error:
+            error_message = "An error as occurred during the computation of the envelope correlation."
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.signals.error.emit()
 
     def check_data_export(self):
         """
@@ -215,7 +219,6 @@ class sourceSpaceConnectivityRunnable(QRunnable):
                 file.write("\n")
             file.close()
 
-
     def compute_envelope_correlation_with_source_space(self):
         """
         Launch the computation of the source space if it is not provided.
@@ -363,6 +366,7 @@ class sensorSpaceConnectivityWorkerSignals(QObject):
     Contain the signals used by the sensor space connectivity runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 # noinspection PyUnresolvedReferences
@@ -394,8 +398,11 @@ class sensorSpaceConnectivityRunnable(QRunnable):
             self.sensor_space_connectivity_data = connectivity_data.get_data(output='dense')[:, :, 0]
             self.check_data_export()
             self.signals.finished.emit()
-        except Exception as e:
-            print(e)
+        except Exception as error:
+            error_message = "An error as occurred during the computation of the sensor space connectivity."
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.signals.error.emit()
 
     def check_data_export(self):
         """

@@ -31,6 +31,7 @@ class openFifFileWorkerSignals(QObject):
     Contain the signals used by the open FIF file runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class openFifFileRunnable(QRunnable):
@@ -59,9 +60,12 @@ class openFifFileRunnable(QRunnable):
             else:
                 self.file_type = "Epochs"
                 self.file_data = read_epochs(self.path_to_file, preload=True)
-        except TypeError:
-            print("Error")
-        self.signals.finished.emit()
+            self.signals.finished.emit()
+        except TypeError as error:
+            error_message = "An error has occurred"
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.signals.error.emit()
 
     def get_file_data(self):
         """
@@ -94,12 +98,13 @@ class openCntFileWorkerSignals(QObject):
     Contain the signals used by the open CNT file runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class openCntFileRunnable(QRunnable):
     def __init__(self, path_to_file):
         """
-        Runnable for the opening of a CNT file, getting the dataset's data.
+        Runnable for the opening of an ANT eego CNT file, getting the dataset's data.
         :param path_to_file: The path to the file.
         :type path_to_file: str
         """
@@ -112,20 +117,18 @@ class openCntFileRunnable(QRunnable):
 
     def run(self):
         """
-        Launch the reading of the CNT file.
+        Launch the reading of the ANT eego CNT file.
         Notifies the main model that the computation is finished.
         """
         try:
             self.file_data = get_raw_from_cnt(self.path_to_file)
             self.file_type = "Raw"
-        except TypeError:
-            error_message = "An error has occurred during the reading of the CNT file."
-            error_window = errorWindow(error_message)
+            self.signals.finished.emit()
+        except Exception as error:
+            error_message = "An error has occurred during the reading of the ANT eego CNT file."
+            error_window = errorWindow(error_message, detailed_message=str(error))
             error_window.show()
-        except Exception as e:
-            print(e)
-            print(type(e))
-        self.signals.finished.emit()
+            self.signals.error.emit()
 
     def get_file_data(self):
         """
@@ -158,6 +161,7 @@ class openSetFileWorkerSignals(QObject):
     Contain the signals used by the open SET file runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class openSetFileRunnable(QRunnable):
@@ -179,16 +183,33 @@ class openSetFileRunnable(QRunnable):
         Launch the reading of the SET file.
         Notifies the main model that the computation is finished.
         """
+        raw_read, epochs_read = False, False
         try:
             self.file_data = read_raw_eeglab(self.path_to_file, preload=True)
             self.file_type = "Raw"
-        except TypeError:
-            self.file_data = read_epochs_eeglab(self.path_to_file)
-            self.file_type = "Epochs"
-        except FileNotFoundError:
-            self.file_data = None
-            self.file_type = None
-        self.signals.finished.emit()
+            raw_read = True
+        except Exception as error:
+            raw_read = False
+            print(error)
+            print(type(error))
+
+        if not raw_read:    # Raw reading failed, try epochs
+            try:
+                self.file_data = read_epochs_eeglab(self.path_to_file)
+                self.file_type = "Epochs"
+                epochs_read = True
+            except Exception as error:
+                epochs_read = False
+                print(error)
+                print(type(error))
+
+        if raw_read or epochs_read:
+            self.signals.finished.emit()
+        else:
+            error_message = "An error has occurred during the reading of the SET file."
+            error_window = errorWindow(error_message)
+            error_window.show()
+            self.signals.error.emit()
 
     def get_file_data(self):
         """
@@ -304,8 +325,11 @@ class findEventsFromChannelRunnable(QRunnable):
         try:
             self.read_events = find_events(self.file_data, stim_channel=self.stim_channel)
             self.signals.finished.emit()
-        except Exception as e:
-            print(e)
+        except Exception as error:
+            error_message = "An error has occurred when trying to find the events on the given channel, please check the " \
+                            "channel used for the computation."
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
             self.signals.error.emit()
 
     def get_read_events(self):
@@ -323,6 +347,7 @@ class exportDataCSVWorkerSignals(QObject):
     Contain the signals used by the export data CSV runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class exportDataCSVRunnable(QRunnable):
@@ -345,24 +370,30 @@ class exportDataCSVRunnable(QRunnable):
         Launch the exportation of the data of the dataset into a CSV file.
         Notifies the main model that the computation is finished.
         """
-        data = self.file_data.get_data()
-        time_points = self.file_data.times
+        try:
+            data = self.file_data.get_data()
+            time_points = self.file_data.times
 
-        file = open(self.path_to_file + ".csv", "x")
-        # Write header
-        file.write("Time")
-        for channel in self.file_data.ch_names:
-            file.write(", " + channel)
-        file.write("\n")
-        # Write data
-        for i in range(len(data)):  # Epoch
-            for j in range(len(data[0][0])):   # Time
-                file.write(str(time_points[j]))
-                for k in range(len(data[0])):    # Channel
-                    file.write(", " + str(data[i][i][j]))
-                file.write("\n")
-        file.close()
-        self.signals.finished.emit()
+            file = open(self.path_to_file + ".csv", "x")
+            # Write header
+            file.write("Time")
+            for channel in self.file_data.ch_names:
+                file.write(", " + channel)
+            file.write("\n")
+            # Write data
+            for i in range(len(data)):  # Epoch
+                for j in range(len(data[0][0])):   # Time
+                    file.write(str(time_points[j]))
+                    for k in range(len(data[0])):    # Channel
+                        file.write(", " + str(data[i][i][j]))
+                    file.write("\n")
+            file.close()
+            self.signals.finished.emit()
+        except Exception as error:
+            error_message = "An error has occurred when exporting the data into a CSV file."
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.signals.error.emit()
 
 
 # Export Data to SET file
@@ -371,6 +402,7 @@ class exportDataSETWorkerSignals(QObject):
     Contain the signals used by the export data CSV runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class exportDataSETRunnable(QRunnable):
@@ -395,11 +427,12 @@ class exportDataSETRunnable(QRunnable):
         """
         try:
             self.file_data.export(self.path_to_file + ".set", fmt="eeglab")
-        except:
-            error_message = "An error has occurred"
-            error_window = errorWindow(error_message=error_message)
+            self.signals.finished.emit()
+        except Exception as error:
+            error_message = "An error has occurred when exporting the data into a SET file."
+            error_window = errorWindow(error_message=error_message, detailed_message=str(error))
             error_window.show()
-        self.signals.finished.emit()
+            self.signals.error.emit()
 
 
 # Export Events to TXT file
@@ -408,6 +441,7 @@ class exportEventsTXTWorkerSignals(QObject):
     Contain the signals used by the export events TXT runnable.
     """
     finished = pyqtSignal()
+    error = pyqtSignal()
 
 
 class exportEventsTXTRunnable(QRunnable):
@@ -430,18 +464,24 @@ class exportEventsTXTRunnable(QRunnable):
         Launch the exportation of the events of the dataset into a TXT file.
         Notifies the main model that the computation is finished.
         """
-        event_values = self.file_data.events
-        event_ids = self.file_data.event_id
-        file = open(self.path_to_file + ".txt", "x")
-        file.write("Number, Type, Latency \n")
-        for i in range(len(event_values)):
-            latency = event_values[i][0]
-            event_id = event_values[i][2]
-            file.write(str(i) + ", ")   # Event number
-            for key in event_ids.keys():
-                if event_ids[key] == event_id:  # Find correct key / event name
-                    file.write(key + ", ")
-                    break
-            file.write(str(latency) + "\n")
-        file.close()
-        self.signals.finished.emit()
+        try:
+            event_values = self.file_data.events
+            event_ids = self.file_data.event_id
+            file = open(self.path_to_file + ".txt", "x")
+            file.write("Number, Type, Latency \n")
+            for i in range(len(event_values)):
+                latency = event_values[i][0]
+                event_id = event_values[i][2]
+                file.write(str(i) + ", ")   # Event number
+                for key in event_ids.keys():
+                    if event_ids[key] == event_id:  # Find correct key / event name
+                        file.write(key + ", ")
+                        break
+                file.write(str(latency) + "\n")
+            file.close()
+            self.signals.finished.emit()
+        except Exception as error:
+            error_message = "An error has occurred during the exportation of the events into a TXT file."
+            error_window = errorWindow(error_message=error_message, detailed_message=str(error))
+            error_window.show()
+            self.signals.error.emit()
