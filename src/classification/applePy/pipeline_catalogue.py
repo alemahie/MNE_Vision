@@ -9,8 +9,8 @@ from pyriemann.spatialfilters import Xdawn, CSP
 from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import LogisticRegression
 
-from lib.applePy.channel_selection import ElectrodeSelectionRaw
-from lib.applePy.tools import DownSampler, EpochsVectorizer, CospBoostingClassifier, PSDfiltering
+from classification.applePy.channel_selection import ElectrodeSelectionRaw
+from classification.applePy.tools import DownSampler, EpochsVectorizer, CospBoostingClassifier, PSDfiltering
 
 CONST_DEFAULT_RANDOMIZEDSEARCH_NBITER = 10
 

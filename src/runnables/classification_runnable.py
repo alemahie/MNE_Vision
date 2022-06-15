@@ -9,7 +9,7 @@ from copy import deepcopy
 
 from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
-from lib.applePy.classifier import ApplePyClassifier
+from classification.applePy.classifier import ApplePyClassifier
 
 from utils.view.error_window import errorWindow
 

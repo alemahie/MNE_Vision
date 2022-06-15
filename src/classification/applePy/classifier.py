@@ -1,5 +1,4 @@
 import os
-import sys
 import math
 
 import numpy as np
@@ -22,10 +21,10 @@ from sklearn.model_selection import KFold, LeaveOneOut, GroupKFold
 
 from pyriemann.estimation import Covariances
 
-from lib.applePy.channel_selection import ElectrodeSelection
-from lib.applePy.pipeline_catalogue import Pipeline_catalogue
-from lib.applePy.sources_estimator import Sources_estimator
-from lib.applePy.cnn import CNN
+from classification.applePy.channel_selection import ElectrodeSelection
+from classification.applePy.pipeline_catalogue import Pipeline_catalogue
+from classification.applePy.sources_estimator import Sources_estimator
+from classification.applePy.cnn import CNN
 
 CONST_MAX_1by1_ELECTRODES = 30
 CONST_MAX_5by5_ELECTRODES = 50
