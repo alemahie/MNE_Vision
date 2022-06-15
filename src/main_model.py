@@ -1167,4 +1167,4 @@ class mainModel:
         :param channel_names: The channels' names.
         :type channel_names: list of str
         """
-        self.file_data.info.update({"ch_names": copy(channel_names)})
+        self.file_data = self.file_data.pick_channels(channel_names)

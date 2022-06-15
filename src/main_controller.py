@@ -489,8 +489,8 @@ class mainController(mainListener):
         :param channel_names: Channel names
         :type channel_names: list of str
         """
-        self.main_model.set_channel_locations(channel_locations, channel_names)
         self.main_model.set_channel_names(channel_names)
+        self.main_model.set_channel_locations(channel_locations, channel_names)
 
     # Select data
     def select_data_clicked(self):
