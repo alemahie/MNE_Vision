@@ -12,6 +12,7 @@ from mne.channels import make_standard_montage
 from mne.io import read_raw_fif, read_raw_eeglab, read_epochs_eeglab
 
 from utils.cnt_reader.cnt_file_reader import get_raw_from_cnt
+from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -23,9 +24,6 @@ __status__ = "Dev"
 
 
 # Open FIF File
-from utils.view.error_window import errorWindow
-
-
 class openFifFileWorkerSignals(QObject):
     """
     Contain the signals used by the open FIF file runnable.

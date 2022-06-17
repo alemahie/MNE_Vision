@@ -1,0 +1,2 @@
+[gui_scripts]
+mne_vision = mne_vision:main

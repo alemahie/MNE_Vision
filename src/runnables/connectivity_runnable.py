@@ -234,8 +234,10 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         else:
             inv = self.create_inverse_operator()
         stcs = self.compute_inverse(inv)
+
         labels = get_labels_from_subject(self.subject, self.subjects_dir)
         label_ts = extract_label_time_course(stcs, labels, inv['src'], mode='mean_flip', return_generator=True)
+
         sfreq = self.file_data.info["sfreq"]
         correlation_data = spectral_connectivity_epochs(label_ts, method=self.connectivity_method, mode=self.spectrum_estimation_method,
                                                         sfreq=sfreq, faverage=True, mt_adaptive=True, n_jobs=self.n_jobs)

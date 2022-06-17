@@ -9,8 +9,6 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLab
 
 from mne_connectivity.viz import plot_connectivity_circle
 
-# import matplotlib.pyplot as plt
-
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]

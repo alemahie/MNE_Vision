@@ -1,0 +1,2 @@
+include image/mne_vision_logo.png
+include mne_vision/utils/cnt_reader/libeep/*

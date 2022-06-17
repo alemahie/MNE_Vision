@@ -22,14 +22,22 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
+def main():
+    try:
+        app = QApplication(sys.argv)
+        app.setStyleSheet(get_stylesheet())
+
+        # splash_screen = splashScreen()
+        # splash_screen.show()
+        # app.processEvents()     # Allow the splash screen to be displayed while loading the main window
+
+        screen_size = app.primaryScreen().size()
+        main_controller = mainController(screen_size)
+        sys.exit(app.exec())
+    except Exception as e:
+        print(e)
+        print(type(e))
+
+
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    app.setStyleSheet(get_stylesheet())
-
-    # splash_screen = splashScreen()
-    # splash_screen.show()
-    # app.processEvents()     # Allow the splash screen to be displayed while loading the main window
-
-    screen_size = app.primaryScreen().size()
-    main_controller = mainController(screen_size)
-    sys.exit(app.exec())
+    main()

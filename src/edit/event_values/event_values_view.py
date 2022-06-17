@@ -4,6 +4,7 @@
 """
 Event Values View
 """
+
 from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QVBoxLayout, QLineEdit, QLabel, QHBoxLayout
 
