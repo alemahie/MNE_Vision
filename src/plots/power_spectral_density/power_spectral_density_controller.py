@@ -39,11 +39,9 @@ class powerSpectralDensityController(powerSpectralDensityListener):
         """
         self.power_spectral_density_view.close()
 
-    def confirm_button_clicked(self, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
+    def confirm_button_clicked(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
         """
         Close the window and send the information to the main controller.
-        :param method_psd: Method used to compute the power spectral density.
-        :type method_psd: str
         :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.
         :type minimum_frequency: float
         :param maximum_frequency: Maximum frequency from which the power spectral density will be computed.
@@ -52,20 +50,22 @@ class powerSpectralDensityController(powerSpectralDensityListener):
         :type minimum_time: float
         :param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.
         :type maximum_time: float
+        :param topo_time_points: The time points for the topomaps.
+        :type topo_time_points: list of float
         """
-        self.main_listener.plot_spectra_maps_information(method_psd, minimum_frequency, maximum_frequency, minimum_time,
-                                                         maximum_time)
+        self.main_listener.plot_spectra_maps_information(minimum_frequency, maximum_frequency, minimum_time, maximum_time,
+                                                         topo_time_points)
         self.power_spectral_density_view.close()
 
-    def plot_psd(self, psds, freqs):
+    def plot_psd(self, psd_fig, topo_fig):
         """
         Send the information to the view for plotting the power spectral density computed.
-        :param psds: The actual power spectral density data computed
-        :type psds: list of, list of, list of float
-        :param freqs: The frequencies at which the power spectral density is computed.
-        :type freqs: list of float
+        :param psd_fig: The figure of the actual power spectral density's data computed
+        :type psd_fig: matplotlib.Figure
+        :param topo_fig: The figure of the topographies of the actual power spectral density's data computed
+        :type topo_fig: matplotlib.Figure
         """
-        self.power_spectral_density_view.plot_psd(psds, freqs)
+        self.power_spectral_density_view.plot_psd(psd_fig, topo_fig)
 
     """
     Setters

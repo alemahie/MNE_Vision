@@ -24,10 +24,12 @@ __status__ = "Dev"
 
 
 class eventValuesController(eventValuesListener):
-    def __init__(self, event_values, event_ids, number_of_epochs, number_of_frames):
+    def __init__(self, file_type, event_values, event_ids, number_of_epochs, number_of_frames):
         """
         Controller for editing the events' information
         Create a new window for displaying the events' information.
+        :param file_type: The type of the file, either "Epochs" or "Raw"
+        :type file_type: str
         :param event_values: Event values
         :type event_values: list of, list of int
         :param event_ids: Event ids
@@ -43,6 +45,7 @@ class eventValuesController(eventValuesListener):
 
         self.event_values_view.show()
 
+        self.file_type = file_type
         self.event_values = np.copy(event_values)
         self.event_ids = copy(event_ids)
         self.number_of_epochs = number_of_epochs
@@ -67,7 +70,8 @@ class eventValuesController(eventValuesListener):
         :param latency: The latency of the event.
         :type latency: int
         """
-        if len(self.event_values) == self.number_of_epochs:
+        if self.file_type == "Raw" or len(self.event_values) == self.number_of_epochs:
+            # If file type is not "Raw", then it is "Epochs" and number of event must be equal to number epochs.
             self.update_event_data(event_name, latency)
             self.main_listener.event_values_finished(self.event_values, self.event_ids)
             self.event_values_view.close()

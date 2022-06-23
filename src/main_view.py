@@ -7,7 +7,7 @@ Main view
 
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QLabel, QFileDialog
 
-from mne.viz import plot_sensors
+from mne.viz import plot_sensors, set_3d_backend, set_browser_backend
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -55,6 +55,15 @@ class mainView(QMainWindow):
 
         self.setCentralWidget(self.central_widget)
         self.setWindowTitle("MNE Vision")
+        self.setup_mne_backends()
+
+    @staticmethod
+    def setup_mne_backends():
+        """
+        Set the 2D and 3D backends that will be used by MNE for the plots.
+        """
+        set_browser_backend("matplotlib")
+        set_3d_backend("pyvistaqt")
 
     def display_info(self, all_info):
         """
@@ -84,7 +93,7 @@ class mainView(QMainWindow):
         plot the data of all channels.
         :param file_data: "Epochs" or "Raw" MNE file containing the information about the dataset.
         :type file_data: MNE_Epochs/MNE_Raw
-        :param file_type: The type of the file, either "Epochs" or "Raw
+        :param file_type: The type of the file, either "Epochs" or "Raw"
         :type file_type: str
         :param events: Event values
         :type events: list of, list of int

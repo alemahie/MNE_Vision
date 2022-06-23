@@ -7,7 +7,7 @@ Files runnable
 
 from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
-from mne import read_epochs, find_events
+from mne import read_epochs, find_events, events_from_annotations
 from mne.channels import make_standard_montage
 from mne.io import read_raw_fif, read_raw_eeglab, read_epochs_eeglab
 
@@ -175,6 +175,8 @@ class openSetFileRunnable(QRunnable):
         self.path_to_file = path_to_file
         self.file_data = None
         self.file_type = None
+        self.read_events = None
+        self.read_event_ids = None
 
     def run(self):
         """
@@ -182,6 +184,7 @@ class openSetFileRunnable(QRunnable):
         Notifies the main model that the computation is finished.
         """
         raw_read, epochs_read = False, False
+        detailed_error = None
         try:
             self.file_data = read_raw_eeglab(self.path_to_file, preload=True)
             self.file_type = "Raw"
@@ -190,6 +193,7 @@ class openSetFileRunnable(QRunnable):
             raw_read = False
             print(error)
             print(type(error))
+            detailed_error = error
 
         if not raw_read:    # Raw reading failed, try epochs
             try:
@@ -198,6 +202,7 @@ class openSetFileRunnable(QRunnable):
                 epochs_read = True
             except Exception as error:
                 epochs_read = False
+                detailed_error = error
                 print(error)
                 print(type(error))
 
@@ -205,7 +210,7 @@ class openSetFileRunnable(QRunnable):
             self.signals.finished.emit()
         else:
             error_message = "An error has occurred during the reading of the SET file."
-            error_window = errorWindow(error_message)
+            error_window = errorWindow(error_message, detailed_message=str(detailed_error))
             error_window.show()
             self.signals.error.emit()
 
@@ -311,6 +316,7 @@ class findEventsFromChannelRunnable(QRunnable):
         self.file_data = file_data
         self.stim_channel = stim_channel
         self.read_events = None
+        self.read_event_ids = None
 
     def run(self):
         """
@@ -324,11 +330,23 @@ class findEventsFromChannelRunnable(QRunnable):
             self.read_events = find_events(self.file_data, stim_channel=self.stim_channel)
             self.signals.finished.emit()
         except Exception as error:
-            error_message = "An error has occurred when trying to find the events on the given channel, please check the " \
-                            "channel used for the computation."
-            error_window = errorWindow(error_message, detailed_message=str(error))
-            error_window.show()
-            self.signals.error.emit()
+            if self.stim_channel is not None:
+                error_message = "An error has occurred when trying to find the events on the given channel, please check the " \
+                                "channel used for the computation."
+                error_window = errorWindow(error_message, detailed_message=str(error))
+                error_window.show()
+                self.signals.error.emit()
+            else:   # No stim channel was precised and computation failed, so try another method.
+                try:
+                    events, event_ids = events_from_annotations(self.file_data)
+                    self.read_events = events
+                    self.read_event_ids = event_ids
+                    self.signals.finished.emit()
+                except Exception as error:
+                    error_message = "An error has occurred when trying to find the events."
+                    error_window = errorWindow(error_message, detailed_message=str(error))
+                    error_window.show()
+                    self.signals.error.emit()
 
     def get_read_events(self):
         """
@@ -337,6 +355,14 @@ class findEventsFromChannelRunnable(QRunnable):
         :rtype: list of int
         """
         return self.read_events
+
+    def get_read_event_ids(self):
+        """
+        Get the read event ids.
+        :return: The event ids.
+        :rtype: dict
+        """
+        return self.read_event_ids
 
 
 # Export Data to CSV file

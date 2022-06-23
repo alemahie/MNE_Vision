@@ -295,7 +295,7 @@ class mainController(mainListener):
         :type stim_channel: str
         """
         processing_title = "Finding events from the channel, please wait."
-        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title)
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.find_events_from_channel_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.find_events_from_channel(stim_channel)
 
@@ -312,6 +312,13 @@ class mainController(mainListener):
         """
         processing_title_finished = "An error as occurred when trying to find events from the provided channel, please try again."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
+
+    def find_events_from_channel_finished(self):
+        """
+        Display the new information about the events on the main window.
+        """
+        number_of_events = self.main_model.get_number_of_events()
+        self.main_view.update_number_of_events(number_of_events)
 
     # Export CSV
     def export_data_to_csv_file_clicked(self, path_to_file):
@@ -444,17 +451,21 @@ class mainController(mainListener):
         Create the controller for displaying information about the event of the dataset.
         Display an error message if the dataset is a "Raw" dataset, because only "Epochs" dataset have events.
         """
-        file_type = self.main_model.get_file_type()
-        if file_type == "Epochs":
+        event_values = self.main_model.get_event_values()
+        number_of_events = self.main_model.get_number_of_events()
+        if event_values is not None and number_of_events != 0:
+            file_type = self.main_model.get_file_type()
             event_values = self.main_model.get_event_values()
             event_ids = self.main_model.get_event_ids()
             number_of_epochs = self.main_model.get_number_of_epochs()
             number_of_frames = self.main_model.get_number_of_frames()
-            self.event_values_controller = eventValuesController(event_values, event_ids, number_of_epochs,
+            self.event_values_controller = eventValuesController(file_type, event_values, event_ids, number_of_epochs,
                                                                  number_of_frames)
             self.event_values_controller.set_listener(self)
         else:
-            error_message = "You must be working with an epoched file to edit the events."
+            error_message = "It seems like no events are loaded from the dataset. " \
+                            "Please try to read the events from a channel or a file under the 'file' menu or work with" \
+                            "an epoched dataset."
             error_window_view = errorWindow(error_message)
             error_window_view.show()
 
@@ -691,14 +702,16 @@ class mainController(mainListener):
         """
         Create the controller for extracting epochs from the dataset.
         """
-        read_events = self.main_model.get_read_events()
         file_type = self.main_model.get_file_type()
         if file_type == "Raw":
-            if read_events is not None:
+            read_events = self.main_model.get_read_events()
+            number_of_events = self.main_model.get_number_of_events()
+            if read_events is not None and number_of_events != 0:
                 self.extract_epochs_controller = extractEpochsController()
                 self.extract_epochs_controller.set_listener(self)
             else:
-                error_message = "You must read the events from a channel or a file under the 'file' menu, before " \
+                error_message = "It seems like no events are loaded from the dataset. " \
+                                "Please try to read the events from a channel or a file under the 'file' menu, before " \
                                 "extracting the epochs"
                 error_window = errorWindow(error_message)
                 error_window.show()
@@ -880,11 +893,9 @@ class mainController(mainListener):
         self.power_spectral_density_controller = powerSpectralDensityController(minimum_time, maximum_time)
         self.power_spectral_density_controller.set_listener(self)
 
-    def plot_spectra_maps_information(self, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
+    def plot_spectra_maps_information(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
         """
         Create the waiting window while the computation of the power spectral density is done on the dataset.
-        :param method_psd: Method used to compute the power spectral density.
-        :type method_psd: str
         :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.
         :type minimum_frequency: float
         :param maximum_frequency: Maximum frequency from which the power spectral density will be computed.
@@ -893,11 +904,13 @@ class mainController(mainListener):
         :type minimum_time: float
         :param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.
         :type maximum_time: float
+        :param topo_time_points: The time points for the topomaps.
+        :type topo_time_points: list of float
         """
         processing_title = "PSD running, please wait."
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.plot_spectra_maps_finished)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.power_spectral_density(method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time)
+        self.main_model.power_spectral_density(minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points)
 
     def plot_spectra_maps_computation_finished(self):
         """
@@ -917,9 +930,9 @@ class mainController(mainListener):
         """
         The computation of the power spectral density is completely done, plot it.
         """
-        psds = self.main_model.get_psds()
-        freqs = self.main_model.get_freqs()
-        self.power_spectral_density_controller.plot_psd(psds, freqs)
+        psd_fig = self.main_model.get_psd_fig()
+        topo_fig = self.main_model.get_psd_topo_fig()
+        self.power_spectral_density_controller.plot_psd(psd_fig, topo_fig)
 
     # ERP Image
     def plot_ERP_image_clicked(self):

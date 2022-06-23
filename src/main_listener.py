@@ -350,7 +350,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def plot_spectra_maps_information(self, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
+    def plot_spectra_maps_information(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
         pass
 
     @abstractmethod

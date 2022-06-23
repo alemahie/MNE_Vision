@@ -27,5 +27,5 @@ class powerSpectralDensityListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
+    def confirm_button_clicked(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
         pass

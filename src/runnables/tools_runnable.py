@@ -303,13 +303,15 @@ class extractEpochsWorkerSignals(QObject):
 
 
 class extractEpochsRunnable(QRunnable):
-    def __init__(self, file_data, events, tmin, tmax):
+    def __init__(self, file_data, events, event_ids, tmin, tmax):
         """
         Runnable for the computation of the extraction of the epochs of the given data.
         :param file_data: MNE data of the dataset.
         :type file_data: MNE.Epochs/MNE.Raw
         :param events: The events from which the epochs will be extracted.
         :type events: list of, list of int
+        :param event_ids: The event ids
+        :type event_ids: dict
         :param tmin: Start time of the epoch to keep
         :type tmin: float
         :param tmax: End time of the epoch to keep
@@ -320,6 +322,7 @@ class extractEpochsRunnable(QRunnable):
 
         self.file_data = file_data
         self.events = events
+        self.event_ids = event_ids
         self.tmin = tmin
         self.tmax = tmax
 
@@ -329,7 +332,8 @@ class extractEpochsRunnable(QRunnable):
         Notifies the main model that the computation is finished.
         """
         try:
-            self.file_data = Epochs(self.file_data, self.events, tmin=self.tmin, tmax=self.tmax, preload=True)
+            self.file_data = Epochs(self.file_data, events=self.events, event_id=self.event_ids, tmin=self.tmin,
+                                    tmax=self.tmax, preload=True)
             self.signals.finished.emit()
         except Exception as error:
             error_message = "An error has occurred during the epoch extraction"

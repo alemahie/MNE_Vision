@@ -8,7 +8,7 @@ Plots runnable
 import numpy as np
 from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
-from mne.time_frequency import psd_welch, psd_multitaper, tfr_morlet, tfr_multitaper, tfr_stockwell
+from mne.time_frequency import tfr_morlet, tfr_multitaper, tfr_stockwell
 
 from utils.view.error_window import errorWindow
 
@@ -31,13 +31,11 @@ class powerSpectralDensityWorkerSignals(QObject):
 
 
 class powerSpectralDensityRunnable(QRunnable):
-    def __init__(self, file_data, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
+    def __init__(self, file_data, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
         """
         Runnable for the computation of the power spectral density of the given data.
         :param file_data: MNE data of the dataset.
         :type file_data: MNE.Epochs/MNE.Raw
-        :param method_psd: Method used to compute the power spectral density.
-        :type method_psd: str
         :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.
         :type minimum_frequency: float
         :param maximum_frequency: Maximum frequency from which the power spectral density will be computed.
@@ -46,18 +44,20 @@ class powerSpectralDensityRunnable(QRunnable):
         :type minimum_time: float
         :param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.
         :type maximum_time: float
+        :param topo_time_points: The time points for the topomaps.
+        :type topo_time_points: list of float
         """
         super().__init__()
         self.signals = powerSpectralDensityWorkerSignals()
 
         self.file_data = file_data
-        self.method_psd = method_psd
-        self.minimum_frequency = minimum_frequency
-        self.maximum_frequency = maximum_frequency
+        self.fmin = minimum_frequency
+        self.fmax = maximum_frequency
         self.tmin = minimum_time
         self.tmax = maximum_time
-        self.psds = None
-        self.freqs = None
+        self.topo_time_points = topo_time_points
+        self.fig_psd = None
+        self.fig_topo = None
 
     def run(self):
         """
@@ -65,34 +65,34 @@ class powerSpectralDensityRunnable(QRunnable):
         Notifies the main model that the computation is finished.
         """
         try:
-            if self.method_psd == "Welch":
-                self.psds, self.freqs = psd_welch(self.file_data, fmin=self.minimum_frequency, fmax=self.maximum_frequency,
-                                                  tmin=self.tmin, tmax=self.tmax)
-            elif self.method_psd == "Multitaper":
-                self.psds, self.freqs = psd_multitaper(self.file_data, fmin=self.minimum_frequency, fmax=self.maximum_frequency,
-                                                       tmin=self.tmin, tmax=self.tmax)
+            self.fig_psd = self.file_data.plot_psd(fmin=self.fmin, fmax=self.fmax, tmin=self.tmin, tmax=self.tmax,
+                                                   average=False, show=False)
+            bands = []
+            for time in self.topo_time_points:
+                bands.append((time, str(time) + " Hz"))
+            self.fig_topo = self.file_data.plot_psd_topomap(bands=bands, tmin=self.tmin, tmax=self.tmax, show=False)
             self.signals.finished.emit()
         except Exception as error:
-            error_message = "An error has occured during the computation of the PSD"
+            error_message = "An error has occurred during the computation of the PSD"
             error_window = errorWindow(error_message, detailed_message=str(error))
             error_window.show()
             self.signals.error.emit()
 
-    def get_psds(self):
+    def get_psd_fig(self):
         """
-        Get the power spectral density's data
-        :return: The actual power spectral density's data computed
-        :rtype: list of, list of, list of float
+        Get the power spectral density's figure
+        :return: The figure of the actual power spectral density's data computed
+        :rtype: matplotlib.Figure
         """
-        return self.psds
+        return self.fig_psd
 
-    def get_freqs(self):
+    def get_topo_fig(self):
         """
-        Get the frequencies of the power spectral density computation.
-        :return: The frequencies at which the power spectral density is computed.
-        :rtype: list of float
+        Get the power spectral density's figure fo the topographies
+        :return: The figure of the topographies of the actual power spectral density's data computed
+        :rtype: matplotlib.Figure
         """
-        return self.freqs
+        return self.fig_topo
 
 
 # Time Frequency

@@ -12,7 +12,7 @@ from copy import copy
 
 from PyQt5.QtCore import QThreadPool
 
-from mne import read_events
+from mne import read_events, find_events, events_from_annotations
 
 from runnables.tools_runnable import filterRunnable, icaRunnable, sourceEstimationRunnable, resamplingRunnable, \
     reReferencingRunnable, extractEpochsRunnable
@@ -63,6 +63,7 @@ class mainModel:
         self.ica_decomposition = "No"
         self.references = "Unknown"
         self.read_events = None     # Events info read from file or channel, used to transform raw to epochs
+        self.read_event_ids = None  # Event ids
 
         # Runnable
         self.open_fif_file_runnable = None
@@ -206,8 +207,12 @@ class mainModel:
         self.file_data = self.load_data_info_runnable.get_file_data()
         self.file_type = self.file_type_tmp
         self.file_path_name = self.file_path_name_tmp
-        self.create_channels_locations()
         self.reset_tmp_attributes()
+
+        self.create_channels_locations()
+        if self.file_type == "Raw":
+            self.try_finding_events()
+
         self.main_listener.load_data_info_computation_finished()
 
     # Events
@@ -258,6 +263,13 @@ class mainModel:
         Notifies the main controller that the computation is done.
         """
         self.read_events = self.find_events_from_channel_runnable.get_read_events()
+        self.read_event_ids = self.find_events_from_channel_runnable.get_read_event_ids()
+        if self.read_events is not None:
+            if len(self.read_events) == 0:
+                error_message = "It seems that the number of events found is 0, please check the channel used or use " \
+                                "another method."
+                error_window = errorWindow(error_message)
+                error_window.show()
         self.main_listener.find_events_from_channel_computation_finished()
 
     def find_events_from_channel_computation_error(self):
@@ -507,7 +519,8 @@ class mainModel:
         :type tmax: float
         """
         pool = QThreadPool.globalInstance()
-        self.extract_epochs_runnable = extractEpochsRunnable(self.file_data, self.read_events, tmin, tmax)
+        self.extract_epochs_runnable = extractEpochsRunnable(self.file_data, self.read_events, self.read_event_ids, tmin,
+                                                             tmax)
         pool.start(self.extract_epochs_runnable)
         self.extract_epochs_runnable.signals.finished.connect(self.extract_epochs_computation_finished)
         self.extract_epochs_runnable.signals.error.connect(self.extract_epochs_computation_error)
@@ -575,11 +588,9 @@ class mainModel:
     Plot menu
     """
     # PSD
-    def power_spectral_density(self, method_psd, minimum_frequency, maximum_frequency, minimum_time, maximum_time):
+    def power_spectral_density(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
         """
         Creates the parallel runnable for computing the power spectral density.
-        :param method_psd: Method used to compute the power spectral density.
-        :type method_psd: str
         :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.
         :type minimum_frequency: float
         :param maximum_frequency: Maximum frequency from which the power spectral density will be computed.
@@ -588,10 +599,12 @@ class mainModel:
         :type minimum_time: float
         :param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.
         :type maximum_time: float
+        :param topo_time_points: The time points for the topomaps.
+        :type topo_time_points: list of float
         """
         pool = QThreadPool.globalInstance()
-        self.power_spectral_density_runnable = powerSpectralDensityRunnable(self.file_data, method_psd, minimum_frequency,
-                                                                            maximum_frequency, minimum_time, maximum_time)
+        self.power_spectral_density_runnable = powerSpectralDensityRunnable(self.file_data, minimum_frequency, maximum_frequency,
+                                                                            minimum_time, maximum_time, topo_time_points)
         pool.start(self.power_spectral_density_runnable)
         self.power_spectral_density_runnable.signals.finished.connect(self.power_spectral_density_computation_finished)
         self.power_spectral_density_runnable.signals.error.connect(self.power_spectral_density_computation_error)
@@ -801,6 +814,24 @@ class mainModel:
         for channel in channels_info:
             self.channels_locations[channel["ch_name"]] = channel["loc"][:3]
 
+    def try_finding_events(self):
+        """
+        Try to find the events if a raw file as been loaded.
+        """
+        read_ok = False
+        try:
+            self.read_events = find_events(self.file_data)
+            read_ok = True
+        except Exception as e:
+            print(e)
+            print(type(e))
+        if not read_ok:
+            try:
+                self.read_events, self.read_event_ids = events_from_annotations(self.file_data)
+            except Exception as e:
+                print(e)
+                print(type(e))
+
     def reset_tmp_attributes(self):
         self.file_data_tmp = None
         self.file_type_tmp = None
@@ -808,6 +839,7 @@ class mainModel:
         self.ica_decomposition = "No"
         self.references = "Unknown"
         self.read_events = None     # Events info read from file or channel, used to transform raw to epochs
+        self.read_event_ids = None
 
     """
     Getters
@@ -879,7 +911,10 @@ class mainModel:
         :rtype: int/None
         """
         if self.file_type == "Raw":
-            return None
+            if self.read_events is None:
+                return self.read_events
+            else:
+                return len(self.read_events)
         else:
             return len(self.file_data.events)
 
@@ -890,15 +925,21 @@ class mainModel:
         the event; Second a "0" for MNE backwards compatibility; Third the event id.
         :rtype: list of, list of int
         """
-        return self.file_data.events
+        if self.file_type == "Raw":
+            return self.read_events
+        elif self.file_type == "Epochs":
+            return self.file_data.events
 
     def get_event_ids(self):
         """
-        Gets the events' ids present in the dataset.
+        Gets the event ids present in the dataset.
         :return: The events' ids
         :rtype: dict
         """
-        return self.file_data.event_id
+        if self.file_type == "Raw":
+            return self.read_event_ids
+        elif self.file_type == "Epochs":
+            return self.file_data.event_id
 
     def get_number_of_epochs(self):
         """
@@ -1045,21 +1086,21 @@ class mainModel:
         """
         return self.source_estimation_runnable.get_source_estimation_data()
 
-    def get_psds(self):
+    def get_psd_fig(self):
         """
-        Gets the "psds" data of the power spectral density computation performed on the dataset.
-        :return: The actual power spectral density data computed
-        :rtype: list of, list of, list of float
+        Get the power spectral density's figure
+        :return: The figure of the actual power spectral density's data computed
+        :rtype: matplotlib.Figure
         """
-        return self.power_spectral_density_runnable.get_psds()
+        return self.power_spectral_density_runnable.get_psd_fig()
 
-    def get_freqs(self):
+    def get_psd_topo_fig(self):
         """
-        Gets the "freqs" data of the power spectral density computation performed on the dataset.
-        :return: The frequencies at which the power spectral density is computed.
-        :rtype: list of float
+        Get the power spectral density's figure fo the topographies
+        :return: The figure of the topographies of the actual power spectral density's data computed
+        :rtype: matplotlib.Figure
         """
-        return self.power_spectral_density_runnable.get_freqs()
+        return self.power_spectral_density_runnable.get_topo_fig()
 
     def get_tfr_channel_selected(self):
         """
@@ -1134,7 +1175,10 @@ class mainModel:
         :param event_values: The event values
         :type event_values: list of, list of int
         """
-        self.file_data.events = np.copy(event_values)
+        if self.file_type == "Raw":
+            self.read_events = np.copy(event_values)
+        elif self.file_type == "Epochs":
+            self.file_data.events = np.copy(event_values)
 
     def set_event_ids(self, event_ids):
         """
@@ -1142,7 +1186,10 @@ class mainModel:
         :param event_ids: The events' ids.
         :type event_ids: dict
         """
-        self.file_data.event_id = copy(event_ids)
+        if self.file_type == "Raw":
+            self.read_event_ids = copy(event_ids)
+        elif self.file_type == "Epochs":
+            self.file_data.event_id = copy(event_ids)
 
     def set_channel_locations(self, channel_locations, channel_names):
         """
