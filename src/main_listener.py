@@ -238,7 +238,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def re_referencing_information(self, references, n_jobs):
+    def re_referencing_information(self, references, save_data, load_data, n_jobs):
         pass
 
     @abstractmethod
@@ -285,7 +285,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def extract_epochs_information(self, tmin, tmax):
+    def extract_epochs_information(self, tmin, tmax, trials_selected):
         pass
 
     @abstractmethod
@@ -303,6 +303,22 @@ class mainListener(ABC):
     # SNR
     @abstractmethod
     def snr_clicked(self):
+        pass
+
+    @abstractmethod
+    def snr_information(self, snr_methods, source_method, read, write, picks, trials_selected):
+        pass
+
+    @abstractmethod
+    def snr_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def snr_computation_error(self):
+        pass
+
+    @abstractmethod
+    def snr_finished(self):
         pass
 
     # Source Estimation
@@ -413,7 +429,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def envelope_correlation_information(self, export_path):
+    def envelope_correlation_information(self, psi, export_path):
         pass
 
     @abstractmethod

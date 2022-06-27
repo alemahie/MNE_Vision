@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 """
-Extract Epochs Controller
+SNR controller
 """
 
-from tools.extract_epochs.extract_epochs_listener import extractEpochsListener
-from tools.extract_epochs.extract_epochs_view import extractEpochsView
+from tools.signal_to_noise_ratio.signal_to_noise_ratio_listener import signalToNoiseRatioListener
+from tools.signal_to_noise_ratio.signal_to_noise_ratio_view import signalToNoiseRatioView
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -19,38 +19,30 @@ __status__ = "Dev"
 from utils.view.error_window import errorWindow
 
 
-class extractEpochsController(extractEpochsListener):
-    def __init__(self, event_values, event_ids):
+class signalToNoiseRatioController(signalToNoiseRatioListener):
+    def __init__(self, all_channels_names, event_values, event_ids):
         """
-        Controller for extracting epochs from the dataset.
+        Controller for computing the signal-to-noise ratio on the dataset.
         Create a new window for specifying some parameters.
-        :param event_values: Event_id associated to each epoch/trial.
-        :type event_values: list of, list of int
-        :param event_ids: Name of the events associated to their id.
-        :type event_ids: dict
         """
         self.main_listener = None
-        self.extract_epochs_view = extractEpochsView(event_values, event_ids)
-        self.extract_epochs_view.set_listener(self)
+        self.snr_view = signalToNoiseRatioView(all_channels_names, event_values, event_ids)
+        self.snr_view.set_listener(self)
 
-        self.extract_epochs_view.show()
+        self.snr_view.show()
 
     def cancel_button_clicked(self):
         """
         Close the window.
         """
-        self.extract_epochs_view.close()
+        self.snr_view.close()
 
-    def confirm_button_clicked(self, tmin, tmax, trials_selected):
+    def confirm_button_clicked(self, snr_methods, source_method, read, write, picks, trials_selected):
         """
         Close the window and send the information to the main controller.
-        :param tmin: Start time of the epoch to keep
-        :type tmin: float
-        :param tmax: End time of the epoch to keep
-        :type tmax: float
         """
-        self.extract_epochs_view.close()
-        self.main_listener.extract_epochs_information(tmin, tmax, trials_selected)
+        self.main_listener.snr_information(snr_methods, source_method, read, write, picks, trials_selected)
+        self.snr_view.close()
 
     """
     Getters
@@ -65,12 +57,11 @@ class extractEpochsController(extractEpochsListener):
         :type element_type: str
         """
         if len(elements_selected) == 0:
-            error_message = "Please select at least one element in the list. \n The source estimation can not be " \
-                            "computed on 0 trials"
+            error_message = "Please select at least one element in the list. \n The SNR can not be computed on 0 trials"
             error_window = errorWindow(error_message)
             error_window.show()
         else:
-            self.extract_epochs_view.set_trials_selected(elements_selected, element_type)
+            self.snr_view.check_element_type(elements_selected, element_type)
 
     """
     Setters

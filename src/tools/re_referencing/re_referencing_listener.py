@@ -27,7 +27,7 @@ class reReferencingListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, references, n_jobs):
+    def confirm_button_clicked(self, references, save_data, load_data, n_jobs):
         pass
 
     @abstractmethod

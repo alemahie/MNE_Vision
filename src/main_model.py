@@ -15,11 +15,11 @@ from PyQt5.QtCore import QThreadPool
 from mne import read_events, find_events, events_from_annotations
 
 from runnables.tools_runnable import filterRunnable, icaRunnable, sourceEstimationRunnable, resamplingRunnable, \
-    reReferencingRunnable, extractEpochsRunnable
+    reReferencingRunnable, extractEpochsRunnable, signalToNoiseRatioRunnable
 from runnables.files_runnable import openCntFileRunnable, openSetFileRunnable, openFifFileRunnable, \
     findEventsFromChannelRunnable, loadDataInfoRunnable, exportDataCSVRunnable, exportDataSETRunnable, \
     exportEventsTXTRunnable
-from runnables.plots_runnable import powerSpectralDensityRunnable, timeFrequencyRunnable
+from runnables.plots_runnable import timeFrequencyRunnable
 from runnables.connectivity_runnable import envelopeCorrelationRunnable, sourceSpaceConnectivityRunnable, \
     sensorSpaceConnectivityRunnable
 from runnables.classification_runnable import classifyRunnable
@@ -80,6 +80,7 @@ class mainModel:
         self.re_referencing_runnable = None
         self.ica_data_decomposition_runnable = None
         self.extract_epochs_runnable = None
+        self.snr_runnable = None
         self.source_estimation_runnable = None
 
         self.power_spectral_density_runnable = None
@@ -451,17 +452,22 @@ class mainModel:
         self.main_listener.resampling_computation_error()
 
     # Re-referencing
-    def re_referencing(self, references, n_jobs):
+    def re_referencing(self, references, save_data, load_data, n_jobs):
         """
         Creates the parallel runnable for performing a re-referencing.
         :param references: References from which the data will be re-referenced. Can be a single or multiple channels;
         Can be an average of all channels; Can be a "point to infinity".
         :type references: list of str; str
+        :param save_data: Boolean telling if the data computed must be saved into files.
+        :type save_data: bool
+        :param load_data: Boolean telling if the data used for the computation can be read from computer files.
+        :type load_data: bool
         :param n_jobs: Number of parallel processes used to compute the re-referencing
         :type n_jobs: int
         """
         pool = QThreadPool.globalInstance()
-        self.re_referencing_runnable = reReferencingRunnable(references, self.file_data, n_jobs)
+        self.re_referencing_runnable = reReferencingRunnable(references, self.file_data, self.get_file_path_name_without_extension(),
+                                                             save_data, load_data, n_jobs)
         pool.start(self.re_referencing_runnable)
         self.re_referencing_runnable.signals.finished.connect(self.re_referencing_computation_finished)
         self.re_referencing_runnable.signals.error.connect(self.re_referencing_computation_error)
@@ -510,17 +516,19 @@ class mainModel:
         self.main_listener.ica_data_decomposition_computation_error()
 
     # Extract Epochs
-    def extract_epochs(self, tmin, tmax):
+    def extract_epochs(self, tmin, tmax, trials_selected):
         """
         Creates the parallel runnable for extracting the epochs of a dataset based on the events provided/or found beforehand.
         :param tmin: Start time of the epoch to keep
         :type tmin: float
         :param tmax: End time of the epoch to keep
         :type tmax: float
+        :param trials_selected: The indexes of the trials selected for the computation
+        :type trials_selected: list of int
         """
         pool = QThreadPool.globalInstance()
         self.extract_epochs_runnable = extractEpochsRunnable(self.file_data, self.read_events, self.read_event_ids, tmin,
-                                                             tmax)
+                                                             tmax, trials_selected)
         pool.start(self.extract_epochs_runnable)
         self.extract_epochs_runnable.signals.finished.connect(self.extract_epochs_computation_finished)
         self.extract_epochs_runnable.signals.error.connect(self.extract_epochs_computation_error)
@@ -539,6 +547,31 @@ class mainModel:
         Notifies the main controller that the computation had an error.
         """
         self.main_listener.extract_epochs_computation_error()
+
+    # SNR
+    def signal_to_noise_ratio(self, snr_methods, source_method, read, write, picks, trials_selected):
+        """
+        Creates the parallel runnable for computation of the SNR of a dataset.
+        """
+        pool = QThreadPool.globalInstance()
+        self.snr_runnable = signalToNoiseRatioRunnable(self.file_data, snr_methods, source_method, self.get_file_path_name_without_extension(),
+                                                       read, write, picks, trials_selected)
+        pool.start(self.snr_runnable)
+        self.snr_runnable.signals.finished.connect(self.snr_computation_finished)
+        self.snr_runnable.signals.error.connect(self.snr_computation_error)
+
+    def snr_computation_finished(self):
+        """
+        Retrieves the data from the runnable when the SNR is computed.
+        Notifies the main controller that the computation is done.
+        """
+        self.main_listener.snr_computation_finished()
+
+    def snr_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.snr_computation_error()
 
     # Source Estimation
     def source_estimation(self, source_estimation_method, save_data, load_data, epochs_method, trials_selected, n_jobs,
@@ -602,12 +635,28 @@ class mainModel:
         :param topo_time_points: The time points for the topomaps.
         :type topo_time_points: list of float
         """
+        try:
+            self.fig_psd = self.file_data.plot_psd(fmin=minimum_frequency, fmax=maximum_frequency, tmin=minimum_time,
+                                                   tmax=maximum_time, average=False, show=False)
+            bands = []
+            for time in topo_time_points:
+                bands.append((time, str(time) + " Hz"))
+            self.fig_topo = self.file_data.plot_psd_topomap(bands=bands, tmin=minimum_time, tmax=maximum_time, show=False)
+            self.power_spectral_density_computation_finished()
+        except Exception as error:
+            error_message = "An error has occurred during the computation of the PSD"
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.power_spectral_density_computation_error()
+
+        """
         pool = QThreadPool.globalInstance()
         self.power_spectral_density_runnable = powerSpectralDensityRunnable(self.file_data, minimum_frequency, maximum_frequency,
                                                                             minimum_time, maximum_time, topo_time_points)
         pool.start(self.power_spectral_density_runnable)
         self.power_spectral_density_runnable.signals.finished.connect(self.power_spectral_density_computation_finished)
         self.power_spectral_density_runnable.signals.error.connect(self.power_spectral_density_computation_error)
+        """
 
     def power_spectral_density_computation_finished(self):
         """
@@ -659,14 +708,17 @@ class mainModel:
     Connectivity menu
     """
     # Envelope correlation
-    def envelope_correlation(self, export_path):
+    def envelope_correlation(self, psi, export_path):
         """
         Creates the parallel runnable for computing the envelope correlation between the channels of the dataset.
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
         :param export_path: Path where the envelope correlation data will be stored.
         :type export_path: str
         """
         pool = QThreadPool.globalInstance()
-        self.envelope_correlation_runnable = envelopeCorrelationRunnable(self.file_data, export_path)
+        self.envelope_correlation_runnable = envelopeCorrelationRunnable(self.file_data, psi, export_path)
         pool.start(self.envelope_correlation_runnable)
         self.envelope_correlation_runnable.signals.finished.connect(self.envelope_correlation_computation_finished)
         self.envelope_correlation_runnable.signals.error.connect(self.envelope_correlation_computation_error)
@@ -1092,7 +1144,8 @@ class mainModel:
         :return: The figure of the actual power spectral density's data computed
         :rtype: matplotlib.Figure
         """
-        return self.power_spectral_density_runnable.get_psd_fig()
+        return self.fig_topo
+        # return self.power_spectral_density_runnable.get_psd_fig()
 
     def get_psd_topo_fig(self):
         """
@@ -1100,7 +1153,8 @@ class mainModel:
         :return: The figure of the topographies of the actual power spectral density's data computed
         :rtype: matplotlib.Figure
         """
-        return self.power_spectral_density_runnable.get_topo_fig()
+        return self.fig_psd
+        # return self.power_spectral_density_runnable.get_topo_fig()
 
     def get_tfr_channel_selected(self):
         """
@@ -1133,6 +1187,14 @@ class mainModel:
         :rtype: list of, list of float
         """
         return self.envelope_correlation_runnable.get_envelope_correlation_data()
+
+    def get_psi_data(self):
+        """
+        Get the psi's data.
+        :return: The psi's data. Or nothing if the psi's data has not been computed.
+        :rtype: list of, list of float
+        """
+        return self.envelope_correlation_runnable.get_psi_data()
 
     def get_source_space_connectivity_data(self):
         """

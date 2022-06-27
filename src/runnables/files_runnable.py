@@ -277,8 +277,14 @@ class loadDataInfoRunnable(QRunnable):
         Notifies the main model that the computation is finished.
         """
         if self.montage != "default":
-            montage = make_standard_montage(self.montage)
-            self.file_data.set_montage(montage)
+            try:
+                montage = make_standard_montage(self.montage)
+                self.file_data.set_montage(montage)
+            except Exception as error:
+                error_message = "The provided montage does not work with the data in the dataset, the default montage will " \
+                                "be used."
+                error_window = errorWindow(error_message)
+                error_window.show()
         self.file_data = self.file_data.pick_channels(self.channels_selected)
         if self.tmin is not None and self.tmax is not None:
             if self.tmin is None:

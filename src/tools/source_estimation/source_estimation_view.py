@@ -132,7 +132,7 @@ class sourceEstimationView(QWidget):
         self.n_jobs_slider.setSingleStep(1)
         self.n_jobs_slider.valueChanged.connect(self.slider_value_changed_trigger)
         self.n_jobs_label = QLabel("1")
-        self.n_jobs_layout.addWidget(QLabel("Number of threads : "))
+        self.n_jobs_layout.addWidget(QLabel("Number of parallel jobs : "))
         self.n_jobs_layout.addWidget(self.n_jobs_slider)
         self.n_jobs_layout.addWidget(self.n_jobs_label)
         self.n_jobs_widget.setLayout(self.n_jobs_layout)

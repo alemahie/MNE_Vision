@@ -39,16 +39,20 @@ class reReferencingController(reReferencingListener):
         """
         self.re_referencing_view.close()
 
-    def confirm_button_clicked(self, references, n_jobs):
+    def confirm_button_clicked(self, references, save_data, load_data, n_jobs):
         """
         Close the window and send the information to the main controller.
         :param references: References from which the data will be re-referenced. Can be a single or multiple channels;
         Can be an average of all channels; Can be a "point to infinity".
         :type references: list of str; str
+        :param save_data: Boolean telling if the data computed must be saved into files.
+        :type save_data: bool
+        :param load_data: Boolean telling if the data used for the computation can be read from computer files.
+        :type load_data: bool
         :param n_jobs: Number of parallel processes used to compute the re-referencing
         :type n_jobs: int
         """
-        self.main_listener.re_referencing_information(references, n_jobs)
+        self.main_listener.re_referencing_information(references, save_data, load_data, n_jobs)
         self.re_referencing_view.close()
 
     def get_elements_selected(self, elements_selected):

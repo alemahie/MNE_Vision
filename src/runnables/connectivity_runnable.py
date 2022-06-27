@@ -10,7 +10,7 @@ from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 from mne import compute_covariance, setup_source_space, write_source_spaces, make_bem_model, make_bem_solution, \
     write_bem_solution, make_forward_solution, write_forward_solution, extract_label_time_course
 from mne.minimum_norm import make_inverse_operator, write_inverse_operator, read_inverse_operator, apply_inverse_epochs
-from mne_connectivity import envelope_correlation, spectral_connectivity_epochs
+from mne_connectivity import envelope_correlation, spectral_connectivity_epochs, phase_slope_index
 
 from utils.view.error_window import errorWindow
 from utils.file_path_search import get_project_freesurfer_path, get_labels_from_subject
@@ -34,11 +34,14 @@ class envelopeCorrelationWorkerSignals(QObject):
 
 
 class envelopeCorrelationRunnable(QRunnable):
-    def __init__(self, file_data, export_path):
+    def __init__(self, file_data, psi, export_path):
         """
         Runnable for the computation of the envelope correlation of the dataset.
         :param file_data: MNE data of the dataset.
         :type file_data: MNE.Epochs/MNE.Raw
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
         :param export_path: Path where the envelope correlation data will be stored.
         :type export_path: str
         """
@@ -46,8 +49,11 @@ class envelopeCorrelationRunnable(QRunnable):
         self.signals = envelopeCorrelationWorkerSignals()
 
         self.file_data = file_data
+        self.psi = psi
         self.export_path = export_path
+
         self.envelope_correlation_data = None
+        self.psi_data = None
 
     def run(self):
         """
@@ -59,8 +65,9 @@ class envelopeCorrelationRunnable(QRunnable):
             self.envelope_correlation_data = correlation_data.get_data(output="dense")[:, :, 0]
             self.check_data_export()
 
-            # correlation_data = phase_slope_index(self.file_data)
-            # self.envelope_correlation_data = correlation_data.get_data(output="dense")[:, :, 0]
+            if self.psi:
+                correlation_data = phase_slope_index(self.file_data)
+                self.psi_data = correlation_data.get_data(output="dense")[:, :, 0]
             self.signals.finished.emit()
         except Exception as error:
             error_message = "An error as occurred during the computation of the envelope correlation."
@@ -105,6 +112,14 @@ class envelopeCorrelationRunnable(QRunnable):
         :rtype: list of, list of float
         """
         return self.envelope_correlation_data
+
+    def get_psi_data(self):
+        """
+        Get the psi's data.
+        :return: The psi's data. Or nothing if the psi's data has not been computed.
+        :rtype: list of, list of float
+        """
+        return self.psi_data
 
 
 # Source Space Connectivity

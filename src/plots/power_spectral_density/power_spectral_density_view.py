@@ -8,6 +8,9 @@ Power spectral density view
 from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLineEdit, QPushButton, QLabel
 
+from utils.view.error_window import errorWindow
+
+
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
@@ -15,8 +18,6 @@ __license__ = "GNU General Public License v3.0"
 __maintainer__ = "Lemahieu Antoine"
 __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
-
-from utils.view.error_window import errorWindow
 
 
 class powerSpectralDensityView(QWidget):
@@ -78,8 +79,13 @@ class powerSpectralDensityView(QWidget):
         :param topo_fig: The figure of the topographies of the actual power spectral density's data computed
         :type topo_fig: matplotlib.Figure
         """
-        topo_fig.show()
-        psd_fig.show()
+        try:
+            topo_fig.show()
+            psd_fig.show()
+        except Exception as error:
+            error_message = "An error has occurred during the computation of the PSD"
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
 
     """
     Triggers

@@ -43,12 +43,15 @@ class envelopeCorrelationController(envelopeCorrelationListener):
         """
         self.envelope_correlation_view.close()
 
-    def confirm_button_clicked(self):
+    def confirm_button_clicked(self, psi):
         """
         Close the window and send the information to the main controller.
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
         """
         self.envelope_correlation_view.close()
-        self.main_listener.envelope_correlation_information(self.export_path)
+        self.main_listener.envelope_correlation_information(psi, self.export_path)
 
     def additional_parameters_clicked(self):
         """
@@ -68,15 +71,18 @@ class envelopeCorrelationController(envelopeCorrelationListener):
     """
     Plot
     """
-    def plot_envelope_correlation(self, envelope_correlation_data, channel_names):
+    def plot_envelope_correlation(self, envelope_correlation_data, psi, channel_names):
         """
         Send the information to the view to plot the envelope correlation.
         :param envelope_correlation_data: The envelope correlation data to plot.
         :type envelope_correlation_data: list of, list of float
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
         :param channel_names: Channels' names
         :type channel_names: list of str
         """
-        self.envelope_correlation_view.plot_envelope_correlation(envelope_correlation_data, channel_names)
+        self.envelope_correlation_view.plot_envelope_correlation(envelope_correlation_data, psi, channel_names)
 
     """
     Setters

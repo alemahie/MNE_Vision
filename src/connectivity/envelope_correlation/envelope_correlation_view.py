@@ -6,6 +6,7 @@ Envelope Correlation view
 """
 
 from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QGridLayout, QCheckBox
+from matplotlib import pyplot as plt
 
 from mne_connectivity.viz import plot_connectivity_circle
 
@@ -42,10 +43,13 @@ class envelopeCorrelationView(QWidget):
         self.number_strongest_connections_line.setMaximum(number_of_channels*number_of_channels)
         self.number_strongest_connections_line.setValue(100)
         self.all_connections_check_box = QCheckBox()
+        self.psi_check_box = QCheckBox()
         self.lines_layout.addWidget(QLabel("Number of strongest connections plotted : "), 0, 0)
         self.lines_layout.addWidget(self.number_strongest_connections_line, 0, 1)
         self.lines_layout.addWidget(QLabel("Plot all connections : "), 1, 0)
         self.lines_layout.addWidget(self.all_connections_check_box, 1, 1)
+        self.lines_layout.addWidget(QLabel("Compute the Phase Slope Index (directionality) : "), 2, 0)
+        self.lines_layout.addWidget(self.psi_check_box, 2, 1)
         self.lines_widget.setLayout(self.lines_layout)
 
         # Exportation
@@ -72,21 +76,35 @@ class envelopeCorrelationView(QWidget):
         self.vertical_layout.addWidget(self.cancel_confirm_widget)
         self.setLayout(self.vertical_layout)
 
-    def plot_envelope_correlation(self, envelope_correlation_data, channel_names):
+    def plot_envelope_correlation(self, envelope_correlation_data, psi, channel_names):
         """
         Plot the envelope correlation computed.
         :param envelope_correlation_data: The envelope correlation data to plot.
         :type envelope_correlation_data: list of, list of float
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
         :param channel_names: Channels' names
         :type channel_names: list of str
         """
         plot_connectivity_circle(envelope_correlation_data, channel_names, n_lines=self.number_strongest_connections,
                                  title="Envelope Correlation")
+        if psi is not None:
+            self.plot_psi(psi, channel_names)
 
+    @staticmethod
+    def plot_psi(psi, channel_names):
+        """
+        Plot the Phase Slope Index computed.
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
+        :param channel_names: Channels' names
+        :type channel_names: list of str
         """
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        cax = ax.matshow(envelope_correlation_data)
+        cax = ax.matshow(psi)
         fig.colorbar(cax)
 
         # PSI : Positive value means from the channel to the other (row to columns)
@@ -100,7 +118,6 @@ class envelopeCorrelationView(QWidget):
         ax.set_yticklabels([''] + channel_names)
 
         plt.show()
-        """
 
     """
     Triggers
@@ -119,7 +136,8 @@ class envelopeCorrelationView(QWidget):
             self.number_strongest_connections = self.number_of_channels * self.number_of_channels
         else:
             self.number_strongest_connections = int(self.number_strongest_connections_line.text())
-        self.envelope_correlation_listener.confirm_button_clicked()
+        psi = self.psi_check_box.isChecked()
+        self.envelope_correlation_listener.confirm_button_clicked(psi)
 
     def data_exportation_trigger(self):
         """

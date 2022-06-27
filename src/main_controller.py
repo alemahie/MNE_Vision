@@ -23,6 +23,7 @@ from tools.resampling.resampling_controller import resamplingController
 from tools.re_referencing.re_referencing_controller import reReferencingController
 from tools.ICA_decomposition.ICA_decomposition_controller import icaDecompositionController
 from tools.extract_epochs.extract_epochs_controller import extractEpochsController
+from tools.signal_to_noise_ratio.signal_to_noise_ratio_controller import signalToNoiseRatioController
 from tools.source_estimation.source_estimation_controller import sourceEstimationController
 
 from plots.power_spectral_density.power_spectral_density_controller import powerSpectralDensityController
@@ -89,6 +90,7 @@ class mainController(mainListener):
         self.re_referencing_controller = None
         self.ica_decomposition_controller = None
         self.extract_epochs_controller = None
+        self.snr_controller = None
         self.source_estimation_controller = None
 
         self.power_spectral_density_controller = None
@@ -613,12 +615,16 @@ class mainController(mainListener):
         self.re_referencing_controller = reReferencingController(reference, all_channels_names)
         self.re_referencing_controller.set_listener(self)
 
-    def re_referencing_information(self, references, n_jobs):
+    def re_referencing_information(self, references, save_data, load_data, n_jobs):
         """
         Create the waiting window while the re-referencing is done on the dataset.
         :param references: References from which the data will be re-referenced. Can be a single or multiple channels;
         Can be an average of all channels; Can be a "point to infinity".
         :type references: list of str; str
+        :param save_data: Boolean telling if the data computed must be saved into files.
+        :type save_data: bool
+        :param load_data: Boolean telling if the data used for the computation can be read from computer files.
+        :type load_data: bool
         :param n_jobs: Number of parallel processes used to compute the re-referencing
         :type n_jobs: int
         """
@@ -630,7 +636,7 @@ class mainController(mainListener):
             processing_title = "Re-referencing running, please wait."
             self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.re_referencing_finished)
             self.waiting_while_processing_controller.set_listener(self)
-            self.main_model.re_referencing(references, n_jobs)
+            self.main_model.re_referencing(references, save_data, load_data, n_jobs)
 
     def re_referencing_computation_finished(self):
         """
@@ -707,7 +713,9 @@ class mainController(mainListener):
             read_events = self.main_model.get_read_events()
             number_of_events = self.main_model.get_number_of_events()
             if read_events is not None and number_of_events != 0:
-                self.extract_epochs_controller = extractEpochsController()
+                event_values = self.main_model.get_event_values()
+                event_ids = self.main_model.get_event_ids()
+                self.extract_epochs_controller = extractEpochsController(event_values, event_ids)
                 self.extract_epochs_controller.set_listener(self)
             else:
                 error_message = "It seems like no events are loaded from the dataset. " \
@@ -720,18 +728,20 @@ class mainController(mainListener):
             error_window = errorWindow(error_message)
             error_window.show()
 
-    def extract_epochs_information(self, tmin, tmax):
+    def extract_epochs_information(self, tmin, tmax, trials_selected):
         """
         Create the waiting window while the extraction of epochs is done on the dataset.
         :param tmin: Start time of the epoch to keep
         :type tmin: float
         :param tmax: End time of the epoch to keep
         :type tmax: float
+        :param trials_selected: The indexes of the trials selected for the computation
+        :type trials_selected: list of int
         """
         processing_title = "Epochs extraction running, please wait."
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.extract_epochs_finished)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.extract_epochs(tmin, tmax)
+        self.main_model.extract_epochs(tmin, tmax, trials_selected)
 
     def extract_epochs_computation_finished(self):
         """
@@ -766,7 +776,41 @@ class mainController(mainListener):
 
     # Signal-to-noise ratio
     def snr_clicked(self):
-        pass
+        """
+        Create the controller for computation the SNR from the dataset.
+        """
+        all_channels_names = self.main_model.get_all_channels_names()
+        event_values = self.main_model.get_event_values()
+        event_ids = self.main_model.get_event_ids()
+        self.snr_controller = signalToNoiseRatioController(all_channels_names, event_values, event_ids)
+        self.snr_controller.set_listener(self)
+
+    def snr_information(self, snr_methods, source_method, read, write, picks, trials_selected):
+        """
+        Create the waiting window while the SNR computation is done on the dataset.
+        """
+        processing_title = "SNR running, please wait."
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title,
+                                                                                    self.snr_finished)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.main_model.signal_to_noise_ratio(snr_methods, source_method, read, write, picks, trials_selected)
+
+    def snr_computation_finished(self):
+        """
+        Close the waiting window when the computation of the SNR is done on the dataset.
+        """
+        processing_title_finished = "SNR computation finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def snr_computation_error(self):
+        """
+        Close the waiting window because the computation of the SNR had an error.
+        """
+        processing_title_finished = "SNR computation had an error."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
+
+    def snr_finished(self):
+        print("snr")
 
     # Source Estimation
     def source_estimation_clicked(self):
@@ -1033,16 +1077,19 @@ class mainController(mainListener):
         self.envelope_correlation_controller = envelopeCorrelationController(number_of_channels)
         self.envelope_correlation_controller.set_listener(self)
 
-    def envelope_correlation_information(self, export_path):
+    def envelope_correlation_information(self, psi, export_path):
         """
         Create the waiting window while the computation of the envelope correlation is done on the dataset.
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
         :param export_path: Path where the envelope correlation data will be stored.
         :type export_path: str
         """
         processing_title = "Envelope correlation running, please wait."
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.envelope_correlation_finished)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.envelope_correlation(export_path)
+        self.main_model.envelope_correlation(psi, export_path)
 
     def envelope_correlation_computation_finished(self):
         """
@@ -1063,8 +1110,9 @@ class mainController(mainListener):
         The computation of the envelope correlation is completely done, plot it.
         """
         envelope_correlation_data = self.main_model.get_envelope_correlation_data()
+        psi = self.main_model.get_psi_data()
         channel_names = self.main_model.get_all_channels_names()
-        self.envelope_correlation_controller.plot_envelope_correlation(envelope_correlation_data, channel_names)
+        self.envelope_correlation_controller.plot_envelope_correlation(envelope_correlation_data, psi, channel_names)
 
     # Source space connectivity
     def source_space_connectivity_clicked(self):

@@ -27,5 +27,5 @@ class extractEpochsListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, tmin, tmax):
+    def confirm_button_clicked(self, tmin, tmax, trials_selected):
         pass

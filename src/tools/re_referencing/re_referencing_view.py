@@ -13,6 +13,7 @@ from PyQt5.QtCore import Qt
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
 from utils.view.error_window import errorWindow
+from utils.view.separator import create_layout_separator
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -75,10 +76,29 @@ class reReferencingView(QWidget):
         self.n_jobs_slider.setSingleStep(1)
         self.n_jobs_slider.valueChanged.connect(self.slider_value_changed_trigger)
         self.n_jobs_label = QLabel("1")
-        self.n_jobs_layout.addWidget(QLabel("Number of threads : "))
+        self.n_jobs_layout.addWidget(QLabel("Number of parallel jobs : "))
         self.n_jobs_layout.addWidget(self.n_jobs_slider)
         self.n_jobs_layout.addWidget(self.n_jobs_label)
         self.n_jobs_widget.setLayout(self.n_jobs_layout)
+
+        # How to compute the point at infinity
+        self.save_load_widget = QWidget()
+        self.check_box_layout = QVBoxLayout()
+        self.save_load_buttons = QButtonGroup()
+        self.check_box_compute_from_scratch = QCheckBox()
+        self.check_box_compute_from_scratch.setText("Compute point infinity from scratch and don't save the additional data")
+        self.check_box_compute_from_scratch.setChecked(True)
+        self.save_load_buttons.addButton(self.check_box_compute_from_scratch, 4)    # Button with ID 4
+        self.check_box_save = QCheckBox()
+        self.check_box_save.setText("Save the additional source space data")
+        self.save_load_buttons.addButton(self.check_box_save, 5)   # Button with ID 5
+        self.check_box_load = QCheckBox()
+        self.check_box_load.setText("Load the additional source space data (must be available)")
+        self.save_load_buttons.addButton(self.check_box_load, 6)  # Button with ID 6
+        self.check_box_layout.addWidget(self.check_box_compute_from_scratch)
+        self.check_box_layout.addWidget(self.check_box_save)
+        self.check_box_layout.addWidget(self.check_box_load)
+        self.save_load_widget.setLayout(self.check_box_layout)
 
         # Cancel & Confirm buttons
         self.cancel_confirm_widget = QWidget()
@@ -94,7 +114,11 @@ class reReferencingView(QWidget):
         # Final layout
         self.vertical_layout.addWidget(QLabel("Current reference : " + str(reference)))
         self.vertical_layout.addWidget(self.re_referencing_mode_widget)
+        self.vertical_layout.addWidget(create_layout_separator())
+        self.vertical_layout.addWidget(self.save_load_widget)
+        self.vertical_layout.addWidget(create_layout_separator())
         self.vertical_layout.addWidget(self.n_jobs_widget)
+        self.vertical_layout.addWidget(create_layout_separator())
         self.vertical_layout.addWidget(self.cancel_confirm_widget)
 
     """
@@ -112,6 +136,7 @@ class reReferencingView(QWidget):
         """
         checked_button = self.re_referencing_mode_buttons.checkedButton()
         button_id = self.re_referencing_mode_buttons.id(checked_button)
+        save_data, load_data = self.get_save_load_button_checked()
         references = None
         if button_id == 1:      # Average of all channels for reference
             references = "average"
@@ -121,7 +146,7 @@ class reReferencingView(QWidget):
             references = "infinity"
         if references is not None:
             n_jobs = self.n_jobs_slider.value()
-            self.re_referencing_listener.confirm_button_clicked(references, n_jobs)
+            self.re_referencing_listener.confirm_button_clicked(references, save_data, load_data, n_jobs)
         else:
             error_message = "Please select a channel in the 'channel selection' menu before starting the computation " \
                             "with specific channels as references."
@@ -162,3 +187,28 @@ class reReferencingView(QWidget):
         :type channels_selected: list of str
         """
         self.channels_selected = channels_selected
+
+    """
+    Getters
+    """
+    def get_save_load_button_checked(self):
+        """
+        Get the values of the save and load buttons.
+        :return: save_data: True if the data must be saved. Otherwise, False.
+        load_data: True if the data must be loaded. Otherwise, False.
+        :rtype: boolean, boolean
+        """
+        checked_button = self.save_load_buttons.checkedButton()
+        button_id = self.save_load_buttons.id(checked_button)
+        save_data = None
+        load_data = None
+        if button_id == 4:
+            save_data = False
+            load_data = False
+        elif button_id == 5:
+            save_data = True
+            load_data = False
+        elif button_id == 6:
+            save_data = False
+            load_data = True
+        return save_data, load_data
