@@ -5,8 +5,10 @@
 Dataset info view
 """
 
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLineEdit, QPushButton, QLabel
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QHBoxLayout, QVBoxLayout
+
+from utils.elements_selector.elements_selector_controller import multipleSelectorController
+from utils.view.separator import create_layout_separator
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -18,48 +20,45 @@ __status__ = "Dev"
 
 
 class datasetInfoView(QWidget):
-    def __init__(self, sampling_rate, number_of_frames, start_time):
+    def __init__(self, all_channels_names):
         """
         Window displaying the dataset's information.
-        :param sampling_rate: The sampling rate
-        :type sampling_rate: float
-        :param number_of_frames: The number of frames
-        :type number_of_frames: int
-        :param start_time: The start time of an epoch or the raw file.
-        :type start_time: float
         """
         super().__init__()
         self.dataset_info_listener = None
 
+        self.all_channels_names = all_channels_names
+        self.channels_selected = None
+        self.channels_selector_controller = None
+
         self.setWindowTitle("Dataset Information")
 
-        self.grid_layout = QGridLayout()
-        self.setLayout(self.grid_layout)
+        self.vertical_layout = QVBoxLayout()
+        self.setLayout(self.vertical_layout)
 
-        self.only_int = QIntValidator()
-        self.sampling_rate = QLineEdit()
-        self.sampling_rate.setValidator(self.only_int)
-        self.sampling_rate.setText(str(sampling_rate))
-        self.time_points_epochs = QLineEdit()
-        self.time_points_epochs.setValidator(self.only_int)
-        self.time_points_epochs.setText(str(number_of_frames))
-        self.start_time = QLineEdit()
-        self.start_time.setValidator(self.only_int)
-        self.start_time.setText(str(start_time))
+        # Channels
+        self.channels_selection_widget = QWidget()
+        self.channels_selection_layout = QHBoxLayout()
+        self.channels_selection_button = QPushButton("&Channels ...", self)
+        self.channels_selection_button.clicked.connect(self.channels_selection_trigger)
+        self.channels_selection_layout.addWidget(QLabel("Select a new reference : "))
+        self.channels_selection_layout.addWidget(self.channels_selection_button)
+        self.channels_selection_widget.setLayout(self.channels_selection_layout)
 
+        # Cancel Confirm
+        self.cancel_confirm_widget = QWidget()
+        self.cancel_confirm_layout = QHBoxLayout()
+        self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
         self.cancel = QPushButton("&Cancel", self)
         self.cancel.clicked.connect(self.cancel_dataset_info_trigger)
         self.confirm = QPushButton("&Confirm", self)
+        self.cancel_confirm_layout.addWidget(self.cancel)
+        self.cancel_confirm_layout.addWidget(self.confirm)
         self.confirm.clicked.connect(self.confirm_dataset_info_trigger)
 
-        self.grid_layout.addWidget(QLabel("Data sampling rate (Hz) : "), 0, 0)
-        self.grid_layout.addWidget(self.sampling_rate, 0, 1)
-        self.grid_layout.addWidget(QLabel("Time points per epochs (0 = Continuous) : "), 1, 0)
-        self.grid_layout.addWidget(self.time_points_epochs, 1, 1)
-        self.grid_layout.addWidget(QLabel("Start time (sec) (only for data epochs) : "), 2, 0)
-        self.grid_layout.addWidget(self.start_time, 2, 1)
-        self.grid_layout.addWidget(self.cancel, 3, 0)
-        self.grid_layout.addWidget(self.confirm, 3, 1)
+        self.vertical_layout.addWidget(self.channels_selection_widget)
+        self.vertical_layout.addWidget(create_layout_separator())
+        self.vertical_layout.addWidget(self.cancel_confirm_widget)
 
     """
     Triggers
@@ -74,7 +73,32 @@ class datasetInfoView(QWidget):
         """
         Retrieve the channel name and location and send the information to the controller.
         """
-        self.dataset_info_listener.confirm_button_clicked()
+        self.dataset_info_listener.confirm_button_clicked(self.channels_selected)
+
+    def channels_selection_trigger(self):
+        """
+        Open the multiple selector window.
+        The user can select multiple channels.
+        """
+        title = "Select the channels used for the reference :"
+        self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=True,
+                                                                       element_type="channels")
+        self.channels_selector_controller.set_listener(self.dataset_info_listener)
+
+    """
+    Utils
+    """
+    def check_element_type(self, elements_selected, element_type):
+        if element_type == "channels":
+            self.set_channel_selected(elements_selected)
+
+    def set_channel_selected(self, channels_selected):
+        """
+        Set the channels selected in the multiple selector window.
+        :param channels_selected: Channels selected.
+        :type channels_selected: list of str
+        """
+        self.channels_selected = channels_selected
 
     """
     Setters

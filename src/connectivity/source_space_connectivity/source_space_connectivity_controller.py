@@ -43,7 +43,7 @@ class sourceSpaceConnectivityController(sourceSpaceConnectivityListener):
         self.source_space_connectivity_view.close()
 
     def confirm_button_clicked(self, connectivity_method, spectrum_estimation_method, source_estimation_method, save_data,
-                               load_data, n_jobs):
+                               load_data, n_jobs, psi):
         """
         Close the window and send the information to the main controller.
         :param connectivity_method: Method used for computing the source space connectivity.
@@ -60,10 +60,13 @@ class sourceSpaceConnectivityController(sourceSpaceConnectivityListener):
         :type load_data: bool
         :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
         """
         self.source_space_connectivity_view.close()
         self.main_listener.source_space_connectivity_information(connectivity_method, spectrum_estimation_method, source_estimation_method,
-                                                                 save_data, load_data, n_jobs, self.export_path)
+                                                                 save_data, load_data, n_jobs, self.export_path, psi)
 
     def additional_parameters_clicked(self):
         """
@@ -83,13 +86,16 @@ class sourceSpaceConnectivityController(sourceSpaceConnectivityListener):
     """
     Plot
     """
-    def plot_source_space_connectivity(self, source_space_connectivity_data):
+    def plot_source_space_connectivity(self, source_space_connectivity_data, psi):
         """
         Send the information to the view to plot the source space connectivity.
         :param source_space_connectivity_data: The source space connectivity data.
         :type source_space_connectivity_data: list of, list of float
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
         """
-        self.source_space_connectivity_view.plot_source_space_connectivity(source_space_connectivity_data)
+        self.source_space_connectivity_view.plot_source_space_connectivity(source_space_connectivity_data, psi)
 
     """
     Setters

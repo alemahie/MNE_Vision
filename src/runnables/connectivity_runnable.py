@@ -134,7 +134,7 @@ class sourceSpaceConnectivityWorkerSignals(QObject):
 # noinspection PyUnresolvedReferences
 class sourceSpaceConnectivityRunnable(QRunnable):
     def __init__(self, file_data, file_path, connectivity_method, spectrum_estimation_method, source_estimation_method,
-                 save_data, load_data, n_jobs, export_path):
+                 save_data, load_data, n_jobs, export_path, psi):
         """
         Runnable for the computation of the source space connectivity of the dataset.
         :param file_data: MNE data of the dataset.
@@ -157,6 +157,9 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         :type n_jobs: int
         :param export_path: Path where the source space connectivity data will be stored.
         :type export_path: str
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
         """
         super().__init__()
         self.signals = sourceSpaceConnectivityWorkerSignals()
@@ -170,10 +173,12 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         self.read_files = load_data
         self.n_jobs = n_jobs
         self.export_path = export_path
+        self.psi = psi
         self.subject = "fsaverage"
         self.subjects_dir = get_project_freesurfer_path()
 
         self.source_space_connectivity_data = None
+        self.psi_data = None
 
     def run(self):
         """
@@ -185,8 +190,7 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         Notifies the main model when an error occurs.
         """
         try:
-            correlation_data = self.compute_envelope_correlation_with_source_space()
-            self.source_space_connectivity_data = correlation_data.get_data(output="dense")[:, :, 0]
+            self.compute_envelope_correlation_with_source_space()
             self.check_data_export()
             self.signals.finished.emit()
         except FileNotFoundError as error:
@@ -239,8 +243,6 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         Launch the computation of the source space if it is not provided.
         Once the source space is computed, compute the envelope correlation on this source space, giving the source space
         connectivity of the given data.
-        :return: The envelope correlation's data.
-        :rtype: list of, list of float
         """
         self.file_data.apply_baseline()
         self.file_data.set_eeg_reference(projection=True)
@@ -251,12 +253,16 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         stcs = self.compute_inverse(inv)
 
         labels = get_labels_from_subject(self.subject, self.subjects_dir)
-        label_ts = extract_label_time_course(stcs, labels, inv['src'], mode='mean_flip', return_generator=True)
+        label_ts = extract_label_time_course(stcs, labels, inv['src'], mode='mean_flip', return_generator=False)
 
         sfreq = self.file_data.info["sfreq"]
         correlation_data = spectral_connectivity_epochs(label_ts, method=self.connectivity_method, mode=self.spectrum_estimation_method,
                                                         sfreq=sfreq, faverage=True, mt_adaptive=True, n_jobs=self.n_jobs)
-        return correlation_data
+        self.source_space_connectivity_data = correlation_data.get_data(output="dense")[:, :, 0]
+
+        if self.psi:
+            directionality_data = phase_slope_index(label_ts)
+            self.psi_data = directionality_data.get_data(output="dense")[:, :, 0]
 
     """
     Source Space
@@ -375,6 +381,14 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         :rtype: list of, list of float
         """
         return self.source_space_connectivity_data
+
+    def get_psi_data(self):
+        """
+        Get the psi's data.
+        :return: The psi's data. Or nothing if the psi's data has not been computed.
+        :rtype: list of, list of float
+        """
+        return self.psi_data
 
 
 # Sensor Space Connectivity

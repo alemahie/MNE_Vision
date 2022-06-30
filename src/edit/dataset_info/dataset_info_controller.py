@@ -16,21 +16,17 @@ __maintainer__ = "Lemahieu Antoine"
 __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
+from utils.view.error_window import errorWindow
+
 
 class datasetInfoController(datasetInfoListener):
-    def __init__(self, sampling_rate, number_of_frames, start_time):
+    def __init__(self, all_channels_names):
         """
         Controller for editing some dataset information.
         Create a new window for displaying the dataset's information.
-        :param sampling_rate: The sampling rate
-        :type sampling_rate: float
-        :param number_of_frames: The number of frames
-        :type number_of_frames: int
-        :param start_time: The start time of an epoch or the raw file.
-        :type start_time: float
         """
         self.main_listener = None
-        self.dataset_info_view = datasetInfoView(sampling_rate, number_of_frames, start_time)
+        self.dataset_info_view = datasetInfoView(all_channels_names)
         self.dataset_info_view.set_listener(self)
 
         self.dataset_info_view.show()
@@ -41,11 +37,31 @@ class datasetInfoController(datasetInfoListener):
         """
         self.dataset_info_view.close()
 
-    def confirm_button_clicked(self):
+    def confirm_button_clicked(self, channels_selected):
         """
         Close the window and send the information to the main controller.
         """
+        self.main_listener.dataset_info_information(channels_selected)
         self.dataset_info_view.close()
+
+    """
+    Getters
+    """
+    def get_elements_selected(self, elements_selected, element_type):
+        """
+        Get the elements selected by the user in the multiple elements' selector.
+        :param elements_selected: Elements selected in the multiple elements' selector.
+        :type elements_selected: list of str
+        :param element_type: Type of the element selected, used in case multiple element selector windows can be open in
+        a window. Can thus distinguish the returned elements.
+        :type element_type: str
+        """
+        if len(elements_selected) == 0:
+            error_message = "Please select at least one element in the list. \n The SNR can not be computed on 0 trials"
+            error_window = errorWindow(error_message)
+            error_window.show()
+        else:
+            self.dataset_info_view.check_element_type(elements_selected, element_type)
 
     """
     Setters

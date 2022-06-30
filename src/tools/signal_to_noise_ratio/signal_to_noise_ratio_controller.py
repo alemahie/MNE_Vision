@@ -8,6 +8,8 @@ SNR controller
 from tools.signal_to_noise_ratio.signal_to_noise_ratio_listener import signalToNoiseRatioListener
 from tools.signal_to_noise_ratio.signal_to_noise_ratio_view import signalToNoiseRatioView
 
+from utils.view.error_window import errorWindow
+
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
 __credits__ = ["Lemahieu Antoine"]
@@ -15,8 +17,6 @@ __license__ = "GNU General Public License v3.0"
 __maintainer__ = "Lemahieu Antoine"
 __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
-
-from utils.view.error_window import errorWindow
 
 
 class signalToNoiseRatioController(signalToNoiseRatioListener):
@@ -43,6 +43,19 @@ class signalToNoiseRatioController(signalToNoiseRatioListener):
         """
         self.main_listener.snr_information(snr_methods, source_method, read, write, picks, trials_selected)
         self.snr_view.close()
+
+    """
+    Plots
+    """
+    def plot_SNRs(self, SNRs, SNR_methods):
+        """
+        Plot the SNRs
+        :param SNRs: SNRs
+        :type SNRs: list of float
+        :param SNR_methods: SNR methods
+        :type SNR_methods: list of str
+        """
+        self.snr_view.plot_SNRs(SNRs, SNR_methods)
 
     """
     Getters

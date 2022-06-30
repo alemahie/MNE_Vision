@@ -413,6 +413,22 @@ class signalToNoiseRatioRunnable(QRunnable):
     def __init__(self, file_data, snr_methods, source_method, file_path, read_files, write_files, picks, trials_selected):
         """
         Runnable for the computation of the SNR of the given data.
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param snr_methods:
+        :type snr_methods:
+        :param source_method: The method used to compute the source estimation
+        :type source_method: str
+        :param file_path: The path to the file
+        :type file_path: str
+        :param write_files: Boolean telling if the data computed must be saved into files.
+        :type write_files: bool
+        :param read_files: Boolean telling if the data used for the computation can be read from computer files.
+        :type read_files: bool
+        :param picks: The channels to take into account in the computation.
+        :type picks: list of str
+        :param trials_selected: The indexes of the trials selected for the computation
+        :type trials_selected: list of int
         """
         super().__init__()
         self.signals = signalToNoiseRatioWorkerSignals()
@@ -428,11 +444,12 @@ class signalToNoiseRatioRunnable(QRunnable):
         self.subject = "fsaverage"
         self.subjects_dir = get_project_freesurfer_path()
 
+        self.SNRs = []
+
     def run(self):
         """
         Launch the computation of the SNR
         Notifies the main model when the computation is finished.
-
         Notifies the main model when an error occurs.
         """
         try:
@@ -447,28 +464,32 @@ class signalToNoiseRatioRunnable(QRunnable):
             self.signals.error.emit()
 
     def compute_all_SNRs(self):
-        SNRs = []
+        """
+        Launch all the SNR methods selected by the user.
+        """
         if "Mean-Std" in self.snr_methods:
-            SNRs.append(self.SNR_mean_std())
+            self.SNRs.append(self.SNR_mean_std())
         if "Sample Correlation Coefficient" in self.snr_methods:
-            SNRs.append(self.SNR_sample_correlation_coefficient())
+            self.SNRs.append(self.SNR_sample_correlation_coefficient())
         if "Maximum Likelihood" in self.snr_methods:
-            SNRs.append(self.SNR_maximum_likelihood_estimate())
+            self.SNRs.append(self.SNR_maximum_likelihood_estimate())
         if "Amplitude" in self.snr_methods:
-            SNRs.append(self.SNR_amplitude())
+            self.SNRs.append(self.SNR_amplitude())
         if "Plus-Minus Averaging" in self.snr_methods:
-            SNRs.append(self.SNR_plus_minus_averaging())
+            self.SNRs.append(self.SNR_plus_minus_averaging())
         if "Response Repetition" in self.snr_methods:
-            SNRs.append(self.SNR_response_repetition())
+            self.SNRs.append(self.SNR_response_repetition())
         if "MNE Source" in self.snr_methods:
-            SNRs.append(self.SNR_mne_source())
+            self.SNRs.append(self.SNR_mne_source())
         if "MNE Frequency" in self.snr_methods:
-            SNRs.append(self.SNR_mne_frequency())
-        self.pretty_print_SNRs(SNRs)
-        return SNRs
+            self.SNRs.append(self.SNR_mne_frequency())
+        self.pretty_print_SNRs(self.SNRs)
+        for i in range(len(self.SNRs)):
+            self.SNRs[i] = np.mean(self.SNRs[i])
 
     # Mean Std
-    def SNR_mean_std_computation(self, a, axis=0, ddof=0):
+    @staticmethod
+    def SNR_mean_std_computation(a, axis=0, ddof=0):
         """
         This function comes from an old release of SciPy (version 0.14.0, currently version 1.7.1).
         It is not implemented anymore in Scipy.
@@ -494,11 +515,22 @@ class signalToNoiseRatioRunnable(QRunnable):
         return SNRs
 
     def SNR_mean_std(self, axis=1, ddof=0):
+        """
+        Take the data from the Epoch file, average it and give the data to the computation.
+        :param axis: If axis is equal to None, the array is first ravel'd. If axis is an integer, this is the axis over
+        which to operate. Default is 0.
+        :type axis: int or None, optional
+        :param ddof: Degrees of freedom correction for standard deviation. Default is 0.
+        :type ddof: int, optional
+        :return: SNR_estimate
+        :rtype: int
+        """
         data = self.file_data.average().get_data(picks=self.picks)
         return self.SNR_mean_std_computation(data, axis=axis, ddof=ddof)
 
     # Correlation Coefficient
-    def SNR_sample_correlation_coefficient_computation(self, a, b):
+    @staticmethod
+    def SNR_sample_correlation_coefficient_computation(a, b):
         """
         Paper : Signal to noise ratio and response variability measurements in single trial evoked potentials.
         Link : https://doi.org/10.1016/0013-4694(78)90267-5
@@ -522,6 +554,8 @@ class signalToNoiseRatioRunnable(QRunnable):
     def SNR_sample_correlation_coefficient(self):
         """
         Compute the average of the SNR of epochs.
+        :return: SNR_estimate
+        :rtype: int
         """
         data = self.file_data.get_data(picks=self.picks)
         data_shape = data.shape
@@ -535,7 +569,8 @@ class signalToNoiseRatioRunnable(QRunnable):
         return SNRs
 
     # Maximum Likelihood
-    def SNR_maximum_likelihood_estimate_computation(self, a, b):
+    @staticmethod
+    def SNR_maximum_likelihood_estimate_computation(a, b):
         """
         Paper : Signal to noise ratio and response variability measurements in single trial evoked potentials
         Link : https://doi.org/10.1016/0013-4694(78)90267-5
@@ -544,11 +579,10 @@ class signalToNoiseRatioRunnable(QRunnable):
         Returns the signal-to-noise ratio of 'a' and 'b'
         Parameters
         ----------
-        a : ndarray
-            An ndarray object containing the sample data.
-        b : ndarray
-            An ndarray object containing the sample data.
-        -------
+        :param a: An ndarray object containing the sample data.
+        :type a: ndarray
+        :param b: An ndarray object containing the sample data.
+        :type b: ndarray
         :return: SNR_estimate
         :rtype: int
         """
@@ -557,6 +591,11 @@ class signalToNoiseRatioRunnable(QRunnable):
         return SNR_estimate
 
     def SNR_maximum_likelihood_estimate(self):
+        """
+
+        :return:
+        :rtype:
+        """
         data = self.file_data.get_data(picks=self.picks)
         data_shape = data.shape
         SNRs = np.empty(data_shape[1])
@@ -569,9 +608,17 @@ class signalToNoiseRatioRunnable(QRunnable):
         return SNRs
 
     # Amplitude
-    def SNR_amplitude_computation(self, a, axis=0):
+    @staticmethod
+    def SNR_amplitude_computation(a, axis=0):
         """
         Link : https://www.sciencedirect.com/science/article/pii/S105381190901297X#
+        :param a: An ndarray object containing the sample data.
+        :type a: ndarray
+        :param axis: If axis is equal to None, the array is first ravel'd. If axis is an integer, this is the axis over
+        which to operate. Default is 0.
+        :type axis: int or None, optional
+        :return: SNR_estimate
+        :rtype: int
         """
         data_shape = a.shape
         mean = np.mean(a, axis=axis)
@@ -589,6 +636,14 @@ class signalToNoiseRatioRunnable(QRunnable):
         return SNRs
 
     def SNR_amplitude(self, axis=1):
+        """
+        Take the data from the Epoch file, average it and give the data to the computation.
+        :param axis: If axis is equal to None, the array is first ravel'd. If axis is an integer, this is the axis over
+        which to operate. Default is 0.
+        :type axis: int or None, optional
+        :return: SNR_estimate
+        :rtype: int
+        """
         evoked = self.file_data.average(picks=self.picks)
         data = evoked.data
         return self.SNR_amplitude_computation(data, axis=axis)
@@ -598,6 +653,13 @@ class signalToNoiseRatioRunnable(QRunnable):
         """
         Links : https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/iet-spr.2016.0528
                 https://link.springer.com/content/pdf/10.1007/BF02522949.pdf
+        :param data: An ndarray object containing the sample data.
+        :type data: ndarray
+        :param axis: If axis is equal to None, the array is first ravel'd. If axis is an integer, this is the axis over
+        which to operate. Default is 0.
+        :type axis: int or None, optional
+        :return: SNR_estimate
+        :rtype: int
         """
         data_shape = data.shape
         signal_mean = np.mean(data, axis=axis)
@@ -620,13 +682,29 @@ class signalToNoiseRatioRunnable(QRunnable):
         return SNR
 
     def SNR_plus_minus_averaging(self, axis=0):
+        """
+        Take the data from the Epoch file give it to the computation.
+        :param axis: If axis is equal to None, the array is first ravel'd. If axis is an integer, this is the axis over
+        which to operate. Default is 0.
+        :type axis: int or None, optional
+        :return: SNR_estimate
+        :rtype: int
+        """
         data = self.file_data.get_data(picks=self.picks)
         return self.SNR_plus_minus_averaging_computation(data, axis=axis)
 
     # Response Repetitions
-    def SNR_response_repetition_computation(self, data, axis=0):
+    @staticmethod
+    def SNR_response_repetition_computation(data, axis=0):
         """
         Link : https://github.com/nipy/nitime/blob/master/nitime/analysis/snr.py
+        :param data: An ndarray object containing the sample data.
+        :type data: ndarray
+        :param axis: If axis is equal to None, the array is first ravel'd. If axis is an integer, this is the axis over
+        which to operate. Default is 0.
+        :type axis: int or None, optional
+        :return: SNR_estimate
+        :rtype: int
         """
         signal_mean = np.mean(data, axis=axis)
         noise = data - signal_mean
@@ -646,34 +724,38 @@ class signalToNoiseRatioRunnable(QRunnable):
         return SNRs
 
     def SNR_response_repetition(self, axis=0):
+        """
+        Take the data from the Epoch file give it to the computation.
+        :param axis: If axis is equal to None, the array is first ravel'd. If axis is an integer, this is the axis over
+        which to operate. Default is 0.
+        :type axis: int or None, optional
+        :return: SNR_estimate
+        :rtype: int
+        """
         data = self.file_data.get_data(picks=self.picks)
         return self.SNR_response_repetition_computation(data, axis=axis)
 
     # MNE Frequency
-    def SNR_mne_frequency_computation(self, psd, noise_n_neighbor_freqs=1, noise_skip_neighbor_freqs=1):
+    @staticmethod
+    def SNR_mne_frequency_computation(psd, noise_n_neighbor_freqs=1, noise_skip_neighbor_freqs=1):
         """
         Link : https://mne.tools/stable/auto_tutorials/time-freq/50_ssvep.html#sphx-glr-auto-tutorials-time-freq-50-ssvep-py
         -----
         Compute SNR spectrum from PSD spectrum using convolution.
-
-        Parameters
         ----------
-        psd : ndarray, shape ([n_trials, n_channels,] n_frequency_bins)
-            Data object containing PSD values. Works with arrays as produced by
-            MNE's PSD functions or channel/trial subsets.
-        noise_n_neighbor_freqs : int
-            Number of neighboring frequencies used to compute noise level.
-            increment by one to add one frequency bin ON BOTH SIDES
-        noise_skip_neighbor_freqs : int
-            set this >=1 if you want to exclude the immediately neighboring
-            frequency bins in noise level calculation
-
-        Returns
-        -------
-        snr : ndarray, shape ([n_trials, n_channels,] n_frequency_bins)
-            Array containing SNR for all epochs, channels, frequency bins.
-            NaN for frequencies on the edges, that do not have enough neighbors on
-            one side to calculate SNR.
+        :param psd: Data object containing PSD values. Works with arrays as produced by
+                MNE's PSD functions or channel/trial subsets.
+        :type psd: ndarray, shape ([n_trials, n_channels,] n_frequency_bins)
+        :param noise_n_neighbor_freqs: Number of neighboring frequencies used to compute noise level.
+                increment by one to add one frequency bin ON BOTH SIDES
+        :type noise_n_neighbor_freqs: int
+        :param noise_skip_neighbor_freqs: set this >=1 if you want to exclude the immediately neighboring
+                frequency bins in noise level calculation
+        :type noise_skip_neighbor_freqs: int
+        :return: Array containing SNR for all epochs, channels, frequency bins.
+                NaN for frequencies on the edges, that do not have enough neighbors on
+                one side to calculate SNR.
+        :rtype: ndarray, shape ([n_trials, n_channels,] n_frequency_bins)
         """
         # Construct a kernel that calculates the mean of the neighboring
         # frequencies
@@ -699,6 +781,11 @@ class signalToNoiseRatioRunnable(QRunnable):
         return psd / mean_noise
 
     def SNR_mne_frequency(self):
+        """
+        Compute the power spectral density to give it to the SNR computation.
+        :return: SNR_estimate
+        :rtype: int
+        """
         fmin = 1.
         fmax = 50.
         sfreq = self.file_data.info['sfreq']
@@ -719,7 +806,8 @@ class signalToNoiseRatioRunnable(QRunnable):
 
         return SNRs_mean
 
-    def plot_SNR_mne_frequency(self, PSDs, freqs, SNRs, fmin, fmax):
+    @staticmethod
+    def plot_SNR_mne_frequency(PSDs, freqs, SNRs, fmin, fmax):
         fig, axes = plt.subplots(2, 1, sharex='all', sharey='none', figsize=(8, 5))
         freq_range = range(np.where(np.floor(freqs) == 1.)[0][0],
                            np.where(np.ceil(freqs) == fmax - 1)[0][0])
@@ -751,6 +839,9 @@ class signalToNoiseRatioRunnable(QRunnable):
     def SNR_mne_source(self):
         """
         Link : https://mne.tools/stable/auto_examples/inverse/source_space_snr.html
+        Compute the source estimate to estimated the SNR from it.
+        :return: SNR_estimate
+        :rtype: int
         """
         self.file_data.apply_baseline()
         self.file_data.set_eeg_reference(projection=True)
@@ -828,7 +919,8 @@ class signalToNoiseRatioRunnable(QRunnable):
     """
     Utils
     """
-    def mean_squared(self, data, axis=0):
+    @staticmethod
+    def mean_squared(data, axis=0):
         return np.mean(data ** 2, axis=axis)
 
     def root_mean_squared(self, data, axis=0):
@@ -845,7 +937,7 @@ class signalToNoiseRatioRunnable(QRunnable):
             mask[i] = False
         return mask
 
-    def pretty_print_SNRs(self, SNRs, all_methods=False, means=True, plots=False):
+    def pretty_print_SNRs(self, SNRs, all_methods=False, means=True):
         if all_methods:
             print("=====\nAll methods complete SNRs :\n")
             for i in range(len(SNRs)):
@@ -855,25 +947,22 @@ class signalToNoiseRatioRunnable(QRunnable):
             for i in range(len(SNRs)):
                 print(self.snr_methods[i] + " : " + str(np.mean(SNRs[i])))
         print("=====")
-        if plots:
-            fig, axs = plt.subplots(2, 4)
-            axs[0, 0].plot(SNRs[0])
-            axs[0, 0].set_title("Mean std")
-            axs[0, 1].plot(SNRs[1])
-            axs[0, 1].set_title("Sample correlation coefficient")
-            axs[0, 2].plot(SNRs[2])
-            axs[0, 2].set_title("Maximum likelihood")
-            axs[0, 3].plot(SNRs[3])
-            axs[0, 3].set_title("Amplitude")
-            axs[1, 0].plot(SNRs[4])
-            axs[1, 0].set_title("Plus minus average")
-            axs[1, 1].plot(SNRs[5])
-            axs[1, 1].set_title("Response repetition")
-            axs[1, 2].plot(SNRs[6])
-            axs[1, 2].set_title("MNE source")
-            axs[1, 3].plot(SNRs[7])
-            axs[1, 3].set_title("MNE frequency")
-            plt.show()
+
+    def get_SNRs(self):
+        """
+        Get the SNRs computed over the data.
+        :return: The SNRs computed over the data.
+        :rtype: list of float
+        """
+        return self.SNRs
+
+    def get_SNR_methods(self):
+        """
+        Get the SNR methods used for the computation.
+        :return: SNR methods
+        :rtype: list of str
+        """
+        return self.snr_methods
 
 
 # Source Estimation

@@ -12,6 +12,7 @@ from multiprocessing import cpu_count
 from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QComboBox, QLabel, QButtonGroup, QCheckBox, \
     QSlider, QGridLayout, QSpinBox
 from PyQt5.QtCore import Qt
+from matplotlib import pyplot as plt
 
 from mne.viz import circular_layout
 from mne_connectivity.viz import plot_connectivity_circle
@@ -72,10 +73,13 @@ class sourceSpaceConnectivityView(QWidget):
         self.number_strongest_connections_line.setMaximum(number_of_channels*number_of_channels)
         self.number_strongest_connections_line.setValue(100)
         self.all_connections_check_box = QCheckBox()
+        self.psi_check_box = QCheckBox()
         self.lines_layout.addWidget(QLabel("Number of strongest connections plotted : "), 0, 0)
         self.lines_layout.addWidget(self.number_strongest_connections_line, 0, 1)
         self.lines_layout.addWidget(QLabel("Plot all connections : "), 1, 0)
         self.lines_layout.addWidget(self.all_connections_check_box, 1, 1)
+        self.lines_layout.addWidget(QLabel("Compute the Phase Slope Index (directionality) : "), 2, 0)
+        self.lines_layout.addWidget(self.psi_check_box, 2, 1)
         self.lines_widget.setLayout(self.lines_layout)
 
         # Method
@@ -155,11 +159,14 @@ class sourceSpaceConnectivityView(QWidget):
     """
     Plots
     """
-    def plot_source_space_connectivity(self, source_space_connectivity_data):
+    def plot_source_space_connectivity(self, source_space_connectivity_data, psi):
         """
         Plot the source space connectivity data.
         :param source_space_connectivity_data: The source space connectivity data.
         :type source_space_connectivity_data: list of, list of float
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
         """
         try:
             labels = get_labels_from_subject("fsaverage", get_project_freesurfer_path())
@@ -185,8 +192,38 @@ class sourceSpaceConnectivityView(QWidget):
             title = "Source space connectivity"
             plot_connectivity_circle(source_space_connectivity_data, label_names, n_lines=self.number_strongest_connections,
                                      node_angles=node_angles, node_colors=label_colors, title=title)
+
+            if psi is not None:
+                self.plot_psi(psi, label_names)
         except Exception as e:
             print(e)
+
+    @staticmethod
+    def plot_psi(psi, label_names):
+        """
+        Plot the Phase Slope Index computed.
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
+        :param label_names: Labels' names
+        :type label_names: list of str
+        """
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        cax = ax.matshow(psi)
+        fig.colorbar(cax)
+
+        # PSI : Positive value means from the channel to the other (row to columns)
+        # While negative means the opposite
+
+        # Set ticks on both sides of axes on
+        ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, labeltop=False)
+        plt.locator_params(axis="x", nbins=len(label_names))
+        plt.locator_params(axis="y", nbins=len(label_names))
+        ax.set_xticklabels([''] + label_names, rotation=90)
+        ax.set_yticklabels([''] + label_names)
+
+        plt.show()
 
     """
     Triggers
@@ -210,8 +247,10 @@ class sourceSpaceConnectivityView(QWidget):
         source_estimation_method = self.method_box.currentText()
         save_data, load_data = self.get_save_load_button_checked()
         n_jobs = self.n_jobs_slider.value()
+        psi = self.psi_check_box.isChecked()
         self.source_space_connectivity_listener.confirm_button_clicked(connectivity_method, spectrum_estimation_method,
-                                                                       source_estimation_method, save_data, load_data, n_jobs)
+                                                                       source_estimation_method, save_data, load_data,
+                                                                       n_jobs, psi)
 
     def data_exportation_trigger(self):
         """

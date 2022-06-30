@@ -159,10 +159,16 @@ class mainListener(ABC):
     """
     Edit Menu
     """
+    # Dataset info
     @abstractmethod
     def dataset_info_clicked(self):
         pass
 
+    @abstractmethod
+    def dataset_info_information(self, channels_selected):
+        pass
+
+    # Event values
     @abstractmethod
     def event_values_clicked(self):
         pass
@@ -171,6 +177,7 @@ class mainListener(ABC):
     def event_values_finished(self, event_values, event_ids):
         pass
 
+    # Channel location
     @abstractmethod
     def channel_location_clicked(self):
         pass
@@ -451,7 +458,7 @@ class mainListener(ABC):
 
     @abstractmethod
     def source_space_connectivity_information(self, connectivity_method, spectrum_estimation_method, source_estimation_method,
-                                              save_data, load_data, n_jobs, export_path):
+                                              save_data, load_data, n_jobs, export_path, psi):
         pass
 
     @abstractmethod

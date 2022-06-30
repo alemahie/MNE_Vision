@@ -171,7 +171,6 @@ class menubarView(QMenuBar):
         self.tools_menu.addSeparator()
         snr_action = QAction("Signal-to-noise ratio", self)
         snr_action.triggered.connect(self.snr_trigger)
-        snr_action.setEnabled(False)
         self.tools_menu.addAction(snr_action)
         self.tools_menu.addSeparator()
         source_estimation_action = QAction("Source estimation", self)

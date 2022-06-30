@@ -441,11 +441,14 @@ class mainController(mainListener):
         """
         Create the controller for displaying some information about the dataset.
         """
-        sampling_rate = self.main_model.get_sampling_frequency()
-        number_of_frames = self.main_model.get_number_of_frames()
-        start_time = self.main_model.get_epochs_start()
-        self.dataset_info_controller = datasetInfoController(sampling_rate, number_of_frames, start_time)
+        all_channels_names = self.main_model.get_all_channels_names()
+        self.dataset_info_controller = datasetInfoController(all_channels_names)
         self.dataset_info_controller.set_listener(self)
+
+    def dataset_info_information(self, channels_selected):
+        self.main_model.set_reference(channels_selected)
+        reference = self.main_model.get_reference()
+        self.main_view.update_reference(reference)
 
     # Event values
     def event_values_clicked(self):
@@ -810,7 +813,12 @@ class mainController(mainListener):
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
 
     def snr_finished(self):
-        print("snr")
+        """
+        The computation of the SNR is completely done, plot the results.
+        """
+        SNRs = self.main_model.get_SNRs()
+        SNR_methods = self.main_model.get_SNR_methods()
+        self.snr_controller.plot_SNRs(SNRs, SNR_methods)
 
     # Source Estimation
     def source_estimation_clicked(self):
@@ -1110,7 +1118,7 @@ class mainController(mainListener):
         The computation of the envelope correlation is completely done, plot it.
         """
         envelope_correlation_data = self.main_model.get_envelope_correlation_data()
-        psi = self.main_model.get_psi_data()
+        psi = self.main_model.get_psi_data_envelope_correlation()
         channel_names = self.main_model.get_all_channels_names()
         self.envelope_correlation_controller.plot_envelope_correlation(envelope_correlation_data, psi, channel_names)
 
@@ -1129,7 +1137,7 @@ class mainController(mainListener):
             self.source_space_connectivity_controller.set_listener(self)
 
     def source_space_connectivity_information(self, connectivity_method, spectrum_estimation_method, source_estimation_method,
-                                              save_data, load_data, n_jobs, export_path):
+                                              save_data, load_data, n_jobs, export_path, psi):
         """
         Create the waiting window while the computation of the source space connectivity is done on the dataset.
         :param connectivity_method: Method used for computing the source space connectivity.
@@ -1148,12 +1156,15 @@ class mainController(mainListener):
         :type n_jobs: int
         :param export_path: Path where the source space connectivity data will be stored.
         :type export_path: str
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
         """
         processing_title = "Source Space Connectivity running, please wait."
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.source_space_connectivity_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.source_space_connectivity(connectivity_method, spectrum_estimation_method, source_estimation_method,
-                                                  save_data, load_data, n_jobs, export_path)
+                                                  save_data, load_data, n_jobs, export_path, psi)
 
     def source_space_connectivity_computation_finished(self):
         """
@@ -1174,7 +1185,9 @@ class mainController(mainListener):
         The computation of the source space connectivity is completely done, plot it.
         """
         source_space_connectivity_data = self.main_model.get_source_space_connectivity_data()
-        self.source_space_connectivity_controller.plot_source_space_connectivity(source_space_connectivity_data)
+        psi = self.main_model.get_psi_data_source_space()
+        print(psi)
+        self.source_space_connectivity_controller.plot_source_space_connectivity(source_space_connectivity_data, psi)
 
     # Sensor space connectivity
     def sensor_space_connectivity_clicked(self):

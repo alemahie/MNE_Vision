@@ -737,7 +737,7 @@ class mainModel:
 
     # Source space connectivity
     def source_space_connectivity(self, connectivity_method, spectrum_estimation_method, source_estimation_method, save_data,
-                                  load_data, n_jobs, export_path):
+                                  load_data, n_jobs, export_path, psi):
         """
         Creates the parallel runnable for computing the connectivity inside the source space of the dataset.
         :param connectivity_method: Method used for computing the source space connectivity.
@@ -756,12 +756,15 @@ class mainModel:
         :type n_jobs: int
         :param export_path: Path where the source space connectivity data will be stored.
         :type export_path: str
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
         """
         pool = QThreadPool.globalInstance()
         self.source_space_connectivity_runnable = sourceSpaceConnectivityRunnable(self.file_data, self.get_file_path_name_without_extension(),
                                                                                   connectivity_method, spectrum_estimation_method,
                                                                                   source_estimation_method, save_data, load_data,
-                                                                                  n_jobs, export_path)
+                                                                                  n_jobs, export_path, psi)
         pool.start(self.source_space_connectivity_runnable)
         self.source_space_connectivity_runnable.signals.finished.connect(self.source_space_connectivity_computation_finished)
         self.source_space_connectivity_runnable.signals.error.connect(self.source_space_connectivity_computation_error)
@@ -1130,6 +1133,22 @@ class mainModel:
     """
     Runnable getters
     """
+    def get_SNRs(self):
+        """
+        Get the SNR values computed over the data.
+        :return: SNR
+        :rtype: list of float
+        """
+        return self.snr_runnable.get_SNRs()
+
+    def get_SNR_methods(self):
+        """
+        Get the SNR methods used for the computation.
+        :return: SNR methods
+        :rtype: list of str
+        """
+        return self.snr_runnable.get_SNR_methods()
+
     def get_source_estimation_data(self):
         """
         Gets the data of the source estimation computation performed on the dataset.
@@ -1188,9 +1207,9 @@ class mainModel:
         """
         return self.envelope_correlation_runnable.get_envelope_correlation_data()
 
-    def get_psi_data(self):
+    def get_psi_data_envelope_correlation(self):
         """
-        Get the psi's data.
+        Get the psi's data for the envelope correlation.
         :return: The psi's data. Or nothing if the psi's data has not been computed.
         :rtype: list of, list of float
         """
@@ -1203,6 +1222,14 @@ class mainModel:
         :rtype: list of, list of float
         """
         return self.source_space_connectivity_runnable.get_source_space_connectivity_data()
+
+    def get_psi_data_source_space(self):
+        """
+        Get the psi's data for the source space connectivity.
+        :return: The psi's data. Or nothing if the psi's data has not been computed.
+        :rtype: list of, list of float
+        """
+        return self.source_space_connectivity_runnable.get_psi_data()
 
     def get_sensor_space_connectivity_data(self):
         """
@@ -1277,3 +1304,14 @@ class mainModel:
         :type channel_names: list of str
         """
         self.file_data = self.file_data.pick_channels(channel_names)
+
+    def set_reference(self, channels_selected):
+        """
+        Sets the reference of the dataset.
+        :param channels_selected: The channels' names.
+        :type channels_selected: list of str
+        """
+        if channels_selected[0] in ["average", "infinity"]:
+            self.references = channels_selected[0]
+        else:
+            self.references = channels_selected

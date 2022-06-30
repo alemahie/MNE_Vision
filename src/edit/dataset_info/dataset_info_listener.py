@@ -27,6 +27,9 @@ class datasetInfoListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self):
+    def confirm_button_clicked(self, channels_selected):
         pass
 
+    @abstractmethod
+    def get_elements_selected(self, elements_selected, element_type):
+        pass

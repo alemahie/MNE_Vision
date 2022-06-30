@@ -7,6 +7,7 @@ SNR view
 
 from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QButtonGroup, QCheckBox, \
     QGridLayout
+from matplotlib import pyplot as plt
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
 from utils.view.separator import create_layout_separator
@@ -139,8 +140,17 @@ class signalToNoiseRatioView(QWidget):
         """
         source_method = self.method_box.currentText()
         write, read = self.get_save_load_button_checked()
+        if self.snr_methods is None:
+            self.snr_methods = ['Mean-Std', "Sample Correlation Coefficient", "Maximum Likelihood", "Amplitude",
+                                "Plus-Minus Averaging", "Response Repetition", "MNE Source", "MNE Frequency"]
+        if self.channels_selected is None:
+            self.channels_selected = self.all_channels_names
+        if self.trials_selected is None:
+            trials_selected = [i for i in range(len(self.event_values))]
+        else:
+            trials_selected = self.trials_selected
         self.snr_listener.confirm_button_clicked(self.snr_methods, source_method, read, write, self.channels_selected,
-                                                 self.trials_selected)
+                                                 trials_selected)
 
     def snr_selection_trigger(self):
         """
@@ -185,6 +195,29 @@ class signalToNoiseRatioView(QWidget):
         self.events_selector_controller = multipleSelectorController(events_ids_list, title, box_checked=True,
                                                                      element_type="events")
         self.events_selector_controller.set_listener(self.snr_listener)
+
+    """
+    Plots
+    """
+    @staticmethod
+    def plot_SNRs(SNRs, SNR_methods):
+        """
+        Plot the SNRs
+        :param SNRs: SNRs
+        :type SNRs: list of float
+        :param SNR_methods: SNR methods
+        :type SNR_methods: list of str
+        """
+        res = []
+        for i in range(len(SNRs)):
+            res.append([str(SNRs[i])])
+        fig, ax = plt.subplots()
+        fig.patch.set_visible(False)  # hide axes
+        ax.axis('off')
+        ax.axis('tight')
+        ax.table(cellText=res, rowLabels=SNR_methods, colLabels=['SNR value'], loc='center')
+        fig.tight_layout()
+        plt.show()
 
     """
     Utils
