@@ -66,7 +66,7 @@ class sensorSpaceConnectivityView(QWidget):
         :param sensor_space_connectivity_data: The sensor space connectivity data.
         :type sensor_space_connectivity_data: list of, list of float
         """
-        plot_sensors_connectivity(self.file_info, sensor_space_connectivity_data, picks="all")
+        plot_sensors_connectivity(self.file_info, sensor_space_connectivity_data, picks=None)
 
     """
     Triggers

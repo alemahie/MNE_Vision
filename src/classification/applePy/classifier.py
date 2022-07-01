@@ -1,5 +1,6 @@
 import os
 import math
+import time
 
 import numpy as np
 import seaborn as sn
@@ -9,7 +10,7 @@ from copy import deepcopy
 
 from scipy.stats import randint
 
-from mne import Epochs, concatenate_epochs
+from mne import Epochs, concatenate_epochs, read_epochs
 from mne.io import read_raw_eeglab, read_epochs_eeglab
 from mne.channels import make_standard_montage
 from mne.event import find_events
@@ -388,7 +389,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
                         if resample:
                             epoched_eeg.resample(512)
                     else:
-                        epoched_eeg = mne.read_epochs(
+                        epoched_eeg = read_epochs(
                             raw_file_path)  # not read_epochs_eeglab because it doesn't work for .fif, and because it's already preprocessed
 
                     epoched_sources = deepcopy(epoched_eeg)
@@ -430,7 +431,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
                                 epoched_eeg.pick_channels(picks)
                             epoched_eeg.crop(tmin=tmin, tmax=tmax)
                         else:
-                            epoched_eeg = mne.read_epochs(raw_file_path)
+                            epoched_eeg = read_epochs(raw_file_path)
 
                         epoched_sources = deepcopy(epoched_eeg)
                         epoched_data = epoched_eeg.get_data()
@@ -448,7 +449,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
                             np.concatenate(epoched_raw_eeg_dataset[subject_i + subject_j + 1][label]))
                         labels[subject_i + subject_j + 1][label] = np.asarray(
                             np.concatenate(labels[subject_i + subject_j + 1][label]))
-                        epoched_raw_eeg_sources[subject_i + subject_j + 1][label] = mne.concatenate_epochs(
+                        epoched_raw_eeg_sources[subject_i + subject_j + 1][label] = concatenate_epochs(
                             epoched_raw_eeg_sources[subject_i + subject_j + 1][label])
                     else:
                         epoched_raw_eeg_dataset[subject_i + subject_j + 1][label] = np.asarray(
@@ -580,7 +581,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
                     labels_sources.append(epoched_labels_sources)
 
             for subject_j, raw_eeg_dir in enumerate(list_of_dirs):
-                raw_path_subject = os.path.join(data_class_folder, raw_eeg_dir)
+                raw_path_subject = os.path.join(raw_file_path, raw_eeg_dir)
                 subject_files = []
                 for raw_eeg_file_path in os.listdir(raw_path_subject):
                     if (".set" in raw_eeg_file_path) or ("-epo.fif" in raw_eeg_file_path):
@@ -729,8 +730,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
             for subject_i, raw_eeg_file in enumerate(list_of_files):
                 raw_file_path = os.path.join(data_root_folder, raw_eeg_file)
                 self.read_one_file(raw_file_path, raw_eeg_file, epoched_data_class_folder, bads, picks, filtering, tmin,
-                                   tmax, ICA=ICA, resample=resample, baseline=baseline, event_ids=event_id,
-                                   projection=projection)
+                                   tmax, ICA=ICA, resample=resample, baseline=baseline, event_ids=event_id)
 
             for subject_j, raw_eeg_dir in enumerate(list_of_dirs):
                 raw_path_subject = os.path.join(data_root_folder, raw_eeg_dir)
@@ -748,7 +748,7 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
                         raw_file_path = os.path.join(raw_path_subject, raw_eeg_file)
                         self.read_one_file(raw_file_path, raw_eeg_file, epoched_raw_path_subject, bads, picks,
                                            filtering, tmin, tmax, ICA=ICA, resample=resample, baseline=baseline,
-                                           event_ids=event_id, projection=projection)
+                                           event_ids=event_id)
 
     """
     Computation
@@ -1209,22 +1209,43 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         """
         pipelines = list(self.catalogue.keys())
         pipelines.sort()
-        pipeline_counter = 0
+        # pipeline_counter = 0
+
+        x = 0
+        y = 0
+        fig, axs = plt.subplots(nb_lines, nb_columns)
+
         for pipeline_name in pipelines:
             fpr, tpr, auc = self.roc_infos[pipeline_name]
-            plt.subplot(nb_lines, nb_columns, pipeline_counter + 1)
+            # plt.subplot(nb_lines, nb_columns, pipeline_counter + 1)
             # title = pipeline_name + " : " + str(self.scores[pipeline_name])
-            plt.title(pipeline_name)
 
-            plt.plot(fpr, tpr, 'b', label='AUC = %0.2f' % auc)
-            plt.legend(loc='lower right')
-            plt.plot([0, 1], [0, 1], 'r--')
-            plt.xlim([0, 1])
-            plt.ylim([0, 1])
-            plt.ylabel('True Positive Rate')
-            plt.xlabel('False Positive Rate')
-            pipeline_counter += 1
-        plt.show()
+            if nb_lines > 1:
+                axs[x, y].set_title(pipeline_name)
+                axs[x, y].plot(fpr, tpr, 'b', label='AUC = %0.2f' % auc)
+                axs[x, y].legend(loc='lower right')
+                axs[x, y].plot([0, 1], [0, 1], 'r--')
+                axs[x, y].set_xlim([0, 1])
+                axs[x, y].set_ylim([0, 1])
+                axs[x, y].set_ylabel('True Positive Rate')
+                axs[x, y].set_xlabel('False Positive Rate')
+                # pipeline_counter += 1
+                y += 1
+                if y == nb_columns:
+                    y = 0
+                    x += 1
+            else:
+                axs[y].set_title(pipeline_name)
+                axs[y].plot(fpr, tpr, 'b', label='AUC = %0.2f' % auc)
+                axs[y].legend(loc='lower right')
+                axs[y].plot([0, 1], [0, 1], 'r--')
+                axs[y].set_xlim([0, 1])
+                axs[y].set_ylim([0, 1])
+                axs[y].set_ylabel('True Positive Rate')
+                axs[y].set_xlabel('False Positive Rate')
+                y += 1
+
+        fig.show()
 
     def plot_confusion(self, nb_lines, nb_columns, names):
         """
@@ -1262,9 +1283,25 @@ class ApplePyClassifier(BaseEstimator, TransformerMixin):
         pipelines = list(self.catalogue.keys())
         pipelines.sort()
         nb_lines = math.ceil(len(pipelines) / nb_columns)
+        # Confusion
+        self.plot_confusion(nb_lines, nb_columns, self.event_names)
+        time.sleep(1)
         # ROC
         if self.nb_paradigms == 2:
             self.plot_ROC(nb_lines, nb_columns)
+
+    def plot_ROC_(self, nb_columns):
+        pipelines = list(self.catalogue.keys())
+        pipelines.sort()
+        nb_lines = math.ceil(len(pipelines) / nb_columns)
+        # ROC
+        if self.nb_paradigms == 2:
+            self.plot_ROC(nb_lines, nb_columns)
+
+    def plot_confusion_(self, nb_columns):
+        pipelines = list(self.catalogue.keys())
+        pipelines.sort()
+        nb_lines = math.ceil(len(pipelines) / nb_columns)
         # Confusion
         self.plot_confusion(nb_lines, nb_columns, self.event_names)
 

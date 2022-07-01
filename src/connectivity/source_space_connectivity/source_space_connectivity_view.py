@@ -189,12 +189,14 @@ class sourceSpaceConnectivityView(QWidget):
             node_order.extend(rh_labels)
             node_angles = circular_layout(label_names, node_order, start_pos=90,
                                           group_boundaries=[0, len(label_names) / 2])
-            title = "Source space connectivity"
+
             plot_connectivity_circle(source_space_connectivity_data, label_names, n_lines=self.number_strongest_connections,
-                                     node_angles=node_angles, node_colors=label_colors, title=title)
+                                     node_angles=node_angles, node_colors=label_colors, title="Source Space Connectivity")
 
             if psi is not None:
-                self.plot_psi(psi, label_names)
+                plot_connectivity_circle(psi, label_names, n_lines=self.number_strongest_connections, node_angles=node_angles,
+                                         node_colors=label_colors, title="PSI Directionality")
+
         except Exception as e:
             print(e)
 

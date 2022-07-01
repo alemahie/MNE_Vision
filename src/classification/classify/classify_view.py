@@ -4,6 +4,7 @@
 """
 Classify view
 """
+import time
 
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QGridLayout, QCheckBox, \
     QDoubleSpinBox, QSpinBox
