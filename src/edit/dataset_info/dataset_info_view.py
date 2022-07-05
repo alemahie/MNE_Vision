@@ -5,7 +5,7 @@
 Dataset info view
 """
 
-from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QHBoxLayout, QVBoxLayout, QCheckBox, QButtonGroup, QGridLayout
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
 from utils.view.separator import create_layout_separator
@@ -38,12 +38,26 @@ class datasetInfoView(QWidget):
 
         # Channels
         self.channels_selection_widget = QWidget()
-        self.channels_selection_layout = QHBoxLayout()
+        self.channels_selection_buttons = QButtonGroup()
+        self.average_check_box = QCheckBox()
+        self.average_check_box.setChecked(True)
+        self.average_check_box.setText("Average reference")
+        self.channels_selection_buttons.addButton(self.average_check_box, 1)   # Button with ID 1
+        self.channel_check_box = QCheckBox()
+        self.channel_check_box.setText("Channel(s) reference(s) : ")
+        self.channels_selection_buttons.addButton(self.channel_check_box, 2)  # Button with ID 2
         self.channels_selection_button = QPushButton("&Channels ...", self)
         self.channels_selection_button.clicked.connect(self.channels_selection_trigger)
-        self.channels_selection_layout.addWidget(QLabel("Select a new reference : "))
-        self.channels_selection_layout.addWidget(self.channels_selection_button)
-        self.channels_selection_widget.setLayout(self.channels_selection_layout)
+        self.infinity_check_box = QCheckBox()
+        self.infinity_check_box.setText("Point-to-infinity")
+        self.channels_selection_buttons.addButton(self.infinity_check_box, 3)  # Button with ID 3
+
+        self.check_box_layout = QGridLayout()
+        self.check_box_layout.addWidget(self.average_check_box, 0, 0)
+        self.check_box_layout.addWidget(self.channel_check_box, 1, 0)
+        self.check_box_layout.addWidget(self.channels_selection_button, 1, 1)
+        self.check_box_layout.addWidget(self.infinity_check_box, 2, 0)
+        self.channels_selection_widget.setLayout(self.check_box_layout)
 
         # Cancel Confirm
         self.cancel_confirm_widget = QWidget()
@@ -56,6 +70,7 @@ class datasetInfoView(QWidget):
         self.cancel_confirm_layout.addWidget(self.confirm)
         self.confirm.clicked.connect(self.confirm_dataset_info_trigger)
 
+        self.vertical_layout.addWidget(QLabel("Select a new reference : "))
         self.vertical_layout.addWidget(self.channels_selection_widget)
         self.vertical_layout.addWidget(create_layout_separator())
         self.vertical_layout.addWidget(self.cancel_confirm_widget)
@@ -73,7 +88,16 @@ class datasetInfoView(QWidget):
         """
         Retrieve the channel name and location and send the information to the controller.
         """
-        self.dataset_info_listener.confirm_button_clicked(self.channels_selected)
+        checked_button = self.channels_selection_buttons.checkedButton()
+        button_id = self.channels_selection_buttons.id(checked_button)
+        channels_selected = None
+        if button_id == 1:      # Average of all channels for reference
+            channels_selected = "average"
+        elif button_id == 2:    # Selected channel for reference
+            channels_selected = self.channels_selected
+        elif button_id == 3:
+            channels_selected = "infinity"
+        self.dataset_info_listener.confirm_button_clicked(channels_selected)
 
     def channels_selection_trigger(self):
         """
