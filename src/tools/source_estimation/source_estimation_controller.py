@@ -21,7 +21,7 @@ __status__ = "Dev"
 
 
 class sourceEstimationController(sourceEstimationListener):
-    def __init__(self, number_of_epochs, event_values, event_ids, title=None):
+    def __init__(self, number_of_epochs, event_values, event_ids, tmin, tmax, title=None):
         """
         Controller for computing the source estimation on the dataset.
         Create a new window for specifying some parameters.
@@ -31,11 +31,15 @@ class sourceEstimationController(sourceEstimationListener):
         :type event_values: list of, list of int
         :param event_ids: Name of the events associated to their id.
         :type event_ids: dict
+        :param tmin: Start time of the epoch or raw file
+        :type tmin: float
+        :param tmax: End time of the epoch or raw file
+        :type tmax: float
         :param title: Title of window
         :type title: str
         """
         self.main_listener = None
-        self.source_estimation_view = sourceEstimationView(number_of_epochs, event_values, event_ids, title)
+        self.source_estimation_view = sourceEstimationView(number_of_epochs, event_values, event_ids, tmin, tmax, title)
         self.source_estimation_view.set_listener(self)
 
         self.export_data_controller = None
@@ -49,7 +53,8 @@ class sourceEstimationController(sourceEstimationListener):
         """
         self.source_estimation_view.close()
 
-    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, epochs_method, trials_selected, n_jobs):
+    def confirm_button_clicked(self, source_estimation_method, save_data, load_data, epochs_method, trials_selected, tmin,
+                               tmax,  n_jobs):
         """
         Close the window and send the information to the main controller.
         :param source_estimation_method: The method used to compute the source estimation
@@ -65,12 +70,16 @@ class sourceEstimationController(sourceEstimationListener):
         :type: str
         :param trials_selected: The indexes of the trials selected for the computation
         :type trials_selected: list of int
+        :param tmin: Start time of the epoch or raw file
+        :type tmin: float
+        :param tmax: End time of the epoch or raw file
+        :type tmax: float
         :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
         """
         self.source_estimation_view.close()
         self.main_listener.source_estimation_information(source_estimation_method, save_data, load_data, epochs_method,
-                                                         trials_selected, n_jobs, self.export_path)
+                                                         trials_selected, tmin, tmax,  n_jobs, self.export_path)
 
     def additional_parameters_clicked(self):
         """

@@ -7,8 +7,9 @@ Source estimation view
 
 from multiprocessing import cpu_count
 
+from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import QWidget, QComboBox, QPushButton, QLabel, QCheckBox, QButtonGroup, QVBoxLayout, \
-    QHBoxLayout, QSlider, QGridLayout, QSpinBox
+    QHBoxLayout, QSlider, QGridLayout, QSpinBox, QLineEdit
 from PyQt5.QtCore import Qt
 
 from mne.viz import plot_source_estimates
@@ -27,7 +28,7 @@ __status__ = "Dev"
 
 
 class sourceEstimationView(QWidget):
-    def __init__(self, number_of_epochs, event_values, event_ids, title=None):
+    def __init__(self, number_of_epochs, event_values, event_ids, tmin, tmax, title=None):
         """
         Window displaying the parameters for computing the source estimation on the dataset.
         :param number_of_epochs: Number of epochs in the dataset.
@@ -36,6 +37,10 @@ class sourceEstimationView(QWidget):
         :type event_values: list of, list of int
         :param event_ids: Name of the events associated to their id.
         :type event_ids: dict
+        :param tmin: Start time of the epoch or raw file
+        :type tmin: float
+        :param tmax: End time of the epoch or raw file
+        :type tmax: float
         :param title: Title of window
         :type title: str
         """
@@ -107,20 +112,39 @@ class sourceEstimationView(QWidget):
         self.check_box_all_trials_averaged.setText("Compute source estimation on all trials averaged")
         self.epochs_trial_average_buttons.addButton(self.check_box_all_trials_averaged, 2)  # Button with ID 2
 
+        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_single_trial, 0, 0)
+        self.epochs_trial_average_check_box_layout.addWidget(self.trial_number_single_trial, 0, 1)
+        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_evoked, 1, 0)
+        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_all_trials_averaged, 2, 0)
+        self.epochs_trial_average_widget.setLayout(self.epochs_trial_average_check_box_layout)
+
+        # Trials events and indexes
+        self.trial_selection_widget = QWidget()
+        self.trial_selection_layout = QGridLayout()
         self.trial_selection_label = QLabel("Trials indexes to compute (default : all) :")
         self.trial_selection_indexes = QPushButton("Select by trials indexes")
         self.trial_selection_indexes.clicked.connect(self.trial_selection_indexes_trigger)
         self.trial_selection_events = QPushButton("Select by events")
         self.trial_selection_events.clicked.connect(self.trial_selection_events_trigger)
+        self.trial_selection_layout.addWidget(self.trial_selection_label, 0, 0)
+        self.trial_selection_layout.addWidget(self.trial_selection_indexes, 0, 1)
+        self.trial_selection_layout.addWidget(self.trial_selection_events, 1, 1)
+        self.trial_selection_widget.setLayout(self.trial_selection_layout)
 
-        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_single_trial, 0, 0)
-        self.epochs_trial_average_check_box_layout.addWidget(self.trial_number_single_trial, 0, 1)
-        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_evoked, 1, 0)
-        self.epochs_trial_average_check_box_layout.addWidget(self.check_box_all_trials_averaged, 2, 0)
-        self.epochs_trial_average_check_box_layout.addWidget(self.trial_selection_label, 3, 0)
-        self.epochs_trial_average_check_box_layout.addWidget(self.trial_selection_indexes, 3, 1)
-        self.epochs_trial_average_check_box_layout.addWidget(self.trial_selection_events, 4, 1)
-        self.epochs_trial_average_widget.setLayout(self.epochs_trial_average_check_box_layout)
+        # Data start and end
+        self.data_start_widget = QWidget()
+        self.data_start_layout = QGridLayout()
+        self.data_start_end_validator = QDoubleValidator()
+        self.data_start_end_validator.setRange(tmin, tmax)
+        self.data_start_line = QLineEdit(str(tmin))
+        self.data_start_line.setValidator(self.data_start_end_validator)
+        self.data_end_line = QLineEdit(str(tmax))
+        self.data_end_line.setValidator(self.data_start_end_validator)
+        self.data_start_layout.addWidget(QLabel("Data start time (sec) : "), 0, 0)
+        self.data_start_layout.addWidget(self.data_start_line, 0, 1)
+        self.data_start_layout.addWidget(QLabel("Data end time (sec) : "), 1, 0)
+        self.data_start_layout.addWidget(self.data_end_line, 1, 1)
+        self.data_start_widget.setLayout(self.data_start_layout)
 
         # Number of Jobs Slider
         self.n_jobs_widget = QWidget()
@@ -161,6 +185,8 @@ class sourceEstimationView(QWidget):
         self.global_layout.addWidget(self.save_load_widget)
         self.global_layout.addWidget(create_layout_separator())
         self.global_layout.addWidget(self.epochs_trial_average_widget)
+        self.global_layout.addWidget(self.trial_selection_widget)
+        self.global_layout.addWidget(self.data_start_widget)
         self.global_layout.addWidget(create_layout_separator())
         self.global_layout.addWidget(self.n_jobs_widget)
         self.global_layout.addWidget(self.data_exportation_widget)
@@ -205,8 +231,16 @@ class sourceEstimationView(QWidget):
                 trials_selected = [i for i in range(len(self.event_values))]
             else:
                 trials_selected = self.trials_selected
+        tmin = None
+        tmax = None
+        if self.data_start_line.hasAcceptableInput():
+            tmin = self.data_start_line.text()
+            tmin = float(tmin.replace(',', '.'))
+        if self.data_end_line.hasAcceptableInput():
+            tmax = self.data_end_line.text()
+            tmax = float(tmax.replace(',', '.'))
         self.source_estimation_listener.confirm_button_clicked(source_estimation_method, save_data, load_data, epochs_method,
-                                                               trials_selected, n_jobs)
+                                                               trials_selected, tmin, tmax, n_jobs)
 
     def trial_selection_indexes_trigger(self):
         """

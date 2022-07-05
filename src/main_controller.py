@@ -835,7 +835,10 @@ class mainController(mainListener):
                 number_of_epochs = self.main_model.get_number_of_epochs()
                 event_values = self.main_model.get_event_values()
                 event_ids = self.main_model.get_event_ids()
-                self.source_estimation_controller = sourceEstimationController(number_of_epochs, event_values, event_ids)
+                tmin = self.main_model.get_epochs_start()
+                tmax = self.main_model.get_epochs_end()
+                self.source_estimation_controller = sourceEstimationController(number_of_epochs, event_values, event_ids,
+                                                                               tmin, tmax)
                 self.source_estimation_controller.set_listener(self)
             else:
                 error_message = "You can not compute the source estimation on a raw file"
@@ -843,7 +846,7 @@ class mainController(mainListener):
                 error_window.show()
 
     def source_estimation_information(self, source_estimation_method, save_data, load_data, epochs_method, trials_selected,
-                                      n_jobs, export_path):
+                                      tmin, tmax, n_jobs, export_path):
         """
         Create the waiting window while the computation of the source estimation is done on the dataset.
         :param source_estimation_method: The method used to compute the source estimation
@@ -859,6 +862,10 @@ class mainController(mainListener):
         :type epochs_method: str
         :param trials_selected: The indexes of the trials selected for the computation
         :type trials_selected: list of int
+        :param tmin: Start time of the epoch or raw file
+        :type tmin: float
+        :param tmax: End time of the epoch or raw file
+        :type tmax: float
         :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
         :param export_path: Path where the source estimation data will be stored.
@@ -868,7 +875,7 @@ class mainController(mainListener):
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.source_estimation_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.source_estimation(source_estimation_method, save_data, load_data, epochs_method, trials_selected,
-                                          n_jobs, export_path)
+                                          tmin, tmax, n_jobs, export_path)
 
     def source_estimation_computation_finished(self):
         """

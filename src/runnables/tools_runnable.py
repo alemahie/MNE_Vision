@@ -976,7 +976,7 @@ class sourceEstimationWorkerSignals(QObject):
 
 class sourceEstimationRunnable(QRunnable):
     def __init__(self, source_estimation_method, file_data, file_path, write_files, read_files, epochs_method, trials_selected,
-                 n_jobs, export_path):
+                 tmin, tmax, n_jobs, export_path):
         """
         Runnable for the computation of the source estimation of the given data.
         :param source_estimation_method: The method used to compute the source estimation
@@ -996,6 +996,10 @@ class sourceEstimationRunnable(QRunnable):
         :type: str
         :param trials_selected: The indexes of the trials selected for the computation
         :type trials_selected: list of int
+        :param tmin: Start time of the epoch or raw file
+        :type tmin: float
+        :param tmax: End time of the epoch or raw file
+        :type tmax: float
         :param n_jobs: Number of processes used to compute the source estimation
         :type n_jobs: int
         :param export_path: Path where the source estimation data will be stored.
@@ -1009,6 +1013,8 @@ class sourceEstimationRunnable(QRunnable):
         self.read_files = read_files
         self.write_files = write_files
         self.epochs_method = epochs_method
+        self.tmin = tmin
+        self.tmax = tmax
         self.trials_selected = trials_selected
         self.n_jobs = n_jobs
         self.export_path = export_path
@@ -1055,6 +1061,13 @@ class sourceEstimationRunnable(QRunnable):
         """
         self.file_data.apply_baseline()
         self.file_data.set_eeg_reference(projection=True)
+        if self.tmin is not None and self.tmax is not None:
+            if self.tmin is None:
+                self.tmin = self.file_data.times[0]
+            if self.tmax is None:
+                self.tmax = self.file_data.times[-1]
+            self.file_data = self.file_data.crop(tmin=self.tmin, tmax=self.tmax)
+
         if self.read_files:
             inv = read_inverse_operator(self.file_path + "-inv.fif", verbose=False)
         else:
