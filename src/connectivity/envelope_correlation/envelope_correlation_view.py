@@ -90,8 +90,8 @@ class envelopeCorrelationView(QWidget):
         plot_connectivity_circle(envelope_correlation_data, channel_names, n_lines=self.number_strongest_connections,
                                  title="Envelope Correlation")
         if psi is not None:
-            plot_connectivity_circle(psi, channel_names, n_lines=self.number_strongest_connections,
-                                     title="PSI Directionality")
+            self.plot_psi(psi, channel_names)
+            # plot_connectivity_circle(psi, channel_names, n_lines=self.number_strongest_connections, title="PSI Directionality")
 
     @staticmethod
     def plot_psi(psi, channel_names):
@@ -117,6 +117,7 @@ class envelopeCorrelationView(QWidget):
         plt.locator_params(axis="y", nbins=len(channel_names))
         ax.set_xticklabels([''] + channel_names, rotation=90)
         ax.set_yticklabels([''] + channel_names)
+        ax.set_title("PSI Directionality")
 
         plt.show()
 
