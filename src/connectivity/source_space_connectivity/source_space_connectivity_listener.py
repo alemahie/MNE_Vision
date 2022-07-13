@@ -29,7 +29,7 @@ class sourceSpaceConnectivityListener(ABC):
 
     @abstractmethod
     def confirm_button_clicked(self, connectivity_method, spectrum_estimation_method, source_estimation_method, save_data,
-                               load_data, n_jobs, psi):
+                               load_data, n_jobs, psi, fmin, fmax):
         pass
 
     @abstractmethod

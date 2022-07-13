@@ -203,7 +203,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def filter_information(self, low_frequency, high_frequency, channels_selected):
+    def filter_information(self, low_frequency, high_frequency, channels_selected, filter_method):
         pass
 
     @abstractmethod
@@ -436,7 +436,7 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def envelope_correlation_information(self, psi, export_path):
+    def envelope_correlation_information(self, psi, fmin, fmax, connectivity_method, n_jobs, export_path):
         pass
 
     @abstractmethod
@@ -458,7 +458,7 @@ class mainListener(ABC):
 
     @abstractmethod
     def source_space_connectivity_information(self, connectivity_method, spectrum_estimation_method, source_estimation_method,
-                                              save_data, load_data, n_jobs, export_path, psi):
+                                              save_data, load_data, n_jobs, export_path, psi, fmin, fmax):
         pass
 
     @abstractmethod

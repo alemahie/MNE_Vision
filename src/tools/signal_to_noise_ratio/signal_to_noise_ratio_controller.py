@@ -51,7 +51,7 @@ class signalToNoiseRatioController(signalToNoiseRatioListener):
         """
         Plot the SNRs
         :param SNRs: SNRs
-        :type SNRs: list of float
+        :type SNRs: list of, list of float
         :param SNR_methods: SNR methods
         :type SNR_methods: list of str
         """

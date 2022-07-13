@@ -394,7 +394,7 @@ class mainModel:
     Tools menu
     """
     # Filtering
-    def filter(self, low_frequency, high_frequency, channels_selected):
+    def filter(self, low_frequency, high_frequency, channels_selected, filter_method):
         """
         Creates the parallel runnable for filtering the dataset.
         :param low_frequency: Lowest frequency from where the data will be filtered.
@@ -403,9 +403,12 @@ class mainModel:
         :type high_frequency: float
         :param channels_selected: Channels on which the filtering will be performed.
         :type channels_selected: list of str
+        :param filter_method: Method used for the filtering, either FIR or IIR.
+        :type filter_method: str
         """
         pool = QThreadPool.globalInstance()
-        self.filter_runnable = filterRunnable(low_frequency, high_frequency, channels_selected, self.file_data)
+        self.filter_runnable = filterRunnable(low_frequency, high_frequency, channels_selected, self.file_data,
+                                              filter_method)
         pool.start(self.filter_runnable)
         self.filter_runnable.signals.finished.connect(self.filter_computation_finished)
         self.filter_runnable.signals.error.connect(self.filter_computation_error)
@@ -712,17 +715,26 @@ class mainModel:
     Connectivity menu
     """
     # Envelope correlation
-    def envelope_correlation(self, psi, export_path):
+    def envelope_correlation(self, psi, fmin, fmax, connectivity_method, n_jobs, export_path):
         """
         Creates the parallel runnable for computing the envelope correlation between the channels of the dataset.
         :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
         directionality of the connectivity.
         :type psi: bool
+        :param fmin: Minimum frequency from which the envelope correlation will be computed.
+        :type fmin: float
+        :param fmax: Maximum frequency from which the envelope correlation will be computed.
+        :type fmax: float
+        :param connectivity_method: Method used for computing the source space connectivity.
+        :type connectivity_method: str
+        :param n_jobs: Number of processes used to compute the source estimation
+        :type n_jobs: int
         :param export_path: Path where the envelope correlation data will be stored.
         :type export_path: str
         """
         pool = QThreadPool.globalInstance()
-        self.envelope_correlation_runnable = envelopeCorrelationRunnable(self.file_data, psi, export_path)
+        self.envelope_correlation_runnable = envelopeCorrelationRunnable(self.file_data, psi, fmin, fmax, connectivity_method,
+                                                                         n_jobs, export_path)
         pool.start(self.envelope_correlation_runnable)
         self.envelope_correlation_runnable.signals.finished.connect(self.envelope_correlation_computation_finished)
         self.envelope_correlation_runnable.signals.error.connect(self.envelope_correlation_computation_error)
@@ -741,7 +753,7 @@ class mainModel:
 
     # Source space connectivity
     def source_space_connectivity(self, connectivity_method, spectrum_estimation_method, source_estimation_method, save_data,
-                                  load_data, n_jobs, export_path, psi):
+                                  load_data, n_jobs, export_path, psi, fmin, fmax):
         """
         Creates the parallel runnable for computing the connectivity inside the source space of the dataset.
         :param connectivity_method: Method used for computing the source space connectivity.
@@ -763,12 +775,16 @@ class mainModel:
         :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
         directionality of the connectivity.
         :type psi: bool
+        :param fmin: Minimum frequency from which the envelope correlation will be computed.
+        :type fmin: float
+        :param fmax: Maximum frequency from which the envelope correlation will be computed.
+        :type fmax: float
         """
         pool = QThreadPool.globalInstance()
         self.source_space_connectivity_runnable = sourceSpaceConnectivityRunnable(self.file_data, self.get_file_path_name_without_extension(),
                                                                                   connectivity_method, spectrum_estimation_method,
                                                                                   source_estimation_method, save_data, load_data,
-                                                                                  n_jobs, export_path, psi)
+                                                                                  n_jobs, export_path, psi, fmin, fmax)
         pool.start(self.source_space_connectivity_runnable)
         self.source_space_connectivity_runnable.signals.finished.connect(self.source_space_connectivity_computation_finished)
         self.source_space_connectivity_runnable.signals.error.connect(self.source_space_connectivity_computation_error)
@@ -1141,7 +1157,7 @@ class mainModel:
         """
         Get the SNR values computed over the data.
         :return: SNR
-        :rtype: list of float
+        :rtype: list of, list of float
         """
         return self.snr_runnable.get_SNRs()
 

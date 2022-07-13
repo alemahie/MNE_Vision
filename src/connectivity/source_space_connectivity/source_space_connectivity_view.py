@@ -9,8 +9,9 @@ import numpy as np
 
 from multiprocessing import cpu_count
 
+from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QComboBox, QLabel, QButtonGroup, QCheckBox, \
-    QSlider, QGridLayout, QSpinBox
+    QSlider, QGridLayout, QSpinBox, QLineEdit
 from PyQt5.QtCore import Qt
 from matplotlib import pyplot as plt
 
@@ -65,23 +66,6 @@ class sourceSpaceConnectivityView(QWidget):
         self.spectrum_estimation_method_layout.addWidget(self.spectrum_estimation_method_box)
         self.spectrum_estimation_method_widget.setLayout(self.spectrum_estimation_method_layout)
 
-        # Plot parameters
-        self.lines_widget = QWidget()
-        self.lines_layout = QGridLayout()
-        self.number_strongest_connections_line = QSpinBox()
-        self.number_strongest_connections_line.setMinimum(10)
-        self.number_strongest_connections_line.setMaximum(number_of_channels*number_of_channels)
-        self.number_strongest_connections_line.setValue(100)
-        self.all_connections_check_box = QCheckBox()
-        self.psi_check_box = QCheckBox()
-        self.lines_layout.addWidget(QLabel("Number of strongest connections plotted : "), 0, 0)
-        self.lines_layout.addWidget(self.number_strongest_connections_line, 0, 1)
-        self.lines_layout.addWidget(QLabel("Plot all connections : "), 1, 0)
-        self.lines_layout.addWidget(self.all_connections_check_box, 1, 1)
-        self.lines_layout.addWidget(QLabel("Compute the Phase Slope Index (directionality) : "), 2, 0)
-        self.lines_layout.addWidget(self.psi_check_box, 2, 1)
-        self.lines_widget.setLayout(self.lines_layout)
-
         # Method
         self.method_widget = QWidget()
         self.method_layout = QHBoxLayout()
@@ -109,6 +93,36 @@ class sourceSpaceConnectivityView(QWidget):
         self.check_box_layout.addWidget(self.check_box_save)
         self.check_box_layout.addWidget(self.check_box_load)
         self.save_load_widget.setLayout(self.check_box_layout)
+
+        # Plot parameters
+        self.lines_widget = QWidget()
+        self.lines_layout = QGridLayout()
+        self.number_strongest_connections_line = QSpinBox()
+        self.number_strongest_connections_line.setMinimum(10)
+        self.number_strongest_connections_line.setMaximum(number_of_channels*number_of_channels)
+        self.number_strongest_connections_line.setValue(100)
+        self.all_connections_check_box = QCheckBox()
+        self.psi_check_box = QCheckBox()
+        self.lines_layout.addWidget(QLabel("Number of strongest connections plotted : "), 0, 0)
+        self.lines_layout.addWidget(self.number_strongest_connections_line, 0, 1)
+        self.lines_layout.addWidget(QLabel("Plot all connections : "), 1, 0)
+        self.lines_layout.addWidget(self.all_connections_check_box, 1, 1)
+        self.lines_layout.addWidget(QLabel("Compute the Phase Slope Index (directionality) : "), 2, 0)
+        self.lines_layout.addWidget(self.psi_check_box, 2, 1)
+        self.lines_widget.setLayout(self.lines_layout)
+
+        # Frequencies
+        self.frequency_lines_widget = QWidget()
+        self.frequency_lines_layout = QGridLayout()
+        self.minimum_frequency_line = QLineEdit("2,0")
+        self.minimum_frequency_line.setValidator(QDoubleValidator())
+        self.maximum_frequency_line = QLineEdit("25,0")
+        self.maximum_frequency_line.setValidator(QDoubleValidator())
+        self.frequency_lines_layout.addWidget(QLabel("Minimum frequency of interest (Hz) : "), 0, 0)
+        self.frequency_lines_layout.addWidget(self.minimum_frequency_line, 0, 1)
+        self.frequency_lines_layout.addWidget(QLabel("Maximum frequency of interest (Hz) : "), 1, 0)
+        self.frequency_lines_layout.addWidget(self.maximum_frequency_line, 1, 1)
+        self.frequency_lines_widget.setLayout(self.frequency_lines_layout)
 
         # Number jobs slider
         self.n_jobs_widget = QWidget()
@@ -150,6 +164,8 @@ class sourceSpaceConnectivityView(QWidget):
         self.global_layout.addWidget(self.save_load_widget)
         self.global_layout.addWidget(create_layout_separator())
         self.global_layout.addWidget(self.lines_widget)
+        self.global_layout.addWidget(create_layout_separator())
+        self.global_layout.addWidget(self.frequency_lines_widget)
         self.global_layout.addWidget(create_layout_separator())
         self.global_layout.addWidget(self.n_jobs_widget)
         self.global_layout.addWidget(self.data_exportation_widget)
@@ -224,6 +240,8 @@ class sourceSpaceConnectivityView(QWidget):
         plt.locator_params(axis="y", nbins=len(label_names))
         ax.set_xticklabels([''] + label_names, rotation=90)
         ax.set_yticklabels([''] + label_names)
+        ax.set_xlabel("Receiver")
+        ax.set_ylabel("Sender")
         ax.set_title("PSI Directionality")
 
         plt.show()
@@ -251,9 +269,17 @@ class sourceSpaceConnectivityView(QWidget):
         save_data, load_data = self.get_save_load_button_checked()
         n_jobs = self.n_jobs_slider.value()
         psi = self.psi_check_box.isChecked()
+
+        fmin = None
+        fmax = None
+        if self.minimum_frequency_line.hasAcceptableInput():
+            fmin = float(self.minimum_frequency_line.text().replace(',', '.'))
+        if self.maximum_frequency_line.hasAcceptableInput():
+            fmax = float(self.maximum_frequency_line.text().replace(',', '.'))
+
         self.source_space_connectivity_listener.confirm_button_clicked(connectivity_method, spectrum_estimation_method,
                                                                        source_estimation_method, save_data, load_data,
-                                                                       n_jobs, psi)
+                                                                       n_jobs, psi, fmin, fmax)
 
     def data_exportation_trigger(self):
         """

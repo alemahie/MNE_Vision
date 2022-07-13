@@ -527,7 +527,7 @@ class mainController(mainListener):
         self.filter_controller = filterController(all_channels_names)
         self.filter_controller.set_listener(self)
 
-    def filter_information(self, low_frequency, high_frequency, channels_selected):
+    def filter_information(self, low_frequency, high_frequency, channels_selected, filter_method):
         """
         Create the waiting window while the filtering is done on the dataset.
         :param low_frequency: Lowest frequency from where the data will be filtered.
@@ -536,11 +536,13 @@ class mainController(mainListener):
         :type high_frequency: float
         :param channels_selected: Channels on which the filtering will be performed.
         :type channels_selected: list of str
+        :param filter_method: Method used for the filtering, either FIR or IIR.
+        :type filter_method: str
         """
         processing_title = "Filtering running, please wait."
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.filter_finished)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.filter(low_frequency, high_frequency, channels_selected)
+        self.main_model.filter(low_frequency, high_frequency, channels_selected, filter_method)
 
     def filter_computation_finished(self):
         """
@@ -1089,22 +1091,31 @@ class mainController(mainListener):
         Create the controller for computing the envelope correlation on the dataset.
         """
         number_of_channels = self.main_model.get_number_of_channels()
-        self.envelope_correlation_controller = envelopeCorrelationController(number_of_channels)
+        file_data = self.main_model.get_file_data()
+        self.envelope_correlation_controller = envelopeCorrelationController(number_of_channels, file_data)
         self.envelope_correlation_controller.set_listener(self)
 
-    def envelope_correlation_information(self, psi, export_path):
+    def envelope_correlation_information(self, psi, fmin, fmax, connectivity_method, n_jobs, export_path):
         """
         Create the waiting window while the computation of the envelope correlation is done on the dataset.
         :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
         directionality of the connectivity.
         :type psi: bool
+        :param fmin: Minimum frequency from which the envelope correlation will be computed.
+        :type fmin: float
+        :param fmax: Maximum frequency from which the envelope correlation will be computed.
+        :type fmax: float
+        :param connectivity_method: Method used for computing the source space connectivity.
+        :type connectivity_method: str
+        :param n_jobs: Number of processes used to compute the source estimation
+        :type n_jobs: int
         :param export_path: Path where the envelope correlation data will be stored.
         :type export_path: str
         """
         processing_title = "Envelope correlation running, please wait."
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.envelope_correlation_finished)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.envelope_correlation(psi, export_path)
+        self.main_model.envelope_correlation(psi, fmin, fmax, connectivity_method, n_jobs, export_path)
 
     def envelope_correlation_computation_finished(self):
         """
@@ -1144,7 +1155,7 @@ class mainController(mainListener):
             self.source_space_connectivity_controller.set_listener(self)
 
     def source_space_connectivity_information(self, connectivity_method, spectrum_estimation_method, source_estimation_method,
-                                              save_data, load_data, n_jobs, export_path, psi):
+                                              save_data, load_data, n_jobs, export_path, psi, fmin, fmax):
         """
         Create the waiting window while the computation of the source space connectivity is done on the dataset.
         :param connectivity_method: Method used for computing the source space connectivity.
@@ -1166,12 +1177,16 @@ class mainController(mainListener):
         :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
         directionality of the connectivity.
         :type psi: bool
+        :param fmin: Minimum frequency from which the envelope correlation will be computed.
+        :type fmin: float
+        :param fmax: Maximum frequency from which the envelope correlation will be computed.
+        :type fmax: float
         """
         processing_title = "Source Space Connectivity running, please wait."
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.source_space_connectivity_finished)
         self.waiting_while_processing_controller.set_listener(self)
         self.main_model.source_space_connectivity(connectivity_method, spectrum_estimation_method, source_estimation_method,
-                                                  save_data, load_data, n_jobs, export_path, psi)
+                                                  save_data, load_data, n_jobs, export_path, psi, fmin, fmax)
 
     def source_space_connectivity_computation_finished(self):
         """

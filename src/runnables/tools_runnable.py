@@ -44,7 +44,7 @@ class filterWorkerSignals(QObject):
 
 
 class filterRunnable(QRunnable):
-    def __init__(self, low_frequency, high_frequency, channels_selected, file_data):
+    def __init__(self, low_frequency, high_frequency, channels_selected, file_data, filter_method):
         """
         Runnable for the computation of the filtering of the given data.
         :param low_frequency: Lowest frequency from where the data will be filtered.
@@ -55,6 +55,8 @@ class filterRunnable(QRunnable):
         :type channels_selected: list of str
         :param file_data: MNE data of the dataset.
         :type file_data: MNE.Epochs/MNE.Raw
+        :param filter_method: Method used for the filtering, either FIR or IIR.
+        :type filter_method: str
         """
         super().__init__()
         self.signals = filterWorkerSignals()
@@ -63,6 +65,7 @@ class filterRunnable(QRunnable):
         self.high_frequency = high_frequency
         self.channels_selected = channels_selected
         self.file_data = file_data
+        self.filter_method = filter_method
 
     def run(self):
         """
@@ -70,7 +73,8 @@ class filterRunnable(QRunnable):
         Notifies the main model that the computation is finished.
         """
         try:
-            self.file_data.filter(l_freq=self.low_frequency, h_freq=self.high_frequency, picks=self.channels_selected)
+            self.file_data.filter(l_freq=self.low_frequency, h_freq=self.high_frequency, picks=self.channels_selected,
+                                  method=self.filter_method)
             self.signals.finished.emit()
         except Exception as error:
             error_message = "An error has occurred during the filtering."
@@ -484,8 +488,8 @@ class signalToNoiseRatioRunnable(QRunnable):
         if "MNE Frequency" in self.snr_methods:
             self.SNRs.append(self.SNR_mne_frequency())
         self.pretty_print_SNRs(self.SNRs)
-        for i in range(len(self.SNRs)):
-            self.SNRs[i] = np.mean(self.SNRs[i])
+        # for i in range(len(self.SNRs)):
+        #    self.SNRs[i] = np.mean(self.SNRs[i])
 
     # Mean Std
     @staticmethod
@@ -592,9 +596,9 @@ class signalToNoiseRatioRunnable(QRunnable):
 
     def SNR_maximum_likelihood_estimate(self):
         """
-
-        :return:
-        :rtype:
+        Take the data from the Epoch file, average it and give the data to the computation.
+        :return: SNR_estimate
+        :rtype: int
         """
         data = self.file_data.get_data(picks=self.picks)
         data_shape = data.shape
@@ -952,7 +956,7 @@ class signalToNoiseRatioRunnable(QRunnable):
         """
         Get the SNRs computed over the data.
         :return: The SNRs computed over the data.
-        :rtype: list of float
+        :rtype: list of, list of float
         """
         return self.SNRs
 

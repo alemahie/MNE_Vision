@@ -5,6 +5,8 @@
 Connectivity runnable
 """
 
+from copy import deepcopy
+
 from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
 from mne import compute_covariance, setup_source_space, write_source_spaces, make_bem_model, make_bem_solution, \
@@ -33,8 +35,9 @@ class envelopeCorrelationWorkerSignals(QObject):
     error = pyqtSignal()
 
 
+# noinspection PyUnresolvedReferences
 class envelopeCorrelationRunnable(QRunnable):
-    def __init__(self, file_data, psi, export_path):
+    def __init__(self, file_data, psi, fmin, fmax, connectivity_method, n_jobs, export_path):
         """
         Runnable for the computation of the envelope correlation of the dataset.
         :param file_data: MNE data of the dataset.
@@ -42,14 +45,26 @@ class envelopeCorrelationRunnable(QRunnable):
         :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
         directionality of the connectivity.
         :type psi: bool
+        :param fmin: Minimum frequency from which the envelope correlation will be computed.
+        :type fmin: float
+        :param fmax: Maximum frequency from which the envelope correlation will be computed.
+        :type fmax: float
+        :param connectivity_method: Method used for computing the source space connectivity.
+        :type connectivity_method: str
+        :param n_jobs: Number of processes used to compute the source estimation
+        :type n_jobs: int
         :param export_path: Path where the envelope correlation data will be stored.
         :type export_path: str
         """
         super().__init__()
         self.signals = envelopeCorrelationWorkerSignals()
 
-        self.file_data = file_data
+        self.file_data = deepcopy(file_data)
         self.psi = psi
+        self.fmin = fmin
+        self.fmax = fmax
+        self.connectivity_method = connectivity_method
+        self.n_jobs = n_jobs
         self.export_path = export_path
 
         self.envelope_correlation_data = None
@@ -61,13 +76,11 @@ class envelopeCorrelationRunnable(QRunnable):
         Notifies the main model that the computation is finished.
         """
         try:
-            correlation_data = envelope_correlation(self.file_data).combine()
-            self.envelope_correlation_data = correlation_data.get_data(output="dense")[:, :, 0]
-            self.check_data_export()
-
+            self.compute_correlation_data()
             if self.psi:
-                correlation_data = phase_slope_index(self.file_data)
+                correlation_data = phase_slope_index(self.file_data, fmin=self.fmin, fmax=self.fmax)
                 self.psi_data = correlation_data.get_data(output="dense")[:, :, 0]
+            self.check_data_export()
             self.signals.finished.emit()
         except Exception as error:
             error_message = "An error as occurred during the computation of the envelope correlation."
@@ -75,32 +88,61 @@ class envelopeCorrelationRunnable(QRunnable):
             error_window.show()
             self.signals.error.emit()
 
+    def compute_correlation_data(self):
+        """
+        Compute the correct correlation data depending on the method chosen by the user.
+        """
+        if self.connectivity_method == "envelope_correlation":
+
+            correlation_data = envelope_correlation(self.file_data).combine()
+            self.envelope_correlation_data = correlation_data.get_data(output="dense")[:, :, 0]
+        else:
+            sfreq = self.file_data.info["sfreq"]
+            correlation_data = spectral_connectivity_epochs(self.file_data, method=self.connectivity_method, mode="multitaper",
+                                                            sfreq=sfreq, fmin=self.fmin, fmax=self.fmax, faverage=True, mt_adaptive=True,
+                                                            n_jobs=self.n_jobs)
+            self.envelope_correlation_data = correlation_data.get_data(output="dense")[:, :, 0]
+
     def check_data_export(self):
         """
-        Check if the envelope correlation data must be exported.
-        If it is the case, create the file and write the data in it.
+        Check if the envelope correlation data and the PSI must be exported.
         """
         if self.export_path is not None:
             data = self.envelope_correlation_data
             channels = self.file_data.ch_names
+            self.save_data(data, channels, "-connectivity")
+            if self.psi:
+                data = self.psi_data
+                self.save_data(data, channels, "-PSI")
 
-            file = open(self.export_path + ".txt", "x")
-            # Write header
-            for i in range(len(channels)):
-                if i != len(channels)-1:
-                    file.write(channels[i] + ", ")
+    def save_data(self, data, channels, file_name):
+        """
+        If it is the case, create the file and write the data in it.
+        :param data: The data to save, either the connectivity of PSI.
+        :type data: list of, list of float
+        :param channels: The channels names to save.
+        :type channels: list of str
+        :param file_name: The name of the data to save.
+        :type file_name: str
+        """
+        print(data)
+        file = open(self.export_path + file_name + ".txt", "x")
+        # Write header
+        for i in range(len(channels)):
+            if i != len(channels) - 1:
+                file.write(channels[i] + ", ")
+            else:
+                file.write(channels[i])
+        file.write("\n")
+        # Write data
+        for i in range(len(data)):  # Channels 1
+            for j in range(len(data)):  # Channels 2
+                if j != len(data) - 1:
+                    file.write(str(data[i][j]) + ", ")
                 else:
-                    file.write(channels[i])
+                    file.write(str(data[i][j]))
             file.write("\n")
-            # Write data
-            for i in range(len(data)):     # Channels 1
-                for j in range(len(data)):  # Channels 2
-                    if j != len(data)-1:
-                        file.write(str(data[i][j]) + ", ")
-                    else:
-                        file.write(str(data[i][j]))
-                file.write("\n")
-            file.close()
+        file.close()
 
     """
     Getters
@@ -134,7 +176,7 @@ class sourceSpaceConnectivityWorkerSignals(QObject):
 # noinspection PyUnresolvedReferences
 class sourceSpaceConnectivityRunnable(QRunnable):
     def __init__(self, file_data, file_path, connectivity_method, spectrum_estimation_method, source_estimation_method,
-                 save_data, load_data, n_jobs, export_path, psi):
+                 save_data, load_data, n_jobs, export_path, psi, fmin, fmax):
         """
         Runnable for the computation of the source space connectivity of the dataset.
         :param file_data: MNE data of the dataset.
@@ -160,6 +202,10 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
         directionality of the connectivity.
         :type psi: bool
+        :param fmin: Minimum frequency from which the envelope correlation will be computed.
+        :type fmin: float
+        :param fmax: Maximum frequency from which the envelope correlation will be computed.
+        :type fmax: float
         """
         super().__init__()
         self.signals = sourceSpaceConnectivityWorkerSignals()
@@ -174,6 +220,8 @@ class sourceSpaceConnectivityRunnable(QRunnable):
         self.n_jobs = n_jobs
         self.export_path = export_path
         self.psi = psi
+        self.fmin = fmin
+        self.fmax = fmax
         self.subject = "fsaverage"
         self.subjects_dir = get_project_freesurfer_path()
 
@@ -220,7 +268,7 @@ class sourceSpaceConnectivityRunnable(QRunnable):
             labels = get_labels_from_subject("fsaverage", get_project_freesurfer_path())
             label_names = [label.name for label in labels]
 
-            file = open(self.export_path + ".txt", "x")
+            file = open(self.export_path + ".csv", "x")
             # Write header
             for i in range(len(label_names)):
                 if i != len(label_names)-1:
@@ -257,11 +305,12 @@ class sourceSpaceConnectivityRunnable(QRunnable):
 
         sfreq = self.file_data.info["sfreq"]
         correlation_data = spectral_connectivity_epochs(label_ts, method=self.connectivity_method, mode=self.spectrum_estimation_method,
-                                                        sfreq=sfreq, faverage=True, mt_adaptive=True, n_jobs=self.n_jobs)
+                                                        sfreq=sfreq, fmin=self.fmin, fmax=self.fmax, faverage=True, mt_adaptive=True,
+                                                        n_jobs=self.n_jobs)
         self.source_space_connectivity_data = correlation_data.get_data(output="dense")[:, :, 0]
 
         if self.psi:
-            directionality_data = phase_slope_index(label_ts)
+            directionality_data = phase_slope_index(label_ts, mode=self.spectrum_estimation_method, fmin=self.fmin, fmax=self.fmax)
             self.psi_data = directionality_data.get_data(output="dense")[:, :, 0]
 
     """

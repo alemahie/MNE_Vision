@@ -5,6 +5,7 @@
 SNR view
 """
 
+import numpy as np
 from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QButtonGroup, QCheckBox, \
     QGridLayout
 from matplotlib import pyplot as plt
@@ -199,23 +200,27 @@ class signalToNoiseRatioView(QWidget):
     """
     Plots
     """
+    # noinspection PyTypeChecker
     @staticmethod
     def plot_SNRs(SNRs, SNR_methods):
         """
         Plot the SNRs
         :param SNRs: SNRs
-        :type SNRs: list of float
+        :type SNRs: list of, list of float
         :param SNR_methods: SNR methods
         :type SNR_methods: list of str
         """
         res = []
         for i in range(len(SNRs)):
-            res.append([str(SNRs[i])])
+            res.append([])
+            res[i].append(str(round(np.mean(SNRs[i]), 3)))
+            res[i].append(str(round(np.std(SNRs[i]), 3)))
         fig, ax = plt.subplots()
         fig.patch.set_visible(False)  # hide axes
         ax.axis('off')
         ax.axis('tight')
-        ax.table(cellText=res, rowLabels=SNR_methods, colLabels=['SNR value'], loc='center')
+        ax.table(cellText=res, rowLabels=SNR_methods, colLabels=['SNR mean value (dB)', 'SNR standard deviation (dB)'],
+                 cellLoc='center', rowLoc='center', colLoc='center', loc='center')
         fig.tight_layout()
         plt.show()
 

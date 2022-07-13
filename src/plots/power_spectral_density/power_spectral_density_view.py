@@ -127,9 +127,9 @@ class powerSpectralDensityView(QWidget):
             if time_points == "":
                 return [6.0, 10.0, 22.0]
             else:
-                splitted_time_points = time_points.split()
+                split_time_points = time_points.split()
                 float_time_points = []
-                for time_point in splitted_time_points:
+                for time_point in split_time_points:
                     float_time_points.append(float(time_point.replace(',', '.')))
                 return float_time_points
         except Exception as error:

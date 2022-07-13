@@ -27,7 +27,7 @@ class envelopeCorrelationListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, psi):
+    def confirm_button_clicked(self, psi, fmin, fmax, connectivity_method, n_jobs):
         pass
 
     @abstractmethod

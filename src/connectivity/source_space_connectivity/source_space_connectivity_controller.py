@@ -43,7 +43,7 @@ class sourceSpaceConnectivityController(sourceSpaceConnectivityListener):
         self.source_space_connectivity_view.close()
 
     def confirm_button_clicked(self, connectivity_method, spectrum_estimation_method, source_estimation_method, save_data,
-                               load_data, n_jobs, psi):
+                               load_data, n_jobs, psi, fmin, fmax):
         """
         Close the window and send the information to the main controller.
         :param connectivity_method: Method used for computing the source space connectivity.
@@ -63,10 +63,15 @@ class sourceSpaceConnectivityController(sourceSpaceConnectivityListener):
         :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
         directionality of the connectivity.
         :type psi: bool
+        :param fmin: Minimum frequency from which the envelope correlation will be computed.
+        :type fmin: float
+        :param fmax: Maximum frequency from which the envelope correlation will be computed.
+        :type fmax: float
         """
         self.source_space_connectivity_view.close()
         self.main_listener.source_space_connectivity_information(connectivity_method, spectrum_estimation_method, source_estimation_method,
-                                                                 save_data, load_data, n_jobs, self.export_path, psi)
+                                                                 save_data, load_data, n_jobs, self.export_path, psi, fmin,
+                                                                 fmax)
 
     def additional_parameters_clicked(self):
         """

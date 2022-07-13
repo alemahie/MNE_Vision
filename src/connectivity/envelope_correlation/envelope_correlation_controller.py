@@ -20,15 +20,17 @@ __status__ = "Dev"
 
 
 class envelopeCorrelationController(envelopeCorrelationListener):
-    def __init__(self, number_of_channels):
+    def __init__(self, number_of_channels, file_data):
         """
         Controller for computing the envelope correlation on the dataset.
         Create a new window for specifying some parameters.
         :param number_of_channels: The number of channels
         :type number_of_channels: int
+        :param file_data: The dataset data
+        :type file_data: MNE.Info
         """
         self.main_listener = None
-        self.envelope_correlation_view = envelopeCorrelationView(number_of_channels)
+        self.envelope_correlation_view = envelopeCorrelationView(number_of_channels, file_data)
         self.envelope_correlation_view.set_listener(self)
 
         self.source_estimation_controller = None
@@ -43,15 +45,23 @@ class envelopeCorrelationController(envelopeCorrelationListener):
         """
         self.envelope_correlation_view.close()
 
-    def confirm_button_clicked(self, psi):
+    def confirm_button_clicked(self, psi, fmin, fmax, connectivity_method, n_jobs):
         """
         Close the window and send the information to the main controller.
         :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
         directionality of the connectivity.
         :type psi: bool
+        :param fmin: Minimum frequency from which the envelope correlation will be computed.
+        :type fmin: float
+        :param fmax: Maximum frequency from which the envelope correlation will be computed.
+        :type fmax: float
+        :param connectivity_method: Method used for computing the source space connectivity.
+        :type connectivity_method: str
+        :param n_jobs: Number of processes used to compute the source estimation
+        :type n_jobs: int
         """
         self.envelope_correlation_view.close()
-        self.main_listener.envelope_correlation_information(psi, self.export_path)
+        self.main_listener.envelope_correlation_information(psi, fmin, fmax, connectivity_method, n_jobs, self.export_path)
 
     def additional_parameters_clicked(self):
         """
@@ -76,9 +86,9 @@ class envelopeCorrelationController(envelopeCorrelationListener):
         Send the information to the view to plot the envelope correlation.
         :param envelope_correlation_data: The envelope correlation data to plot.
         :type envelope_correlation_data: list of, list of float
-        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
-        directionality of the connectivity.
-        :type psi: bool
+        :param psi: Values of the computation of the PSI, if None then the computation has not been done.
+        The PSI give an indication to the directionality of the connectivity.
+        :type psi: list of, list of float
         :param channel_names: Channels' names
         :type channel_names: list of str
         """

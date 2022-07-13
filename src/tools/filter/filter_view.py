@@ -6,9 +6,10 @@ Filter view
 """
 
 from PyQt5.QtGui import QDoubleValidator
-from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QGridLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QGridLayout, QLabel, QHBoxLayout, QVBoxLayout, QComboBox
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
+from utils.view.separator import create_layout_separator
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -34,35 +35,52 @@ class filterView(QWidget):
 
         self.setWindowTitle("Filtering")
 
+        self.global_layout = QVBoxLayout()
+
+        # Channels
+        self.method_channels_widget = QWidget()
+        self.method_channels_layout = QGridLayout()
+        self.method_box = QComboBox()
+        self.method_box.addItems(["fir", "iir"])
+        self.channels_selection_button = QPushButton("&Channels ...", self)
+        self.channels_selection_button.clicked.connect(self.channels_selection_trigger)
+        self.method_channels_layout.addWidget(QLabel("Filtering method :"), 0, 0)
+        self.method_channels_layout.addWidget(self.method_box, 0, 1)
+        self.method_channels_layout.addWidget(QLabel("Channels :"), 1, 0)
+        self.method_channels_layout.addWidget(self.channels_selection_button, 1, 1)
+        self.method_channels_widget.setLayout(self.method_channels_layout)
+
+        # Lines
+        self.lines_widget = QWidget()
+        self.lines_layout = QGridLayout()
         self.low_frequency_line = QLineEdit("0,1")
         self.low_frequency_line.setValidator(QDoubleValidator())
         self.high_frequency_line = QLineEdit("45,0")
         self.high_frequency_line.setValidator(QDoubleValidator())
+        self.lines_layout.addWidget(QLabel("Low Frequency (Hz) : "), 0, 0)
+        self.lines_layout.addWidget(self.low_frequency_line, 0, 1)
+        self.lines_layout.addWidget(QLabel("High Frequency (Hz) : "), 1, 0)
+        self.lines_layout.addWidget(self.high_frequency_line, 1, 1)
+        self.lines_widget.setLayout(self.lines_layout)
 
-        self.channels_selection_button = QPushButton("&Channels ...", self)
-        self.channels_selection_button.clicked.connect(self.channels_selection_trigger)
-
+        # Cancel Confirm
+        self.cancel_confirm_widget = QWidget()
+        self.cancel_confirm_layout = QHBoxLayout()
         self.cancel = QPushButton("&Cancel", self)
         self.cancel.clicked.connect(self.cancel_filtering_trigger)
         self.confirm = QPushButton("&Confirm", self)
         self.confirm.clicked.connect(self.confirm_filtering_trigger)
+        self.cancel_confirm_layout.addWidget(self.cancel)
+        self.cancel_confirm_layout.addWidget(self.confirm)
+        self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
 
-        self.grid_layout = QGridLayout()
-        self.setLayout(self.grid_layout)
-        self.create_grid_layout()
-
-    def create_grid_layout(self):
-        """
-        Add the widgets on the grid layout.
-        """
-        info_labels = ["Low Frequency (Hz) : ", "High Frequency (Hz) : ", "Channels : "]
-        for i, label in enumerate(info_labels):
-            self.grid_layout.addWidget(QLabel(label), i, 0)
-        self.grid_layout.addWidget(self.low_frequency_line, 0, 1)
-        self.grid_layout.addWidget(self.high_frequency_line, 1, 1)
-        self.grid_layout.addWidget(self.channels_selection_button, 2, 1)
-        self.grid_layout.addWidget(self.cancel, 3, 0)
-        self.grid_layout.addWidget(self.confirm, 3, 1)
+        # Layout
+        self.global_layout.addWidget(self.method_channels_widget)
+        self.global_layout.addWidget(create_layout_separator())
+        self.global_layout.addWidget(self.lines_widget)
+        self.global_layout.addWidget(create_layout_separator())
+        self.global_layout.addWidget(self.cancel_confirm_widget)
+        self.setLayout(self.global_layout)
 
     """
     Triggers
@@ -77,6 +95,7 @@ class filterView(QWidget):
         """
         Retrieve the parameters and send the information to the controller.
         """
+        filter_method = self.method_box.currentText()
         low_frequency = None
         high_frequency = None
         if self.low_frequency_line.hasAcceptableInput():
@@ -85,7 +104,7 @@ class filterView(QWidget):
         if self.high_frequency_line.hasAcceptableInput():
             high_frequency = self.high_frequency_line.text()
             high_frequency = float(high_frequency.replace(',', '.'))
-        self.filter_listener.confirm_button_clicked(low_frequency, high_frequency, self.channels_selected)
+        self.filter_listener.confirm_button_clicked(low_frequency, high_frequency, self.channels_selected, filter_method)
 
     def channels_selection_trigger(self):
         """

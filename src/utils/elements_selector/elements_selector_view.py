@@ -33,6 +33,11 @@ class multipleSelectorView(QWidget):
         self.multiple_selector_listener = None
         self.unique_box = unique_box
 
+        self.select_unselect_widget = None
+        self.select_unselect_hbox_layout = None
+        self.select_all_elements = None
+        self.unselect_all_elements = None
+
         self.setWindowTitle("Selection")
 
         self.vertical_layout = QVBoxLayout()

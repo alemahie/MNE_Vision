@@ -27,7 +27,7 @@ class filterListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, low_frequency, high_frequency, channels_selected):
+    def confirm_button_clicked(self, low_frequency, high_frequency, channels_selected, filter_method):
         pass
 
     @abstractmethod

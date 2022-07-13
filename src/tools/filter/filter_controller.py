@@ -37,7 +37,7 @@ class filterController(filterListener):
         """
         self.filter_view.close()
 
-    def confirm_button_clicked(self, low_frequency, high_frequency, channels_selected):
+    def confirm_button_clicked(self, low_frequency, high_frequency, channels_selected, filter_method):
         """
         Close the window and send the information to the main controller.
         :param low_frequency: Lowest frequency from where the data will be filtered.
@@ -46,9 +46,11 @@ class filterController(filterListener):
         :type high_frequency: float
         :param channels_selected: Channels on which the filtering will be performed.
         :type channels_selected: list of str
+        :param filter_method: Method used for the filtering, either FIR or IIR.
+        :type filter_method: str
         """
         self.filter_view.close()
-        self.main_listener.filter_information(low_frequency, high_frequency, channels_selected)
+        self.main_listener.filter_information(low_frequency, high_frequency, channels_selected, filter_method)
 
     """
     Getters
