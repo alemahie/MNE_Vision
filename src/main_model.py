@@ -49,23 +49,27 @@ class mainModel:
         """
         self.main_listener = None
 
-        self.file_data = None
-        self.file_type = None
-        self.file_path_name = None
+        self.current_dataset_index = -1     # -1, means no dataset.
+
+        self.file_data = []
+        self.file_type = []
+        self.file_path_name = []
+        self.dataset_name = []
 
         # The 3 tmp variables are used when loading a dataset, prevents the case that if a new dataset is loaded and an
         # error occurs, the old data won't be overwritten if there was a dataset loaded before.
         self.file_data_tmp = None
         self.file_type_tmp = None
         self.file_path_name_tmp = None
+        self.dataset_name_tmp = None
 
-        self.channels_locations = {}
-        self.ica_decomposition = "No"
-        self.references = "Unknown"
-        self.read_events = None     # Events info read from file or channel, used to transform raw to epochs
-        self.read_event_ids = None  # Event ids
+        self.channels_locations = []    # {}
+        self.ica_decomposition = []     # "No"
+        self.references = []            # "Unknown"
+        self.read_events = []           # None     # Events info read from file or channel, used to transform raw to epochs
+        self.read_event_ids = []        # None  # Event ids
 
-        # Runnable
+        # Runnables
         self.open_fif_file_runnable = None
         self.open_cnt_file_runnable = None
         self.open_set_file_runnable = None
@@ -91,6 +95,10 @@ class mainModel:
         self.sensor_space_connectivity_runnable = None
 
         self.classify_runnable = None
+
+        # Others
+        self.fig_psd = None     # PSD figure, to plot them in the main thread to avoid matplotlib errors.
+        self.fig_topo = None
 
     """
     File menu
@@ -183,7 +191,7 @@ class mainModel:
         self.main_listener.open_set_file_computation_error()
 
     # Data Info
-    def load_data_info(self, montage, channels_selected, tmin, tmax):
+    def load_data_info(self, montage, channels_selected, tmin, tmax, dataset_name):
         """
         Creates the parallel runnable for setting the additional information for the dataset.
         :param montage: Montage of the headset
@@ -194,7 +202,11 @@ class mainModel:
         :type tmin: float
         :param tmax: End time of the epoch or raw file to keep
         :type tmax: float
+        :param dataset_name: The name of the loaded dataset.
+        :type dataset_name: str
         """
+        self.dataset_name_tmp = dataset_name
+
         pool = QThreadPool.globalInstance()
         self.load_data_info_runnable = loadDataInfoRunnable(self.file_data_tmp, montage, channels_selected, tmin, tmax)
         pool.start(self.load_data_info_runnable)
@@ -205,13 +217,24 @@ class mainModel:
         Retrieves the data from the runnable when the last information have been updated.
         Notifies the main controller that the reading is done.
         """
-        self.file_data = self.load_data_info_runnable.get_file_data()
-        self.file_type = self.file_type_tmp
-        self.file_path_name = self.file_path_name_tmp
+        self.file_data.append(self.load_data_info_runnable.get_file_data())
+        self.file_type.append(self.file_type_tmp)
+        self.file_path_name.append(self.file_path_name_tmp)
+        self.dataset_name.append(self.dataset_name_tmp)
+
+        self.channels_locations.append({})
+        self.ica_decomposition.append("No")
+        self.references.append("Unknown")
+        self.read_events.append(None)     # Events info read from file or channel, used to transform raw to epochs
+        self.read_event_ids.append(None)
+
+        self.current_dataset_index = len(self.file_data)-1
+
         self.reset_tmp_attributes()
 
         self.create_channels_locations()
-        if self.file_type == "Raw":
+        file_type = self.file_type[self.current_dataset_index]
+        if file_type == "Raw":
             self.try_finding_events()
 
         self.main_listener.load_data_info_computation_finished()
@@ -230,7 +253,7 @@ class mainModel:
             extension = path_to_file[-3:]
             if extension == "txt" or extension == "fif":
                 events = read_events(path_to_file)
-                self.read_events = events
+                self.read_events[self.current_dataset_index] = events
             else:
                 raise EventFileError()
         except EventFileError:
@@ -252,8 +275,10 @@ class mainModel:
         :param stim_channel: Channel containing the stimulation/the events
         :type stim_channel: str
         """
+        file_data = self.file_data[self.current_dataset_index]
+
         pool = QThreadPool.globalInstance()
-        self.find_events_from_channel_runnable = findEventsFromChannelRunnable(self.file_data, stim_channel)
+        self.find_events_from_channel_runnable = findEventsFromChannelRunnable(file_data, stim_channel)
         pool.start(self.find_events_from_channel_runnable)
         self.find_events_from_channel_runnable.signals.finished.connect(self.find_events_from_channel_computation_finished)
         self.find_events_from_channel_runnable.signals.error.connect(self.find_events_from_channel_computation_error)
@@ -263,10 +288,10 @@ class mainModel:
         Retrieves the data from the runnable when the events are found from the provided channel.
         Notifies the main controller that the computation is done.
         """
-        self.read_events = self.find_events_from_channel_runnable.get_read_events()
-        self.read_event_ids = self.find_events_from_channel_runnable.get_read_event_ids()
-        if self.read_events is not None:
-            if len(self.read_events) == 0:
+        self.read_events[self.current_dataset_index] = self.find_events_from_channel_runnable.get_read_events()
+        self.read_event_ids[self.current_dataset_index] = self.find_events_from_channel_runnable.get_read_event_ids()
+        if self.read_events[self.current_dataset_index] is not None:
+            if len(self.read_events[self.current_dataset_index]) == 0:
                 error_message = "It seems that the number of events found is 0, please check the channel used or use " \
                                 "another method."
                 error_window = errorWindow(error_message)
@@ -287,8 +312,10 @@ class mainModel:
         :param path_to_file: Path to the file.
         :type path_to_file: str
         """
+        file_data = self.file_data[self.current_dataset_index]
+
         pool = QThreadPool.globalInstance()
-        self.export_data_csv_runnable = exportDataCSVRunnable(self.file_data, path_to_file)
+        self.export_data_csv_runnable = exportDataCSVRunnable(file_data, path_to_file)
         pool.start(self.export_data_csv_runnable)
         self.export_data_csv_runnable.signals.finished.connect(self.export_data_csv_computation_finished)
         self.export_data_csv_runnable.signals.error.connect(self.export_data_csv_computation_error)
@@ -314,8 +341,10 @@ class mainModel:
         :param path_to_file: Path to the file.
         :type path_to_file: str
         """
+        file_data = self.file_data[self.current_dataset_index]
+
         pool = QThreadPool.globalInstance()
-        self.export_data_set_runnable = exportDataSETRunnable(self.file_data, path_to_file)
+        self.export_data_set_runnable = exportDataSETRunnable(file_data, path_to_file)
         pool.start(self.export_data_set_runnable)
         self.export_data_set_runnable.signals.finished.connect(self.export_data_set_computation_finished)
         self.export_data_set_runnable.signals.error.connect(self.export_data_set_computation_error)
@@ -341,8 +370,10 @@ class mainModel:
         :param path_to_file: Path to the file.
         :type path_to_file: str
         """
+        file_data = self.file_data[self.current_dataset_index]
+
         pool = QThreadPool.globalInstance()
-        self.export_events_txt_runnable = exportEventsTXTRunnable(self.file_data, path_to_file)
+        self.export_events_txt_runnable = exportEventsTXTRunnable(file_data, path_to_file)
         pool.start(self.export_events_txt_runnable)
         self.export_events_txt_runnable.signals.finished.connect(self.export_events_txt_computation_finished)
         self.export_events_txt_runnable.signals.error.connect(self.export_events_txt_computation_error)
@@ -371,7 +402,7 @@ class mainModel:
         :type path_to_file: str
         """
         if self.is_fif_file():
-            self.file_data.save(path_to_file, overwrite=True)
+            self.file_data[self.current_dataset_index].save(path_to_file, overwrite=True)
         else:
             self.save_file_as(path_to_file)
 
@@ -383,12 +414,30 @@ class mainModel:
         :param path_to_file: Path to the file.
         :type path_to_file: str
         """
-        print(path_to_file)
         if self.file_type == "Raw":
-            self.file_path_name = path_to_file + "-raw.fif"
+            file_path_name = path_to_file + "-raw.fif"
         else:
-            self.file_path_name = path_to_file + "-epo.fif"
-        self.file_data.save(self.file_path_name)
+            file_path_name = path_to_file + "-epo.fif"
+        self.file_path_name[self.current_dataset_index] = file_path_name
+        self.file_data[self.current_dataset_index].save(file_path_name)
+
+    # Clear dataset
+    def clear_current_dataset(self):
+        """
+        Clear the data of the removed dataset.
+        """
+        del self.file_data[self.current_dataset_index]
+        del self.file_type[self.current_dataset_index]
+        del self.file_path_name[self.current_dataset_index]
+        del self.dataset_name[self.current_dataset_index]
+
+        del self.channels_locations[self.current_dataset_index]
+        del self.ica_decomposition[self.current_dataset_index]
+        del self.references[self.current_dataset_index]
+        del self.read_events[self.current_dataset_index]
+        del self.read_event_ids[self.current_dataset_index]
+
+        self.current_dataset_index = len(self.file_data) - 1
 
     """
     Tools menu
@@ -406,9 +455,10 @@ class mainModel:
         :param filter_method: Method used for the filtering, either FIR or IIR.
         :type filter_method: str
         """
+        file_data = self.file_data[self.current_dataset_index]
+
         pool = QThreadPool.globalInstance()
-        self.filter_runnable = filterRunnable(low_frequency, high_frequency, channels_selected, self.file_data,
-                                              filter_method)
+        self.filter_runnable = filterRunnable(low_frequency, high_frequency, channels_selected, file_data, filter_method)
         pool.start(self.filter_runnable)
         self.filter_runnable.signals.finished.connect(self.filter_computation_finished)
         self.filter_runnable.signals.error.connect(self.filter_computation_error)
@@ -418,7 +468,7 @@ class mainModel:
         Retrieves the data from the runnable when the filtering is computed.
         Notifies the main controller that the computation is done.
         """
-        self.file_data = self.filter_runnable.get_file_data()
+        self.file_data[self.current_dataset_index] = self.filter_runnable.get_file_data()
         self.main_listener.filter_computation_finished()
 
     def filter_computation_error(self):
@@ -434,8 +484,11 @@ class mainModel:
         :param new_frequency: The new frequency at which the data will be resampled.
         :type new_frequency: int
         """
+        file_data = self.file_data[self.current_dataset_index]
+        events = self.get_event_values()
+
         pool = QThreadPool.globalInstance()
-        self.resampling_runnable = resamplingRunnable(new_frequency, self.file_data)
+        self.resampling_runnable = resamplingRunnable(new_frequency, file_data, events)
         pool.start(self.resampling_runnable)
         self.resampling_runnable.signals.finished.connect(self.resampling_computation_finished)
         self.resampling_runnable.signals.error.connect(self.resampling_computation_error)
@@ -445,7 +498,8 @@ class mainModel:
         Retrieves the data from the runnable when the resampling is computed.
         Notifies the main controller that the computation is done.
         """
-        self.file_data = self.resampling_runnable.get_file_data()
+        self.file_data[self.current_dataset_index] = self.resampling_runnable.get_file_data()
+        self.set_event_values(self.resampling_runnable.get_events())
         self.main_listener.resampling_computation_finished()
 
     def resampling_computation_error(self):
@@ -468,8 +522,11 @@ class mainModel:
         :param n_jobs: Number of parallel processes used to compute the re-referencing
         :type n_jobs: int
         """
+        file_data = self.file_data[self.current_dataset_index]
+        file_path_name_without_extension = self.get_file_path_name_without_extension()
+
         pool = QThreadPool.globalInstance()
-        self.re_referencing_runnable = reReferencingRunnable(references, self.file_data, self.get_file_path_name_without_extension(),
+        self.re_referencing_runnable = reReferencingRunnable(references, file_data, file_path_name_without_extension,
                                                              save_data, load_data, n_jobs)
         pool.start(self.re_referencing_runnable)
         self.re_referencing_runnable.signals.finished.connect(self.re_referencing_computation_finished)
@@ -480,8 +537,8 @@ class mainModel:
         Retrieves the data from the runnable when the re-referencing is computed.
         Notifies the main controller that the computation is done.
         """
-        self.file_data = self.re_referencing_runnable.get_file_data()
-        self.references = self.re_referencing_runnable.get_references()
+        self.file_data[self.current_dataset_index] = self.re_referencing_runnable.get_file_data()
+        self.references[self.current_dataset_index] = self.re_referencing_runnable.get_references()
         self.main_listener.re_referencing_computation_finished()
 
     def re_referencing_computation_error(self):
@@ -497,8 +554,10 @@ class mainModel:
         :param ica_method: Method used for performing the ICA decomposition
         :type ica_method: str
         """
+        file_data = self.file_data[self.current_dataset_index]
+
         pool = QThreadPool.globalInstance()
-        self.ica_data_decomposition_runnable = icaRunnable(ica_method, self.file_data)
+        self.ica_data_decomposition_runnable = icaRunnable(ica_method, file_data)
         pool.start(self.ica_data_decomposition_runnable)
         self.ica_data_decomposition_runnable.signals.finished.connect(self.ica_data_decomposition_computation_finished)
         self.ica_data_decomposition_runnable.signals.error.connect(self.ica_data_decomposition_computation_error)
@@ -508,8 +567,8 @@ class mainModel:
         Retrieves the data from the runnable when the ICA decomposition is computed.
         Notifies the main controller that the computation is done.
         """
-        self.file_data = self.ica_data_decomposition_runnable.get_file_data()
-        self.ica_decomposition = "Yes"
+        self.file_data[self.current_dataset_index] = self.ica_data_decomposition_runnable.get_file_data()
+        self.ica_decomposition[self.current_dataset_index] = "Yes"
         self.main_listener.ica_data_decomposition_computation_finished()
 
     def ica_data_decomposition_computation_error(self):
@@ -529,9 +588,13 @@ class mainModel:
         :param trials_selected: The indexes of the trials selected for the computation
         :type trials_selected: list of int
         """
+        file_data = self.file_data[self.current_dataset_index]
+        read_events = self.read_events[self.current_dataset_index]
+        read_event_ids = self.read_event_ids[self.current_dataset_index]
+
         pool = QThreadPool.globalInstance()
-        self.extract_epochs_runnable = extractEpochsRunnable(self.file_data, self.read_events, self.read_event_ids, tmin,
-                                                             tmax, trials_selected)
+        self.extract_epochs_runnable = extractEpochsRunnable(file_data, read_events, read_event_ids, tmin, tmax,
+                                                             trials_selected)
         pool.start(self.extract_epochs_runnable)
         self.extract_epochs_runnable.signals.finished.connect(self.extract_epochs_computation_finished)
         self.extract_epochs_runnable.signals.error.connect(self.extract_epochs_computation_error)
@@ -541,8 +604,8 @@ class mainModel:
         Retrieves the data from the runnable when the epochs are extracted from the available events.
         Notifies the main controller that the computation is done.
         """
-        self.file_type = "Epochs"
-        self.file_data = self.extract_epochs_runnable.get_file_data()
+        self.file_type[self.current_dataset_index] = "Epochs"
+        self.file_data[self.current_dataset_index] = self.extract_epochs_runnable.get_file_data()
         self.main_listener.extract_epochs_computation_finished()
 
     def extract_epochs_computation_error(self):
@@ -556,8 +619,11 @@ class mainModel:
         """
         Creates the parallel runnable for computation of the SNR of a dataset.
         """
+        file_data = self.file_data[self.current_dataset_index]
+        file_path_name_without_extension = self.get_file_path_name_without_extension()
+
         pool = QThreadPool.globalInstance()
-        self.snr_runnable = signalToNoiseRatioRunnable(self.file_data, snr_methods, source_method, self.get_file_path_name_without_extension(),
+        self.snr_runnable = signalToNoiseRatioRunnable(file_data, snr_methods, source_method, file_path_name_without_extension,
                                                        read, write, picks, trials_selected)
         pool.start(self.snr_runnable)
         self.snr_runnable.signals.finished.connect(self.snr_computation_finished)
@@ -603,9 +669,12 @@ class mainModel:
         :param export_path: Path where the source estimation data will be stored.
         :type export_path: str
         """
+        file_data = self.file_data[self.current_dataset_index]
+        file_path_name_without_extension = self.get_file_path_name_without_extension()
+
         pool = QThreadPool.globalInstance()
-        self.source_estimation_runnable = sourceEstimationRunnable(source_estimation_method, self.file_data,
-                                                                   self.get_file_path_name_without_extension(),
+        self.source_estimation_runnable = sourceEstimationRunnable(source_estimation_method, file_data,
+                                                                   file_path_name_without_extension,
                                                                    save_data, load_data, epochs_method, trials_selected,
                                                                    tmin, tmax, n_jobs, export_path)
         pool.start(self.source_estimation_runnable)
@@ -642,13 +711,14 @@ class mainModel:
         :param topo_time_points: The time points for the topomaps.
         :type topo_time_points: list of float
         """
+        file_data = self.file_data[self.current_dataset_index]
         try:
-            self.fig_psd = self.file_data.plot_psd(fmin=minimum_frequency, fmax=maximum_frequency, tmin=minimum_time,
-                                                   tmax=maximum_time, average=False, show=False)
+            self.fig_psd = file_data.plot_psd(fmin=minimum_frequency, fmax=maximum_frequency, tmin=minimum_time,
+                                              tmax=maximum_time, average=False, show=False)
             bands = []
             for time in topo_time_points:
                 bands.append((time, str(time) + " Hz"))
-            self.fig_topo = self.file_data.plot_psd_topomap(bands=bands, tmin=minimum_time, tmax=maximum_time, show=False)
+            self.fig_topo = file_data.plot_psd_topomap(bands=bands, tmin=minimum_time, tmax=maximum_time, show=False)
             self.power_spectral_density_computation_finished()
         except Exception as error:
             error_message = "An error has occurred during the computation of the PSD"
@@ -692,8 +762,10 @@ class mainModel:
         :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
         :type n_cycles: int
         """
+        file_data = self.file_data[self.current_dataset_index]
+
         pool = QThreadPool.globalInstance()
-        self.time_frequency_runnable = timeFrequencyRunnable(self.file_data, method_tfr, channel_selected,
+        self.time_frequency_runnable = timeFrequencyRunnable(file_data, method_tfr, channel_selected,
                                                              min_frequency, max_frequency, n_cycles)
         pool.start(self.time_frequency_runnable)
         self.time_frequency_runnable.signals.finished.connect(self.time_frequency_computation_finished)
@@ -732,8 +804,10 @@ class mainModel:
         :param export_path: Path where the envelope correlation data will be stored.
         :type export_path: str
         """
+        file_data = self.file_data[self.current_dataset_index]
+
         pool = QThreadPool.globalInstance()
-        self.envelope_correlation_runnable = envelopeCorrelationRunnable(self.file_data, psi, fmin, fmax, connectivity_method,
+        self.envelope_correlation_runnable = envelopeCorrelationRunnable(file_data, psi, fmin, fmax, connectivity_method,
                                                                          n_jobs, export_path)
         pool.start(self.envelope_correlation_runnable)
         self.envelope_correlation_runnable.signals.finished.connect(self.envelope_correlation_computation_finished)
@@ -780,8 +854,11 @@ class mainModel:
         :param fmax: Maximum frequency from which the envelope correlation will be computed.
         :type fmax: float
         """
+        file_data = self.file_data[self.current_dataset_index]
+        file_path_name_without_extension = self.get_file_path_name_without_extension()
+
         pool = QThreadPool.globalInstance()
-        self.source_space_connectivity_runnable = sourceSpaceConnectivityRunnable(self.file_data, self.get_file_path_name_without_extension(),
+        self.source_space_connectivity_runnable = sourceSpaceConnectivityRunnable(file_data, file_path_name_without_extension,
                                                                                   connectivity_method, spectrum_estimation_method,
                                                                                   source_estimation_method, save_data, load_data,
                                                                                   n_jobs, export_path, psi, fmin, fmax)
@@ -808,8 +885,10 @@ class mainModel:
         :param export_path: Path where the sensor space connectivity data will be stored.
         :type export_path: str
         """
+        file_data = self.file_data[self.current_dataset_index]
+
         pool = QThreadPool.globalInstance()
-        self.sensor_space_connectivity_runnable = sensorSpaceConnectivityRunnable(self.file_data, export_path)
+        self.sensor_space_connectivity_runnable = sensorSpaceConnectivityRunnable(file_data, export_path)
         pool.start(self.sensor_space_connectivity_runnable)
         self.sensor_space_connectivity_runnable.signals.finished.connect(self.sensor_space_connectivity_computation_finished)
         self.sensor_space_connectivity_runnable.signals.error.connect(self.sensor_space_connectivity_computation_error)
@@ -849,10 +928,12 @@ class mainModel:
         :param trials_selected: The indexes of the trials selected for the computation
         :type trials_selected: list of int
         """
+        file_data = self.file_data[self.current_dataset_index]
+        directory_path = self.get_directory_path_from_file_path()
+
         pool = QThreadPool.globalInstance()
-        self.classify_runnable = classifyRunnable(self.file_data, self.get_directory_path_from_file_path(),
-                                                  pipeline_selected, feature_selection, number_of_channels_to_select,
-                                                  hyper_tuning, cross_val_number, trials_selected)
+        self.classify_runnable = classifyRunnable(file_data, directory_path, pipeline_selected, feature_selection,
+                                                  number_of_channels_to_select, hyper_tuning, cross_val_number, trials_selected)
         pool.start(self.classify_runnable)
         self.classify_runnable.signals.finished.connect(self.classify_computation_finished)
         self.classify_runnable.signals.error.connect(self.classify_computation_error)
@@ -878,31 +959,42 @@ class mainModel:
         :return: True if the file used is a FIF file, False otherwise.
         :rtype: boolean
         """
-        return self.file_path_name[-3:] == "fif"
+        file_path_name = self.file_path_name[self.current_dataset_index]
+        return file_path_name[-3:] == "fif"
 
     def create_channels_locations(self):
         """
         Retrieves the location of all channels from the MNE "Epochs" or "Raw" object for an easier use.
         Store the information inside the "self.channels_locations" attribute.
         """
-        channels_info = self.file_data.info.get("chs")
+        file_data = self.file_data[self.current_dataset_index]
+        channels_locations = self.channels_locations[self.current_dataset_index]
+
+        channels_info = file_data.info.get("chs")
         for channel in channels_info:
-            self.channels_locations[channel["ch_name"]] = channel["loc"][:3]
+            channels_locations[channel["ch_name"]] = channel["loc"][:3]
+
+        self.channels_locations[self.current_dataset_index] = channels_locations
 
     def try_finding_events(self):
         """
         Try to find the events if a raw file as been loaded.
         """
+        file_data = self.file_data[self.current_dataset_index]
+
         read_ok = False
         try:
-            self.read_events = find_events(self.file_data)
+            read_events = find_events(file_data)
+            self.read_events[self.current_dataset_index] = read_events
             read_ok = True
         except Exception as e:
             print(e)
             print(type(e))
         if not read_ok:
             try:
-                self.read_events, self.read_event_ids = events_from_annotations(self.file_data)
+                read_events, read_event_ids = events_from_annotations(file_data)
+                self.read_events[self.current_dataset_index] = read_events
+                self.read_event_ids[self.current_dataset_index] = read_event_ids
             except Exception as e:
                 print(e)
                 print(type(e))
@@ -911,10 +1003,7 @@ class mainModel:
         self.file_data_tmp = None
         self.file_type_tmp = None
         self.file_path_name_tmp = None
-        self.ica_decomposition = "No"
-        self.references = "Unknown"
-        self.read_events = None     # Events info read from file or channel, used to transform raw to epochs
-        self.read_event_ids = None
+        self.dataset_name_tmp = None
 
     """
     Getters
@@ -925,11 +1014,20 @@ class mainModel:
         :return: A list of all the displayed information.
         :rtype: list of str/float/int
         """
-        all_info = [self.get_file_path_name(), self.get_file_type(), self.get_number_of_channels(),
+        all_info = [self.get_dataset_name(), self.get_file_path_name(), self.get_file_type(), self.get_number_of_channels(),
                     self.get_sampling_frequency(), self.get_number_of_events(), self.get_number_of_epochs(),
                     self.get_epochs_start(), self.get_epochs_end(), self.get_number_of_frames(),
                     self.get_reference(), self.get_channels_locations_status(), self.get_ica(), self.get_dataset_size()]
         return all_info
+
+    def get_dataset_name(self):
+        """
+        Gets the dataset name of the dataset.
+        :return: The dataset name
+        :rtype: str
+        """
+        dataset_name = self.dataset_name[self.current_dataset_index]
+        return dataset_name
 
     def get_file_path_name(self):
         """
@@ -937,7 +1035,8 @@ class mainModel:
         :return: The file path of the dataset
         :rtype: str
         """
-        return self.file_path_name
+        file_path_name = self.file_path_name[self.current_dataset_index]
+        return file_path_name
 
     def get_file_path_name_without_extension(self):
         """
@@ -945,7 +1044,8 @@ class mainModel:
         :return: The file path of the dataset without the extension.
         :rtype: str
         """
-        return splitext(self.file_path_name)[0]
+        file_path_name = self.file_path_name[self.current_dataset_index]
+        return splitext(file_path_name)[0]
 
     def get_directory_path_from_file_path(self):
         """
@@ -953,7 +1053,8 @@ class mainModel:
         :return: The directory path of the dataset.
         :rtype: str
         """
-        return get_directory_path_from_file_path(self.file_path_name)
+        file_path_name = self.file_path_name[self.current_dataset_index]
+        return get_directory_path_from_file_path(file_path_name)
 
     def get_file_type(self):
         """
@@ -961,7 +1062,8 @@ class mainModel:
         :return: The type of the file.
         :rtype: str
         """
-        return self.file_type
+        file_type = self.file_type[self.current_dataset_index]
+        return file_type
 
     def get_number_of_channels(self):
         """
@@ -969,7 +1071,8 @@ class mainModel:
         :return: The number of channels
         :rtype: int
         """
-        return len(self.file_data.ch_names)
+        file_data = self.file_data[self.current_dataset_index]
+        return len(file_data.ch_names)
 
     def get_sampling_frequency(self):
         """
@@ -977,7 +1080,8 @@ class mainModel:
         :return: The sampling frequency.
         :rtype: float
         """
-        return self.file_data.info.get("sfreq")
+        file_data = self.file_data[self.current_dataset_index]
+        return file_data.info.get("sfreq")
 
     def get_number_of_events(self):
         """
@@ -985,13 +1089,17 @@ class mainModel:
         :return: The number of events. None for "Raw" type of dataset.
         :rtype: int/None
         """
-        if self.file_type == "Raw":
-            if self.read_events is None:
-                return self.read_events
+        file_data = self.file_data[self.current_dataset_index]
+        file_type = self.file_type[self.current_dataset_index]
+        read_events = self.read_events[self.current_dataset_index]
+
+        if file_type == "Raw":
+            if read_events is None:
+                return read_events
             else:
-                return len(self.read_events)
+                return len(read_events)
         else:
-            return len(self.file_data.events)
+            return len(file_data.events)
 
     def get_event_values(self):
         """
@@ -1000,10 +1108,14 @@ class mainModel:
         the event; Second a "0" for MNE backwards compatibility; Third the event id.
         :rtype: list of, list of int
         """
-        if self.file_type == "Raw":
-            return self.read_events
-        elif self.file_type == "Epochs":
-            return self.file_data.events
+        file_data = self.file_data[self.current_dataset_index]
+        file_type = self.file_type[self.current_dataset_index]
+        read_events = self.read_events[self.current_dataset_index]
+
+        if file_type == "Raw":
+            return read_events
+        elif file_type == "Epochs":
+            return file_data.events
 
     def get_event_ids(self):
         """
@@ -1011,10 +1123,14 @@ class mainModel:
         :return: The events' ids
         :rtype: dict
         """
-        if self.file_type == "Raw":
-            return self.read_event_ids
-        elif self.file_type == "Epochs":
-            return self.file_data.event_id
+        file_data = self.file_data[self.current_dataset_index]
+        file_type = self.file_type[self.current_dataset_index]
+        read_event_ids = self.read_event_ids[self.current_dataset_index]
+
+        if file_type == "Raw":
+            return read_event_ids
+        elif file_type == "Epochs":
+            return file_data.event_id
 
     def get_number_of_epochs(self):
         """
@@ -1022,10 +1138,13 @@ class mainModel:
         :return: The number of epochs. 1 for "Raw" type of dataset.
         :rtype: int
         """
-        if self.file_type == "Raw":
+        file_data = self.file_data[self.current_dataset_index]
+        file_type = self.file_type[self.current_dataset_index]
+
+        if file_type == "Raw":
             return 1
         else:
-            return len(self.file_data)
+            return len(file_data)
 
     def get_epochs_start(self):
         """
@@ -1033,7 +1152,8 @@ class mainModel:
         :return: The start time of the epochs.
         :rtype: float
         """
-        return round(self.file_data.times[0], 3)
+        file_data = self.file_data[self.current_dataset_index]
+        return round(file_data.times[0], 3)
 
     def get_epochs_end(self):
         """
@@ -1041,7 +1161,8 @@ class mainModel:
         :return: The end time of the epochs.
         :rtype: float
         """
-        return round(self.file_data.times[-1], 3)
+        file_data = self.file_data[self.current_dataset_index]
+        return round(file_data.times[-1], 3)
 
     def get_number_of_frames(self):
         """
@@ -1050,7 +1171,8 @@ class mainModel:
         :return: The number of frames.
         :rtype: int
         """
-        return len(self.file_data.times)
+        file_data = self.file_data[self.current_dataset_index]
+        return len(file_data.times)
 
     def get_reference(self):
         """
@@ -1058,7 +1180,8 @@ class mainModel:
         :return: The references.
         :rtype: list of str/str
         """
-        return self.references
+        references = self.references[self.current_dataset_index]
+        return references
 
     def get_channels_locations_status(self):
         """
@@ -1066,7 +1189,8 @@ class mainModel:
         :return: "Unknown" if the channels' locations dict is empty. "Available" otherwise.
         :rtype: str
         """
-        if not self.channels_locations:     # channels_locations dictionary is empty.
+        channels_locations = self.channels_locations[self.current_dataset_index]
+        if not channels_locations:     # channels_locations dictionary is empty.
             return "Unknown"
         else:
             return "Available"
@@ -1077,7 +1201,8 @@ class mainModel:
         :return: The channels' locations.
         :rtype: dict
         """
-        return self.channels_locations
+        channels_locations = self.channels_locations[self.current_dataset_index]
+        return channels_locations
 
     def get_ica(self):
         """
@@ -1085,7 +1210,8 @@ class mainModel:
         :return: True if it is known by the software that the ICA decomposition has been performed. False otherwise.
         :rtype: boolean
         """
-        return self.ica_decomposition
+        ica_decomposition = self.ica_decomposition[self.current_dataset_index]
+        return ica_decomposition
 
     def get_dataset_size(self):
         """
@@ -1093,11 +1219,12 @@ class mainModel:
         :return: The size of the dataset.
         :rtype: float
         """
-        # if self.file_path_name[-3:] == "set":
+        file_path_name = self.file_path_name[self.current_dataset_index]
+
         try:
-            return round(getsize(self.file_path_name[:-3] + "fdt") / (1024 ** 2), 3)
+            return round(getsize(file_path_name[:-3] + "fdt") / (1024 ** 2), 3)
         except:
-            return round(getsize(self.file_path_name) / (1024 ** 2), 3)
+            return round(getsize(file_path_name) / (1024 ** 2), 3)
 
     def get_all_channels_names(self):
         """
@@ -1105,7 +1232,8 @@ class mainModel:
         :return: The channels' names.
         :rtype: list of str
         """
-        return self.file_data.ch_names
+        file_data = self.file_data[self.current_dataset_index]
+        return file_data.ch_names
 
     def get_file_data(self):
         """
@@ -1113,7 +1241,8 @@ class mainModel:
         :return: The MNE "Epochs" or "Raw" object.
         :rtype: Epochs/Raw
         """
-        return self.file_data
+        file_data = self.file_data[self.current_dataset_index]
+        return file_data
 
     def get_read_events(self):
         """
@@ -1121,7 +1250,16 @@ class mainModel:
         :return: The read events.
         :rtype: list of int
         """
-        return self.read_events
+        read_events = self.read_events[self.current_dataset_index]
+        return read_events
+
+    def get_current_dataset_index(self):
+        """
+        Gets the current dataset index.
+        :return: The current dataset index.
+        :rtype: int
+        """
+        return self.current_dataset_index
 
     """
     Temporaries
@@ -1284,10 +1422,11 @@ class mainModel:
         :param event_values: The event values
         :type event_values: list of, list of int
         """
-        if self.file_type == "Raw":
-            self.read_events = np.copy(event_values)
-        elif self.file_type == "Epochs":
-            self.file_data.events = np.copy(event_values)
+        file_type = self.file_type[self.current_dataset_index]
+        if file_type == "Raw":
+            self.read_events[self.current_dataset_index] = np.copy(event_values)
+        elif file_type == "Epochs":
+            self.file_data[self.current_dataset_index].events = np.copy(event_values)
 
     def set_event_ids(self, event_ids):
         """
@@ -1295,10 +1434,11 @@ class mainModel:
         :param event_ids: The events' ids.
         :type event_ids: dict
         """
-        if self.file_type == "Raw":
-            self.read_event_ids = copy(event_ids)
-        elif self.file_type == "Epochs":
-            self.file_data.event_id = copy(event_ids)
+        file_type = self.file_type[self.current_dataset_index]
+        if file_type == "Raw":
+            self.read_event_ids[self.current_dataset_index] = copy(event_ids)
+        elif file_type == "Epochs":
+            self.file_data[self.current_dataset_index].event_id = copy(event_ids)
 
     def set_channel_locations(self, channel_locations, channel_names):
         """
@@ -1310,12 +1450,13 @@ class mainModel:
         :param channel_names: The channels' names
         :type channel_names: list of str
         """
-        self.channels_locations = copy(channel_locations)
-        channels_info = self.file_data.info.get("chs")
+        new_channels_locations = copy(channel_locations)
+        channels_info = self.file_data[self.current_dataset_index].info.get("chs")
         for i, channel in enumerate(channels_info):
-            channel_location = self.channels_locations[channel_names[i]]
+            channel_location = new_channels_locations[channel_names[i]]
             channel["loc"] = np.array([channel_location[0], channel_location[1], channel_location[2], 0.0, 0.0, 0.0,
-                                       np.NAN, np.NAN, np.NAN, np.NAN, np.NAN, np.NAN])
+                                       np.NAN, np.NAN, np.NAN, np.NAN, np.NAN, np.NAN])     # MNE Format
+        self.channels_locations[self.current_dataset_index] = copy(new_channels_locations)
 
     def set_channel_names(self, channel_names):
         """
@@ -1323,7 +1464,8 @@ class mainModel:
         :param channel_names: The channels' names.
         :type channel_names: list of str
         """
-        self.file_data = self.file_data.pick_channels(channel_names)
+        file_data = self.file_data[self.current_dataset_index]
+        self.file_data[self.current_dataset_index] = file_data.pick_channels(channel_names)
 
     def set_reference(self, channels_selected):
         """
@@ -1332,6 +1474,9 @@ class mainModel:
         :type channels_selected: list of str
         """
         if channels_selected[0] in ["average", "infinity"]:
-            self.references = channels_selected[0]
+            self.references[self.current_dataset_index] = channels_selected[0]
         else:
-            self.references = channels_selected
+            self.references[self.current_dataset_index] = channels_selected
+
+    def set_current_dataset_index(self, index_selected):
+        self.current_dataset_index = index_selected

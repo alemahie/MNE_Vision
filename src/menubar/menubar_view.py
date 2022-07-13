@@ -71,11 +71,19 @@ class menubarView(QMenuBar):
         self.create_classification_menu()
         self.classification_menu.setEnabled(False)
 
+        # Datasets menu
+        self.dataset_menu = QMenu("Datasets", self)
+        self.addMenu(self.dataset_menu)
+        self.dataset_menu.setEnabled(False)
+
         # Help menu
         self.help_menu = QMenu("Help", self)
         self.addMenu(self.help_menu)
         self.create_help_menu()
 
+    """
+    Menu Creation
+    """
     def create_open_menu(self):
         open_fif_file_action = QAction("FIF File", self)
         open_fif_file_action.triggered.connect(self.open_fif_file_trigger)
@@ -119,6 +127,11 @@ class menubarView(QMenuBar):
         save_file_as_action.triggered.connect(self.save_file_as_trigger)
         save_file_as_action.setEnabled(False)
         self.file_menu.addAction(save_file_as_action)
+        # Clear dataset
+        clear_dataset_action = QAction("Clear dataset", self)
+        clear_dataset_action.triggered.connect(self.clear_dataset_trigger)
+        clear_dataset_action.setEnabled(False)
+        self.file_menu.addAction(clear_dataset_action)
         # Other
         self.file_menu.addSeparator()
         exit_action = QAction("Exit", self)
@@ -231,21 +244,72 @@ class menubarView(QMenuBar):
         about_action.setEnabled(False)
         self.help_menu.addAction(about_action)
 
-    def enable_menu_when_file_loaded(self):
+    """
+    Menu Manipulation
+    """
+    def change_menu_status(self, new_status):
         """
-        Make the menus accessible when a dataset is loaded.
+        Change the status of all the menus. Either all enabled of disabled.
+        :param new_status: The new status of the menus
+        :type new_status: bool
         """
         menu_actions = self.file_menu.actions()
-        self.events_menu.setEnabled(True)
-        self.export_menu.setEnabled(True)
+        self.events_menu.setEnabled(new_status)
+        self.export_menu.setEnabled(new_status)
         for action in menu_actions:
-            if action.text() == "Save" or action.text() == "Save As":
-                action.setEnabled(True)
-        self.edit_menu.setEnabled(True)
-        self.tools_menu.setEnabled(True)
-        self.plot_menu.setEnabled(True)
-        self.connectivity_menu.setEnabled(True)
-        self.classification_menu.setEnabled(True)
+            if action.text() == "Save" or action.text() == "Save As" or action.text() == "Clear dataset":
+                action.setEnabled(new_status)
+        self.edit_menu.setEnabled(new_status)
+        self.tools_menu.setEnabled(new_status)
+        self.plot_menu.setEnabled(new_status)
+        self.connectivity_menu.setEnabled(new_status)
+        self.classification_menu.setEnabled(new_status)
+        self.dataset_menu.setEnabled(new_status)
+
+    def enable_menu(self):
+        """
+        Make the menus enabled when at least dataset is loaded.
+        """
+        self.change_menu_status(True)
+
+    def disable_menu(self):
+        """
+        Make the menus disabled when no dataset is loaded.
+        """
+        self.change_menu_status(False)
+
+    def add_dataset(self, dataset_index, dataset_name):
+        """
+        Add a dataset in the dataset menu.
+        :param dataset_index: The index of new dataset.
+        :type dataset_index: int
+        :param dataset_name: The name of the new dataset.
+        :type dataset_name: str
+        """
+        dataset_menu_name = "Dataset " + str(dataset_index+1) + " : " + dataset_name
+        new_dataset = QAction(dataset_menu_name, self)
+        new_dataset.triggered.connect(self.dataset_clicked)
+        self.dataset_menu.addAction(new_dataset)
+
+    def remove_dataset(self, dataset_index):
+        """
+        Remove a dataset from the dataset menu.
+        :param dataset_index: The index of dataset to remove
+        :type dataset_index: int
+        """
+        menu_actions = self.dataset_menu.actions()
+        del menu_actions[dataset_index]     # Remove the dataset in the menus.
+
+        # Recreate all the menus.
+        self.dataset_menu.clear()
+        dataset_counter = 1
+        for dataset in menu_actions:
+            dataset_complete_name = dataset.text()
+            dataset_name = dataset_complete_name.split(": ")[1]     # Get only the dataset name
+            new_dataset_name = "Dataset " + str(dataset_counter) + " : " + dataset_name
+            dataset.setText(new_dataset_name)
+            self.dataset_menu.addAction(dataset)
+            dataset_counter += 1
 
     """
     Triggers
@@ -286,6 +350,10 @@ class menubarView(QMenuBar):
 
     def save_file_as_trigger(self):
         self.menubar_listener.save_file_as_clicked()
+
+    # Dataset
+    def clear_dataset_trigger(self):
+        self.menubar_listener.clear_dataset_clicked()
 
     def exit_program_trigger(self):
         self.menubar_listener.exit_program_clicked()
@@ -372,6 +440,17 @@ class menubarView(QMenuBar):
     # Classification menu triggers
     def classify_trigger(self):
         self.menubar_listener.classify_clicked()
+
+    # Datasets
+    def dataset_clicked(self):
+        menu_actions = self.dataset_menu.actions()
+        selected_action = self.sender()
+
+        index_selected = 0
+        while selected_action != menu_actions[index_selected]:
+            index_selected += 1
+
+        self.menubar_listener.change_dataset(index_selected)
 
     # Help menu triggers
     def help_trigger(self):

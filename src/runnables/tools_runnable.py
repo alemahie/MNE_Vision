@@ -101,18 +101,21 @@ class resamplingWorkerSignals(QObject):
 
 
 class resamplingRunnable(QRunnable):
-    def __init__(self, frequency, file_data):
+    def __init__(self, frequency, file_data, events):
         """
         Runnable for the computation of the resampling of the given data.
         :param frequency: The new frequency at which the data will be resampled.
         :type frequency: int
         :param file_data: MNE data of the dataset.
         :type file_data: MNE.Epochs/MNE.Raw
+        :param events: The events.
+        :type events: list of, list of int
         """
         super().__init__()
         self.signals = resamplingWorkerSignals()
         self.frequency = frequency
         self.file_data = file_data
+        self.events = events
 
     def run(self):
         """
@@ -123,10 +126,10 @@ class resamplingRunnable(QRunnable):
             old_frequency = self.file_data.info.get("sfreq")
             new_frequency = self.frequency
             self.file_data.resample(new_frequency)
-            number_of_frames = len(self.file_data.times)
-            self.file_data.events[0][0] *= (new_frequency/old_frequency)
-            for i in range(1, len(self.file_data.events)):
-                self.file_data.events[i][0] = self.file_data.events[i-1][0] + number_of_frames
+
+            for i in range(0, len(self.events)):
+                self.events[i][0] = self.events[i][0] * (new_frequency / old_frequency)
+
             self.signals.finished.emit()
         except Exception as error:
             error_message = "An error has occurred during the resampling."
@@ -134,6 +137,9 @@ class resamplingRunnable(QRunnable):
             error_window.show()
             self.signals.error.emit()
 
+    """
+    Getters
+    """
     def get_file_data(self):
         """
         Get the file data.
@@ -141,6 +147,14 @@ class resamplingRunnable(QRunnable):
         :rtype: MNE.Epochs/MNE.Raw
         """
         return self.file_data
+
+    def get_events(self):
+        """
+        Get the events.
+        :return: The events
+        :rtype: list of, list of int
+        """
+        return self.events
 
 
 # Re-referencing

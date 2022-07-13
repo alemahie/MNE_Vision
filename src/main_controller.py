@@ -228,7 +228,7 @@ class mainController(mainListener):
         self.load_data_info_controller = loadDataInfoController(channel_names, tmin, tmax)
         self.load_data_info_controller.set_listener(self)
 
-    def load_data_info_information(self, montage, channels_selected, tmin, tmax):
+    def load_data_info_information(self, montage, channels_selected, tmin, tmax, dataset_name):
         """
         Create the waiting window while more information about the dataset are loaded.
         :param montage: Montage of the headset
@@ -239,11 +239,13 @@ class mainController(mainListener):
         :type tmin: float
         :param tmax: End time of the epoch or raw file to keep
         :type tmax: float
+        :param dataset_name: The name of the loaded dataset.
+        :type dataset_name: str
         """
         processing_title = "Loading selected data info, please wait."
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.load_data_info_finished)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.load_data_info(montage, channels_selected, tmin, tmax)
+        self.main_model.load_data_info(montage, channels_selected, tmin, tmax, dataset_name)
 
     def load_data_info_computation_finished(self):
         """
@@ -256,6 +258,10 @@ class mainController(mainListener):
         """
         More information about the dataset are loaded, tell the main window to display all the information about the dataset.
         """
+        current_dataset_index = self.main_model.get_current_dataset_index()
+        dataset_name = self.main_model.get_dataset_name()
+        self.menubar_controller.add_dataset(current_dataset_index, dataset_name)
+
         self.display_all_info()
 
     # Read Events
@@ -432,6 +438,23 @@ class mainController(mainListener):
         if path_to_file != '':
             self.main_model.save_file_as(path_to_file)
             self.main_view.update_path_to_file(self.main_model.get_file_path_name())
+
+    # Clear dataset
+    def clear_dataset_clicked(self):
+        """
+        Remove the current dataset loaded.
+        """
+        current_dataset_index = self.main_model.get_current_dataset_index()
+        self.menubar_controller.remove_dataset(current_dataset_index)
+        self.main_model.clear_current_dataset()
+
+        new_current_dataset_index = self.main_model.get_current_dataset_index()
+        if new_current_dataset_index == -1:     # No dataset loaded
+            self.main_view.clear_display()
+            self.menubar_controller.disable_menu()
+        else:       # Display the new current dataset
+            all_info = self.main_model.get_all_displayed_info()
+            self.main_view.display_info(all_info)
 
     """
     Edit menu
@@ -1208,7 +1231,6 @@ class mainController(mainListener):
         """
         source_space_connectivity_data = self.main_model.get_source_space_connectivity_data()
         psi = self.main_model.get_psi_data_source_space()
-        print(psi)
         self.source_space_connectivity_controller.plot_source_space_connectivity(source_space_connectivity_data, psi)
 
     # Sensor space connectivity
@@ -1320,6 +1342,14 @@ class mainController(mainListener):
         self.classify_controller.plot_results(classifier)
 
     """
+    Dataset Menu
+    """
+    def change_dataset(self, index_selected):
+        self.main_model.set_current_dataset_index(index_selected)
+        all_info = self.main_model.get_all_displayed_info()
+        self.main_view.display_info(all_info)
+
+    """
     Others
     """
     def display_all_info(self):
@@ -1328,7 +1358,7 @@ class mainController(mainListener):
         """
         all_info = self.main_model.get_all_displayed_info()
         self.main_view.display_info(all_info)
-        self.menubar_controller.enable_menu_when_file_loaded()
+        self.menubar_controller.enable_menu()
 
     # Download fsaverage
     def download_fsaverage_mne_data_information(self):

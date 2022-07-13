@@ -6,7 +6,7 @@ Load Data Info View
 """
 
 from PyQt5.QtGui import QDoubleValidator
-from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QComboBox, QLineEdit
+from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QComboBox, QLineEdit, QHBoxLayout, QVBoxLayout
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
 
@@ -17,6 +17,8 @@ __license__ = "GNU General Public License v3.0"
 __maintainer__ = "Lemahieu Antoine"
 __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
+
+from utils.view.separator import create_layout_separator
 
 
 class loadDataInfoView(QWidget):
@@ -39,8 +41,20 @@ class loadDataInfoView(QWidget):
 
         self.setWindowTitle("Load Data Info")
 
+        self.global_layout = QVBoxLayout()
+        self.setLayout(self.global_layout)
+
+        # Dataset Name
+        self.dataset_name_widget = QWidget()
+        self.dataset_name_layout = QHBoxLayout()
+        self.dataset_name_line = QLineEdit()
+        self.dataset_name_layout.addWidget(QLabel("Dataset name : "))
+        self.dataset_name_layout.addWidget(self.dataset_name_line)
+        self.dataset_name_widget.setLayout(self.dataset_name_layout)
+
+        # Parameters
+        self.parameters_widget = QWidget()
         self.grid_layout = QGridLayout()
-        self.setLayout(self.grid_layout)
 
         self.montage_box = QComboBox()
         self.montage_box.addItems(["default", "standard_1005", "standard_1020", "standard_alphabetic", "standard_postfixed",
@@ -59,11 +73,6 @@ class loadDataInfoView(QWidget):
         self.data_end_line = QLineEdit(str(tmax))
         self.data_end_line.setValidator(self.data_start_end_validator)
 
-        self.cancel = QPushButton("&Cancel", self)
-        self.cancel.clicked.connect(self.cancel_load_data_info_trigger)
-        self.confirm = QPushButton("&Confirm", self)
-        self.confirm.clicked.connect(self.confirm_load_data_info_trigger)
-
         self.grid_layout.addWidget(QLabel("Montage : "), 0, 0)
         self.grid_layout.addWidget(self.montage_box, 0, 1)
         self.grid_layout.addWidget(QLabel("Channels : "), 1, 0)
@@ -72,8 +81,25 @@ class loadDataInfoView(QWidget):
         self.grid_layout.addWidget(self.data_start_line, 2, 1)
         self.grid_layout.addWidget(QLabel("Data end time (sec) : "), 3, 0)
         self.grid_layout.addWidget(self.data_end_line, 3, 1)
-        self.grid_layout.addWidget(self.cancel, 4, 0)
-        self.grid_layout.addWidget(self.confirm, 4, 1)
+        self.parameters_widget.setLayout(self.grid_layout)
+
+        # Cancel Confirm
+        self.cancel_confirm_widget = QWidget()
+        self.cancel_confirm_layout = QHBoxLayout()
+        self.cancel = QPushButton("&Cancel", self)
+        self.cancel.clicked.connect(self.cancel_load_data_info_trigger)
+        self.confirm = QPushButton("&Confirm", self)
+        self.confirm.clicked.connect(self.confirm_load_data_info_trigger)
+        self.cancel_confirm_layout.addWidget(self.cancel)
+        self.cancel_confirm_layout.addWidget(self.confirm)
+        self.cancel_confirm_widget.setLayout(self.cancel_confirm_layout)
+
+        # Layout
+        self.global_layout.addWidget(self.dataset_name_widget)
+        self.global_layout.addWidget(create_layout_separator())
+        self.global_layout.addWidget(self.parameters_widget)
+        self.global_layout.addWidget(create_layout_separator())
+        self.global_layout.addWidget(self.cancel_confirm_widget)
 
     """
     Triggers
@@ -90,18 +116,25 @@ class loadDataInfoView(QWidget):
         Check if the float input are in the acceptable range (between tmin and tmax).
         """
         montage = self.montage_box.currentText()
+
         channels_selected = self.channels_selected
-        tmin = None
-        tmax = None
         if channels_selected is None:   # The channel selection has not been opened, take all channels
             channels_selected = self.all_channels_names
+
+        tmin = None
+        tmax = None
         if self.data_start_line.hasAcceptableInput():
             tmin = self.data_start_line.text()
             tmin = float(tmin.replace(',', '.'))
         if self.data_end_line.hasAcceptableInput():
             tmax = self.data_end_line.text()
             tmax = float(tmax.replace(',', '.'))
-        self.load_data_listener.confirm_button_clicked(montage, channels_selected, tmin, tmax)
+
+        dataset_name = self.dataset_name_line.text()
+        if len(dataset_name) == 0:  # No Name
+            dataset_name = "No Name"
+
+        self.load_data_listener.confirm_button_clicked(montage, channels_selected, tmin, tmax, dataset_name)
 
     def channels_selection_trigger(self):
         """

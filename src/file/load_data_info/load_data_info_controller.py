@@ -41,7 +41,7 @@ class loadDataInfoController(loadDataInfoListener):
         """
         self.load_data_info_view.close()
 
-    def confirm_button_clicked(self, montage, channels_selected, tmin, tmax):
+    def confirm_button_clicked(self, montage, channels_selected, tmin, tmax, dataset_name):
         """
         Close the window and send the information to the main controller
         :param montage: Montage of the headset
@@ -52,9 +52,11 @@ class loadDataInfoController(loadDataInfoListener):
         :type tmin: float
         :param tmax: End time of the epoch or raw file to keep
         :type tmax: float
+        :param dataset_name: The name of the loaded dataset.
+        :type dataset_name: str
         """
         self.load_data_info_view.close()
-        self.main_listener.load_data_info_information(montage, channels_selected, tmin, tmax)
+        self.main_listener.load_data_info_information(montage, channels_selected, tmin, tmax, dataset_name)
 
     """
     Getters

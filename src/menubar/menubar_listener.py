@@ -64,6 +64,10 @@ class menubarListener(ABC):
         pass
 
     @abstractmethod
+    def clear_dataset_clicked(self):
+        pass
+
+    @abstractmethod
     def exit_program_clicked(self):
         pass
 
@@ -170,6 +174,11 @@ class menubarListener(ABC):
     # Classification menu
     @abstractmethod
     def classify_clicked(self):
+        pass
+
+    # Dataset menu
+    @abstractmethod
+    def change_dataset(self, index_selected):
         pass
 
     # Help menu

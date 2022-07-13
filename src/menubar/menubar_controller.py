@@ -29,11 +29,35 @@ class menubarController(menubarListener):
         self.menubar_view = menubarView()
         self.menubar_view.set_listener(self)
 
-    def enable_menu_when_file_loaded(self):
+    def enable_menu(self):
         """
         Make the menus accessible when a dataset is loaded.
         """
-        self.menubar_view.enable_menu_when_file_loaded()
+        self.menubar_view.enable_menu()
+
+    def disable_menu(self):
+        """
+        Make the menus disabled when no dataset is loaded.
+        """
+        self.menubar_view.disable_menu()
+
+    def add_dataset(self, dataset_index, dataset_name):
+        """
+        Add a dataset in the dataset menu.
+        :param dataset_index: The index of new dataset.
+        :type dataset_index: int
+        :param dataset_name: The name of the new dataset.
+        :type dataset_name: str
+        """
+        self.menubar_view.add_dataset(dataset_index, dataset_name)
+
+    def remove_dataset(self, dataset_index):
+        """
+        Remove a dataset from the dataset menu.
+        :param dataset_index: The index of dataset to remove
+        :type dataset_index: int
+        """
+        self.menubar_view.remove_dataset(dataset_index)
 
     """
     Menu buttons clicked
@@ -68,6 +92,9 @@ class menubarController(menubarListener):
 
     def save_file_as_clicked(self):
         self.main_listener.save_file_as_clicked()
+
+    def clear_dataset_clicked(self):
+        self.main_listener.clear_dataset_clicked()
 
     def exit_program_clicked(self):
         sys.exit(0)
@@ -151,6 +178,10 @@ class menubarController(menubarListener):
     # Classification menu
     def classify_clicked(self):
         self.main_listener.classify_clicked()
+
+    # Dataset menu
+    def change_dataset(self, index_selected):
+        self.main_listener.change_dataset(index_selected)
 
     # Help menu
     def help_clicked(self):

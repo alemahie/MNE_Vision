@@ -27,7 +27,7 @@ class loadDataInfoListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, montage, channels_selected, tmin, tmax):
+    def confirm_button_clicked(self, montage, channels_selected, tmin, tmax, dataset_name):
         pass
 
     @abstractmethod

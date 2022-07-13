@@ -6,6 +6,8 @@ Main view
 """
 
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QLabel, QFileDialog
+from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt
 
 from mne.viz import plot_sensors, set_3d_backend, set_browser_backend
 
@@ -26,9 +28,9 @@ class mainView(QMainWindow):
         """
         super().__init__()
 
-        self.info_labels = ["Filename : ", "File Type : ", "Number of Channels : ", "Sampling Frequency (Hz) : ",
-                            "Number of Events : ", "Number of Epochs : ", "Epoch start (sec) : ", "Epoch end (sec) : ",
-                            "Number of Frames/Frames per Epoch : ", "Reference : ", "Channel Locations : ",
+        self.info_labels = ["       No dataset loaded", "Filename : ", "File Type : ", "Number of Channels : ",
+                            "Sampling Frequency (Hz) : ", "Number of Events : ", "Number of Epochs : ", "Epoch start (sec) : ",
+                            "Epoch end (sec) : ", "Number of Frames/Frames per Epoch : ", "Reference : ", "Channel Locations : ",
                             "ICA : ", "Dataset Size (Mb) : "]
 
         self.central_widget = QWidget()
@@ -40,14 +42,19 @@ class mainView(QMainWindow):
 
         for i, info in enumerate(self.info_labels):
             label = QLabel(info)
-            if i != 12:
+            if i == 0:
+                dataset_name_font = QFont('', 15)
+                dataset_name_font.setBold(True)
+                label.setFont(dataset_name_font)
+                label.setAlignment(Qt.AlignBottom)
+            elif 0 < i < 13:
                 label.setObjectName("BoundariesGridLayoutLeft")
-            else:
+            elif i == 13:
                 label.setObjectName("BoundariesGridLayoutBottomLeft")
             self.grid_layout.addWidget(label, i, 0)
-        for i in range(13):
+        for i in range(1, 14):
             label = QLabel("/")
-            if i != 12:
+            if i != 13:
                 label.setObjectName("BoundariesGridLayoutRight")
             else:
                 label.setObjectName("BoundariesGridLayoutBottomRight")
@@ -71,9 +78,25 @@ class mainView(QMainWindow):
         :param all_info: All the information to display.
         :type all_info: list of str/int/float/list
         """
-        for i in range(13):
-            label_item = self.grid_layout.itemAtPosition(i, 1).widget()
+        for i in range(14):
+            if i != 0:
+                label_item = self.grid_layout.itemAtPosition(i, 1).widget()
+            else:           # Dataset name
+                label_item = self.grid_layout.itemAtPosition(i, 0).widget()
+                all_info[i] = "        " + all_info[i]
             label_item.setText(str(all_info[i]))
+
+    def clear_display(self):
+        """
+        Clear the display when no dataset is loaded.
+        """
+        for i in range(14):
+            if i != 0:
+                label_item = self.grid_layout.itemAtPosition(i, 1).widget()
+                label_item.setText("/")
+            else:
+                label_item = self.grid_layout.itemAtPosition(i, 0).widget()
+                label_item.setText("        No dataset loaded")
 
     """
     Plot
@@ -148,13 +171,22 @@ class mainView(QMainWindow):
     """
     Updates
     """
+    def update_dataset_name(self, dataset_name):
+        """
+        Update the dataset name on the main window.
+        :param dataset_name: The dataset name.
+        :type dataset_name: str
+        """
+        label_item = self.grid_layout.itemAtPosition(0, 0).widget()
+        label_item.setText(dataset_name)
+
     def update_path_to_file(self, path_to_file):
         """
         Update the path to the file on the main window.
         :param path_to_file: Path to the file
         :type path_to_file: str
         """
-        label_item = self.grid_layout.itemAtPosition(0, 1).widget()
+        label_item = self.grid_layout.itemAtPosition(1, 1).widget()
         label_item.setText(path_to_file)
 
     def update_file_type(self, file_type):
@@ -163,7 +195,7 @@ class mainView(QMainWindow):
         :param file_type: File type, either "Epochs" or "Raw".
         :type file_type: str
         """
-        label_item = self.grid_layout.itemAtPosition(1, 1).widget()
+        label_item = self.grid_layout.itemAtPosition(2, 1).widget()
         label_item.setText(file_type)
 
     def update_sampling_frequency(self, frequency):
@@ -172,7 +204,7 @@ class mainView(QMainWindow):
         :param frequency: The frequency
         :type frequency: float
         """
-        label_item = self.grid_layout.itemAtPosition(3, 1).widget()
+        label_item = self.grid_layout.itemAtPosition(4, 1).widget()
         label_item.setText(str(frequency))
 
     def update_number_of_events(self, number_of_events):
@@ -181,7 +213,7 @@ class mainView(QMainWindow):
         :param number_of_events: The number of events.
         :type number_of_events: int
         """
-        label_item = self.grid_layout.itemAtPosition(4, 1).widget()
+        label_item = self.grid_layout.itemAtPosition(5, 1).widget()
         label_item.setText(str(number_of_events))
 
     def update_number_of_epochs(self, number_of_epochs):
@@ -190,7 +222,7 @@ class mainView(QMainWindow):
         :param number_of_epochs: The number of epochs.
         :type number_of_epochs: int
         """
-        label_item = self.grid_layout.itemAtPosition(5, 1).widget()
+        label_item = self.grid_layout.itemAtPosition(6, 1).widget()
         label_item.setText(str(number_of_epochs))
 
     def update_epoch_start(self, epoch_start):
@@ -199,7 +231,7 @@ class mainView(QMainWindow):
         :param epoch_start: The epochs start time.
         :type epoch_start: float
         """
-        label_item = self.grid_layout.itemAtPosition(6, 1).widget()
+        label_item = self.grid_layout.itemAtPosition(7, 1).widget()
         label_item.setText(str(epoch_start))
 
     def update_epoch_end(self, epoch_end):
@@ -208,7 +240,7 @@ class mainView(QMainWindow):
         :param epoch_end: The epochs end time.
         :type epoch_end: float
         """
-        label_item = self.grid_layout.itemAtPosition(7, 1).widget()
+        label_item = self.grid_layout.itemAtPosition(8, 1).widget()
         label_item.setText(str(epoch_end))
 
     def update_number_of_frames(self, number_of_frames):
@@ -217,7 +249,7 @@ class mainView(QMainWindow):
         :param number_of_frames: The number of frames.
         :type number_of_frames: int
         """
-        label_item = self.grid_layout.itemAtPosition(8, 1).widget()
+        label_item = self.grid_layout.itemAtPosition(9, 1).widget()
         label_item.setText(str(number_of_frames))
 
     def update_reference(self, references):
@@ -226,7 +258,7 @@ class mainView(QMainWindow):
         :param references: The references.
         :type references: str/list of str
         """
-        label_item = self.grid_layout.itemAtPosition(9, 1).widget()
+        label_item = self.grid_layout.itemAtPosition(10, 1).widget()
         label_item.setText(str(references))
 
     def update_ica_decomposition(self, ica_status):
@@ -235,7 +267,7 @@ class mainView(QMainWindow):
         :param ica_status: The ICA decomposition status.
         :type ica_status: bool
         """
-        label_item = self.grid_layout.itemAtPosition(11, 1).widget()
+        label_item = self.grid_layout.itemAtPosition(12, 1).widget()
         label_item.setText(str(ica_status))
 
     def update_dataset_size(self, dataset_size):
@@ -244,7 +276,7 @@ class mainView(QMainWindow):
         :param dataset_size: The dataset size.
         :type dataset_size: float
         """
-        label_item = self.grid_layout.itemAtPosition(12, 1).widget()
+        label_item = self.grid_layout.itemAtPosition(13, 1).widget()
         label_item.setText(str(dataset_size))
 
     """

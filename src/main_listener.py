@@ -80,7 +80,7 @@ class mainListener(ABC):
 
     # Load Data Info
     @abstractmethod
-    def load_data_info_information(self, montage, channels_selected, tmin, tmax):
+    def load_data_info_information(self, montage, channels_selected, tmin, tmax, dataset_name):
         pass
 
     @abstractmethod
@@ -154,6 +154,11 @@ class mainListener(ABC):
 
     @abstractmethod
     def save_file_as_clicked(self):
+        pass
+
+    # Clear dataset
+    @abstractmethod
+    def clear_dataset_clicked(self):
         pass
 
     """
@@ -521,6 +526,13 @@ class mainListener(ABC):
 
     @abstractmethod
     def classify_finished(self):
+        pass
+
+    """
+    Dataset Menu
+    """
+    @abstractmethod
+    def change_dataset(self, index_selected):
         pass
 
     """
