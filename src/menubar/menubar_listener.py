@@ -22,7 +22,9 @@ class menubarListener(ABC):
     It retrieves the information from the view to send it to the controller.
     """
 
-    # File menu
+    """
+    File menu
+    """
     @abstractmethod
     def open_fif_file_clicked(self, path_to_file):
         pass
@@ -35,6 +37,7 @@ class menubarListener(ABC):
     def open_set_file_clicked(self, path_to_file):
         pass
 
+    # Events
     @abstractmethod
     def read_events_file_clicked(self, path_to_file):
         pass
@@ -43,6 +46,7 @@ class menubarListener(ABC):
     def find_events_from_channel_clicked(self):
         pass
 
+    # Export
     @abstractmethod
     def export_data_to_csv_file_clicked(self, path_to_file):
         pass
@@ -55,6 +59,7 @@ class menubarListener(ABC):
     def export_events_to_file_clicked(self):
         pass
 
+    # Save
     @abstractmethod
     def save_file_clicked(self):
         pass
@@ -67,11 +72,23 @@ class menubarListener(ABC):
     def clear_dataset_clicked(self):
         pass
 
+    # Study
+    @abstractmethod
+    def create_study_clicked(self):
+        pass
+
+    @abstractmethod
+    def clear_study_clicked(self):
+        pass
+
+    # Other
     @abstractmethod
     def exit_program_clicked(self):
         pass
 
-    # Edit menu
+    """
+    Edit Menu
+    """
     @abstractmethod
     def dataset_info_clicked(self):
         pass
@@ -92,7 +109,9 @@ class menubarListener(ABC):
     def select_data_events_clicked(self):
         pass
 
-    # Tools menu
+    """
+    Tools menu
+    """
     @abstractmethod
     def filter_clicked(self):
         pass
@@ -125,7 +144,9 @@ class menubarListener(ABC):
     def source_estimation_clicked(self):
         pass
 
-    # Plot menu
+    """
+    Plot menu
+    """
     @abstractmethod
     def plot_channel_locations_clicked(self):
         pass
@@ -154,7 +175,9 @@ class menubarListener(ABC):
     def plot_time_frequency_clicked(self):
         pass
 
-    # Connectivity menu
+    """
+    Connectivity menu
+    """
     @abstractmethod
     def envelope_correlation_clicked(self):
         pass
@@ -171,17 +194,38 @@ class menubarListener(ABC):
     def spectro_temporal_connectivity_clicked(self):
         pass
 
-    # Classification menu
+    """
+    Classification menu
+    """
     @abstractmethod
     def classify_clicked(self):
         pass
 
-    # Dataset menu
+    """
+    Study menu
+    """
+    @abstractmethod
+    def edit_study_clicked(self):
+        pass
+
+    @abstractmethod
+    def plot_study_clicked(self):
+        pass
+
+    """
+    Dataset menu
+    """
     @abstractmethod
     def change_dataset(self, index_selected):
         pass
 
-    # Help menu
+    @abstractmethod
+    def study_selected(self):
+        pass
+
+    """
+    Help menu
+    """
     @abstractmethod
     def help_clicked(self):
         pass

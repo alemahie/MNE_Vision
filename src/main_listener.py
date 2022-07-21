@@ -161,6 +161,20 @@ class mainListener(ABC):
     def clear_dataset_clicked(self):
         pass
 
+    # Study
+    @abstractmethod
+    def create_study_clicked(self):
+        pass
+
+    @abstractmethod
+    def create_study_information(self, study_name, task_name, dataset_names, dataset_indexes, subjects, sessions, runs,
+                                 conditions, groups):
+        pass
+
+    @abstractmethod
+    def clear_study_clicked(self):
+        pass
+
     """
     Edit Menu
     """
@@ -529,10 +543,25 @@ class mainListener(ABC):
         pass
 
     """
+    Study Menu
+    """
+    @abstractmethod
+    def edit_study_clicked(self):
+        pass
+
+    @abstractmethod
+    def plot_study_clicked(self):
+        pass
+
+    """
     Dataset Menu
     """
     @abstractmethod
     def change_dataset(self, index_selected):
+        pass
+
+    @abstractmethod
+    def study_selected(self):
         pass
 
     """

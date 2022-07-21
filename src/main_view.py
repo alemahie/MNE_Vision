@@ -32,14 +32,34 @@ class mainView(QMainWindow):
                             "Sampling Frequency (Hz) : ", "Number of Events : ", "Number of Epochs : ", "Epoch start (sec) : ",
                             "Epoch end (sec) : ", "Number of Frames/Frames per Epoch : ", "Reference : ", "Channel Locations : ",
                             "ICA : ", "Dataset Size (Mb) : "]
+        self.study_info_labels = ["       No dataset loaded", "Study Filename : ", "Study task name : ", "Number of subjects : ",
+                                  "Number of conditions : ", "Number of sessions : ", "Number of groups : ", "Epochs Consistency : ",
+                                  "Channels per frame : ", "Channel locations : ", "ICA Status : ", "Study Size (Mb) : "]
 
+        self.central_widget = None
+        self.grid_layout = None
+
+        self.create_display()
+
+        self.setWindowTitle("MNE Vision")
+        self.setup_mne_backends()
+
+    @staticmethod
+    def setup_mne_backends():
+        """
+        Set the 2D and 3D backends that will be used by MNE for the plots.
+        """
+        set_browser_backend("matplotlib")
+        set_3d_backend("pyvistaqt")
+
+    def create_display(self):
+        """
+        Create the display of the main window.
+        """
         self.central_widget = QWidget()
-
         self.grid_layout = QGridLayout(self)
-        self.central_widget.setLayout(self.grid_layout)
 
         self.grid_layout.setSpacing(0)
-
         for i, info in enumerate(self.info_labels):
             label = QLabel(info)
             if i == 0:
@@ -59,18 +79,8 @@ class mainView(QMainWindow):
             else:
                 label.setObjectName("BoundariesGridLayoutBottomRight")
             self.grid_layout.addWidget(label, i, 1)
-
+        self.central_widget.setLayout(self.grid_layout)
         self.setCentralWidget(self.central_widget)
-        self.setWindowTitle("MNE Vision")
-        self.setup_mne_backends()
-
-    @staticmethod
-    def setup_mne_backends():
-        """
-        Set the 2D and 3D backends that will be used by MNE for the plots.
-        """
-        set_browser_backend("matplotlib")
-        set_3d_backend("pyvistaqt")
 
     def display_info(self, all_info):
         """
@@ -97,6 +107,50 @@ class mainView(QMainWindow):
             else:
                 label_item = self.grid_layout.itemAtPosition(i, 0).widget()
                 label_item.setText("        No dataset loaded")
+
+    def create_study_display(self):
+        """
+        Create the display of the study_creation on the main window.
+        """
+        self.central_widget = QWidget()
+        self.grid_layout = QGridLayout(self)
+
+        self.grid_layout.setSpacing(0)
+        for i, info in enumerate(self.study_info_labels):
+            label = QLabel(info)
+            if i == 0:
+                dataset_name_font = QFont('', 15)
+                dataset_name_font.setBold(True)
+                label.setFont(dataset_name_font)
+                label.setAlignment(Qt.AlignBottom)
+            elif 0 < i < 11:
+                label.setObjectName("BoundariesGridLayoutLeft")
+            elif i == 11:
+                label.setObjectName("BoundariesGridLayoutBottomLeft")
+            self.grid_layout.addWidget(label, i, 0)
+        for i in range(1, 12):
+            label = QLabel("/")
+            if i != 11:
+                label.setObjectName("BoundariesGridLayoutRight")
+            else:
+                label.setObjectName("BoundariesGridLayoutBottomRight")
+            self.grid_layout.addWidget(label, i, 1)
+        self.central_widget.setLayout(self.grid_layout)
+        self.setCentralWidget(self.central_widget)
+
+    def display_study_info(self, all_info):
+        """
+        Display the information of the study_creation on the main screen.
+        :param all_info: All the information to display.
+        :type all_info: list of str/int/float/list
+        """
+        for i in range(12):
+            if i != 0:
+                label_item = self.grid_layout.itemAtPosition(i, 1).widget()
+            else:           # Dataset name
+                label_item = self.grid_layout.itemAtPosition(i, 0).widget()
+                all_info[i] = "        " + all_info[i]
+            label_item.setText(str(all_info[i]))
 
     """
     Plot
@@ -265,7 +319,7 @@ class mainView(QMainWindow):
         """
         Update the ICA decomposition status on the main window.
         :param ica_status: The ICA decomposition status.
-        :type ica_status: bool
+        :type ica_status: str
         """
         label_item = self.grid_layout.itemAtPosition(12, 1).widget()
         label_item.setText(str(ica_status))

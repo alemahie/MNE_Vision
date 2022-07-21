@@ -6,13 +6,12 @@ Main model
 """
 
 import numpy as np
-
 from os.path import getsize, splitext
 from copy import copy
-
+from mne import read_events, find_events, events_from_annotations
 from PyQt5.QtCore import QThreadPool
 
-from mne import read_events, find_events, events_from_annotations
+from utils.model.study_model import studyModel
 
 from runnables.tools_runnable import filterRunnable, icaRunnable, sourceEstimationRunnable, resamplingRunnable, \
     reReferencingRunnable, extractEpochsRunnable, signalToNoiseRatioRunnable
@@ -49,12 +48,22 @@ class mainModel:
         """
         self.main_listener = None
 
+        # Datasets info
         self.current_dataset_index = -1     # -1, means no dataset.
-
         self.file_data = []
         self.file_type = []
         self.file_path_name = []
         self.dataset_name = []
+
+        self.channels_locations = []    # {}
+        self.ica_decomposition = []     # "No"
+        self.references = []            # "Unknown"
+        self.read_events = []           # None     # Events info read from file or channel, used to transform raw to epochs
+        self.read_event_ids = []        # None  # Event ids
+
+        # Study
+        self.study = None
+        self.study_selected = False
 
         # The 3 tmp variables are used when loading a dataset, prevents the case that if a new dataset is loaded and an
         # error occurs, the old data won't be overwritten if there was a dataset loaded before.
@@ -62,12 +71,6 @@ class mainModel:
         self.file_type_tmp = None
         self.file_path_name_tmp = None
         self.dataset_name_tmp = None
-
-        self.channels_locations = []    # {}
-        self.ica_decomposition = []     # "No"
-        self.references = []            # "Unknown"
-        self.read_events = []           # None     # Events info read from file or channel, used to transform raw to epochs
-        self.read_event_ids = []        # None  # Event ids
 
         # Runnables
         self.open_fif_file_runnable = None
@@ -439,6 +442,39 @@ class mainModel:
 
         self.current_dataset_index = len(self.file_data) - 1
 
+    def create_study(self, study_name, task_name, dataset_names, dataset_indexes, subjects, sessions, runs, conditions, groups):
+        """
+        Create the study_creation with the given information.
+        :param study_name: The name of the study_creation
+        :type study_name: str
+        :param task_name: The name of the task linked to the study_creation
+        :type task_name: str
+        :param dataset_names: The name of the datasets linked to the study_creation
+        :type dataset_names: list of str
+        :param dataset_indexes: The indexes of the datasets selected to be in the study_creation
+        :type dataset_indexes: list of int
+        :param subjects: The subjects assigned to each dataset in the study_creation
+        :type subjects: list of str
+        :param sessions: The sessions assigned to each dataset in the study_creation
+        :type sessions: list of str
+        :param runs: The runs assigned to each dataset in the study_creation
+        :type runs: list of str
+        :param conditions: The conditions assigned to each dataset in the study_creation
+        :type conditions: list of str
+        :param groups: The groups assigned to each dataset in the study_creation
+        :type groups: list of str
+        """
+        self.study = studyModel(study_name, task_name, dataset_names, dataset_indexes, subjects, sessions, runs, conditions, groups)
+        self.study.set_listener(self)
+        self.study_selected = True
+
+    def clear_study(self):
+        """
+        Clear the current study_creation.
+        """
+        self.study = None
+        self.study_selected = False
+
     """
     Tools menu
     """
@@ -714,7 +750,8 @@ class mainModel:
         file_data = self.file_data[self.current_dataset_index]
         try:
             self.fig_psd = file_data.plot_psd(fmin=minimum_frequency, fmax=maximum_frequency, tmin=minimum_time,
-                                              tmax=maximum_time, average=False, show=False)
+                                              tmax=maximum_time, estimate="power", bandwidth=1.0,
+                                              average=False, show=False)
             bands = []
             for time in topo_time_points:
                 bands.append((time, str(time) + " Hz"))
@@ -951,6 +988,35 @@ class mainModel:
         self.main_listener.classify_computation_error()
 
     """
+    Study Menu
+    """
+    def edit_study_information(self, study_name, task_name, subjects, sessions, runs, conditions, groups):
+        """
+        Send the information to the study to be edited.
+        :param study_name: The name of the study_creation
+        :type study_name: str
+        :param task_name: The name of the task linked to the study_creation
+        :type task_name: str
+        :param subjects: The subjects assigned to each dataset in the study_creation
+        :type subjects: list of str
+        :param sessions: The sessions assigned to each dataset in the study_creation
+        :type sessions: list of str
+        :param runs: The runs assigned to each dataset in the study_creation
+        :type runs: list of str
+        :param conditions: The conditions assigned to each dataset in the study_creation
+        :type conditions: list of str
+        :param groups: The groups assigned to each dataset in the study_creation
+        :type groups: list of str
+        """
+        self.study.set_study_name(study_name)
+        self.study.set_task_name(task_name)
+        self.study.set_subjects(subjects)
+        self.study.set_sessions(sessions)
+        self.study.set_runs(runs)
+        self.study.set_conditions(conditions)
+        self.study.set_groups(groups)
+
+    """
     Others
     """
     def is_fif_file(self):
@@ -1029,6 +1095,14 @@ class mainModel:
         dataset_name = self.dataset_name[self.current_dataset_index]
         return dataset_name
 
+    def get_all_dataset_names(self):
+        """
+        Gets the dataset name of all the datasets.
+        :return: The dataset names
+        :rtype: list of str
+        """
+        return self.dataset_name
+
     def get_file_path_name(self):
         """
         Gets the file path of the dataset.
@@ -1037,6 +1111,14 @@ class mainModel:
         """
         file_path_name = self.file_path_name[self.current_dataset_index]
         return file_path_name
+
+    def get_all_file_path_name(self):
+        """
+        Gets the file path of all the datasets.
+        :return: The file path of all the datasets
+        :rtype: list of str
+        """
+        return self.file_path_name
 
     def get_file_path_name_without_extension(self):
         """
@@ -1207,11 +1289,19 @@ class mainModel:
     def get_ica(self):
         """
         Gets the status of the ICA decomposition of the dataset.
-        :return: True if it is known by the software that the ICA decomposition has been performed. False otherwise.
-        :rtype: boolean
+        :return: "Yes" if it is known by the software that the ICA decomposition has been performed. "No" otherwise.
+        :rtype: str
         """
         ica_decomposition = self.ica_decomposition[self.current_dataset_index]
         return ica_decomposition
+
+    def get_all_ica(self):
+        """
+        Gets the status of the ICA decomposition of all the datasets.
+        :return: "Yes" if it is known by the software that the ICA decomposition has been performed. "No" otherwise.
+        :rtype: list of str
+        """
+        return self.ica_decomposition
 
     def get_dataset_size(self):
         """
@@ -1220,7 +1310,6 @@ class mainModel:
         :rtype: float
         """
         file_path_name = self.file_path_name[self.current_dataset_index]
-
         try:
             return round(getsize(file_path_name[:-3] + "fdt") / (1024 ** 2), 3)
         except:
@@ -1244,6 +1333,14 @@ class mainModel:
         file_data = self.file_data[self.current_dataset_index]
         return file_data
 
+    def get_all_file_data(self):
+        """
+        Gets the MNE "Epochs" or "Raw" data of all the datasets.
+        :return: The MNE "Epochs" or "Raw" objects.
+        :rtype: list of Epochs/Raw
+        """
+        return self.file_data
+
     def get_read_events(self):
         """
         Gets the read events obtained after the epochs' importation.
@@ -1260,6 +1357,22 @@ class mainModel:
         :rtype: int
         """
         return self.current_dataset_index
+
+    def get_all_study_displayed_info(self):
+        """
+        Gets all the information of the study_creation that will be displayed on the main window.
+        :return: A list of all the displayed information.
+        :rtype: list of str/float/int
+        """
+        return self.study.get_displayed_info()
+
+    def get_study(self):
+        """
+        Gets the study_creation of the datasets selected.
+        :return: The current study_creation
+        :rtype: studyModel
+        """
+        return self.study
 
     """
     Temporaries
@@ -1479,4 +1592,15 @@ class mainModel:
             self.references[self.current_dataset_index] = channels_selected
 
     def set_current_dataset_index(self, index_selected):
+        """
+        Sets the current dataset index of the currently selected dataset.
+        :param index_selected: The index of the currently selected dataset.
+        :type index_selected: int
+        """
         self.current_dataset_index = index_selected
+
+    def set_study_selected(self):
+        """
+        Sets the selection of the study_creation to True.
+        """
+        self.study_selected = True

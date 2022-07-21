@@ -41,23 +41,41 @@ class menubarController(menubarListener):
         """
         self.menubar_view.disable_menu()
 
-    def add_dataset(self, dataset_index, dataset_name):
+    def add_dataset(self, dataset_index, dataset_name, study_available):
         """
         Add a dataset in the dataset menu.
         :param dataset_index: The index of new dataset.
         :type dataset_index: int
         :param dataset_name: The name of the new dataset.
         :type dataset_name: str
+        :param study_available: Enable the menu for selecting the study_creation if it is available.
+        :type study_available: bool
         """
-        self.menubar_view.add_dataset(dataset_index, dataset_name)
+        self.menubar_view.add_dataset(dataset_index, dataset_name, study_available)
 
-    def remove_dataset(self, dataset_index):
+    def remove_dataset(self, dataset_index, study_available):
         """
         Remove a dataset from the dataset menu.
         :param dataset_index: The index of dataset to remove
         :type dataset_index: int
+        :param study_available: Enable the menu for selecting the study_creation if it is available.
+        :type study_available: bool
         """
-        self.menubar_view.remove_dataset(dataset_index)
+        self.menubar_view.remove_dataset(dataset_index, study_available)
+
+    def study_selection_activation(self):
+        """
+        Activate the menu for study_creation selection because a study_creation has been created.
+        """
+        self.menubar_view.study_selected_menu_activation()
+
+    def study_selection_deactivation(self, study_exist):
+        """
+        Deactivate the menu for study_creation selection because a study_creation has been cleared.
+        :param study_exist: True if the study exists, false otherwise
+        :type study_exist: bool
+        """
+        self.menubar_view.dataset_selected_menu_activation(study_exist)
 
     """
     Menu buttons clicked
@@ -95,6 +113,12 @@ class menubarController(menubarListener):
 
     def clear_dataset_clicked(self):
         self.main_listener.clear_dataset_clicked()
+
+    def create_study_clicked(self):
+        self.main_listener.create_study_clicked()
+
+    def clear_study_clicked(self):
+        self.main_listener.clear_study_clicked()
 
     def exit_program_clicked(self):
         sys.exit(0)
@@ -179,9 +203,19 @@ class menubarController(menubarListener):
     def classify_clicked(self):
         self.main_listener.classify_clicked()
 
+    # Study menu
+    def edit_study_clicked(self):
+        self.main_listener.edit_study_clicked()
+
+    def plot_study_clicked(self):
+        self.main_listener.plot_study_clicked()
+
     # Dataset menu
     def change_dataset(self, index_selected):
         self.main_listener.change_dataset(index_selected)
+
+    def study_selected(self):
+        self.main_listener.study_selected()
 
     # Help menu
     def help_clicked(self):

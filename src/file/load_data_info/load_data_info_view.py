@@ -9,6 +9,8 @@ from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QComboBox, QLineEdit, QHBoxLayout, QVBoxLayout
 
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
+from utils.view.separator import create_layout_separator
+
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -17,8 +19,6 @@ __license__ = "GNU General Public License v3.0"
 __maintainer__ = "Lemahieu Antoine"
 __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
-
-from utils.view.separator import create_layout_separator
 
 
 class loadDataInfoView(QWidget):

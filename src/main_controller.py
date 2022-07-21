@@ -13,6 +13,7 @@ from menubar.menubar_controller import menubarController
 
 from file.load_data_info.load_data_info_controller import loadDataInfoController
 from file.find_events_from_channel.find_events_from_channel_controller import findEventsFromChannelController
+from file.study_creation.study_creation_controller import studyCreationController
 
 from edit.dataset_info.dataset_info_controller import datasetInfoController
 from edit.event_values.event_values_controller import eventValuesController
@@ -40,6 +41,8 @@ from connectivity.spectro_temporal_connectivity.spectro_temporal_connectivity_co
 
 from classification.classify.classify_controller import classifyController
 
+from study.study_edit_info.study_edit_info_controller import studyEditInfoController
+
 from utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller import downloadFsaverageMneDataController
 from utils.waiting_while_processing.waiting_while_processing_controller import waitingWhileProcessingController
 from utils.view.error_window import errorWindow
@@ -55,7 +58,7 @@ __status__ = "Dev"
 
 
 class mainController(mainListener):
-    def __init__(self, screen_size, splash_screen_runnable = False):
+    def __init__(self, screen_size, splash_screen_runnable=False):
         """
         The main controller is the link between the main model and the main view.
         It will "control" where the information needs to go and who does what.
@@ -73,18 +76,23 @@ class mainController(mainListener):
         self.main_view = mainView()
         self.main_view.resize(0.8 * screen_size.width(), 0.8 * screen_size.height())
 
+        # Menubar
         self.menubar_controller = menubarController()
         self.menubar_controller.set_listener(self)
         self.menubar_view = self.menubar_controller.get_view()
         self.main_view.setMenuBar(self.menubar_view)
 
+        # File
         self.load_data_info_controller = None
         self.find_events_from_channel_controller = None
+        self.study_creation_controller = None
 
+        # Edit
         self.dataset_info_controller = None
         self.event_values_controller = None
         self.channel_location_controller = None
 
+        # Tools
         self.filter_controller = None
         self.resampling_controller = None
         self.re_referencing_controller = None
@@ -93,19 +101,26 @@ class mainController(mainListener):
         self.snr_controller = None
         self.source_estimation_controller = None
 
+        # Plot
         self.power_spectral_density_controller = None
         self.topographies_controller = None
         self.erp_image_controller = None
         self.erp_controller = None
         self.time_frequency_ersp_itc_controller = None
 
+        # Connectivity
         self.envelope_correlation_controller = None
         self.source_space_connectivity_controller = None
         self.sensor_space_connectivity_controller = None
         self.spectro_temporal_connectivity_controller = None
 
+        # Classification
         self.classify_controller = None
 
+        # Study
+        self.study_edit_controller = None
+
+        # Others
         self.waiting_while_processing_controller = None
         self.download_fsaverage_mne_data_controller = None
 
@@ -260,7 +275,9 @@ class mainController(mainListener):
         """
         current_dataset_index = self.main_model.get_current_dataset_index()
         dataset_name = self.main_model.get_dataset_name()
-        self.menubar_controller.add_dataset(current_dataset_index, dataset_name)
+        study_available = False
+
+        self.menubar_controller.add_dataset(current_dataset_index, dataset_name, study_available)
 
         self.display_all_info()
 
@@ -445,14 +462,79 @@ class mainController(mainListener):
         Remove the current dataset loaded.
         """
         current_dataset_index = self.main_model.get_current_dataset_index()
-        self.menubar_controller.remove_dataset(current_dataset_index)
+        study_available = False
+
+        self.menubar_controller.remove_dataset(current_dataset_index, study_available)
         self.main_model.clear_current_dataset()
 
         new_current_dataset_index = self.main_model.get_current_dataset_index()
         if new_current_dataset_index == -1:     # No dataset loaded
+            # Clear study
+            self.main_model.clear_study()
+            self.menubar_controller.study_selection_deactivation(study_exist=False)
+            # Clear display
             self.main_view.clear_display()
             self.menubar_controller.disable_menu()
+
         else:       # Display the new current dataset
+            self.main_view.create_display()
+            all_info = self.main_model.get_all_displayed_info()
+            self.main_view.display_info(all_info)
+
+    # Study
+    def create_study_clicked(self):
+        """
+        Create the controller for retrieving information about the study_creation that is wanted to be created.
+        """
+        dataset_names = self.main_model.get_all_dataset_names()
+        self.study_creation_controller = studyCreationController(dataset_names)
+        self.study_creation_controller.set_listener(self)
+
+    def create_study_information(self, study_name, task_name, dataset_names, dataset_indexes, subjects, sessions, runs,
+                                 conditions, groups):
+        """
+        Call the creation of the study_creation with the given parameters.
+        :param study_name: The name of the study_creation
+        :type study_name: str
+        :param task_name: The name of the task linked to the study_creation
+        :type task_name: str
+        :param dataset_names: All the dataset names
+        :type dataset_names: list of str
+        :param dataset_indexes: The indexes of the datasets selected to be in the study_creation
+        :type dataset_indexes: list of int
+        :param subjects: The subjects assigned to each dataset in the study_creation
+        :type subjects: list of str
+        :param sessions: The sessions assigned to each dataset in the study_creation
+        :type sessions: list of str
+        :param runs: The runs assigned to each dataset in the study_creation
+        :type runs: list of str
+        :param conditions: The conditions assigned to each dataset in the study_creation
+        :type conditions: list of str
+        :param groups: The groups assigned to each dataset in the study_creation
+        :type groups: list of str
+        """
+        self.main_model.create_study(study_name, task_name, dataset_names, dataset_indexes, subjects, sessions, runs,
+                                     conditions, groups)
+        # Display the study_creation info
+        self.main_view.create_study_display()
+        all_info = self.main_model.get_all_study_displayed_info()
+        self.main_view.display_study_info(all_info)
+        # Enable the menu
+        self.menubar_controller.study_selection_activation()
+
+    def clear_study_clicked(self):
+        """
+        Remove the current study_creation loaded.
+        """
+        self.main_model.clear_study()
+        self.menubar_controller.study_selection_deactivation(study_exist=False)
+
+        current_dataset_index = self.main_model.get_current_dataset_index()
+        if current_dataset_index == -1:     # No dataset loaded
+            self.main_view.clear_display()
+            self.menubar_controller.disable_menu()
+        else:       # Display the current dataset
+            self.main_view.create_display()
             all_info = self.main_model.get_all_displayed_info()
             self.main_view.display_info(all_info)
 
@@ -469,6 +551,11 @@ class mainController(mainListener):
         self.dataset_info_controller.set_listener(self)
 
     def dataset_info_information(self, channels_selected):
+        """
+        Change the information that have been modified by the user manually.
+        :param channels_selected:
+        :type channels_selected:
+        """
         self.main_model.set_reference(channels_selected)
         reference = self.main_model.get_reference()
         self.main_view.update_reference(reference)
@@ -1342,12 +1429,61 @@ class mainController(mainListener):
         self.classify_controller.plot_results(classifier)
 
     """
+    Study Menu
+    """
+    def edit_study_clicked(self):
+        study = self.main_model.get_study()
+        self.study_edit_controller = studyEditInfoController(study)
+        self.study_edit_controller.set_listener(self)
+
+    def edit_study_information(self, study_name, task_name, subjects, sessions, runs, conditions, groups):
+        """
+        Send the information to the study to be edited.
+        :param study_name: The name of the study_creation
+        :type study_name: str
+        :param task_name: The name of the task linked to the study_creation
+        :type task_name: str
+        :param subjects: The subjects assigned to each dataset in the study_creation
+        :type subjects: list of str
+        :param sessions: The sessions assigned to each dataset in the study_creation
+        :type sessions: list of str
+        :param runs: The runs assigned to each dataset in the study_creation
+        :type runs: list of str
+        :param conditions: The conditions assigned to each dataset in the study_creation
+        :type conditions: list of str
+        :param groups: The groups assigned to each dataset in the study_creation
+        :type groups: list of str
+        """
+        self.main_model.edit_study_information(study_name, task_name, subjects, sessions, runs, conditions, groups)
+        # Display the study_creation info
+        all_info = self.main_model.get_all_study_displayed_info()
+        self.main_view.display_study_info(all_info)
+
+    def plot_study_clicked(self):
+        print("plot study_creation")
+
+    """
     Dataset Menu
     """
     def change_dataset(self, index_selected):
+        """
+        Change the dataset selected and display the corresponding information.
+        :param index_selected: The index of the dataset selected.
+        :type index_selected: int
+        """
         self.main_model.set_current_dataset_index(index_selected)
+        self.main_view.create_display()
         all_info = self.main_model.get_all_displayed_info()
         self.main_view.display_info(all_info)
+
+    def study_selected(self):
+        """
+        Select the current study_creation and display the corresponding information.
+        """
+        self.main_model.set_study_selected()
+        self.main_view.create_study_display()
+        all_info = self.main_model.get_all_study_displayed_info()
+        self.main_view.display_study_info(all_info)
 
     """
     Others
@@ -1357,6 +1493,7 @@ class mainController(mainListener):
         Retrieve all the information that will be displayed on the main window and unlock all the menus.
         """
         all_info = self.main_model.get_all_displayed_info()
+        self.main_view.create_display()
         self.main_view.display_info(all_info)
         self.menubar_controller.enable_menu()
 

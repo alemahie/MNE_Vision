@@ -71,6 +71,12 @@ class menubarView(QMenuBar):
         self.create_classification_menu()
         self.classification_menu.setEnabled(False)
 
+        # Study menu
+        self.study_menu = QMenu("Study", self)
+        self.addMenu(self.study_menu)
+        self.create_study_menu()
+        self.study_menu.setEnabled(False)
+
         # Datasets menu
         self.dataset_menu = QMenu("Datasets", self)
         self.addMenu(self.dataset_menu)
@@ -80,6 +86,9 @@ class menubarView(QMenuBar):
         self.help_menu = QMenu("Help", self)
         self.addMenu(self.help_menu)
         self.create_help_menu()
+
+        # Other
+        self.study_exist = False
 
     """
     Menu Creation
@@ -132,6 +141,16 @@ class menubarView(QMenuBar):
         clear_dataset_action.triggered.connect(self.clear_dataset_trigger)
         clear_dataset_action.setEnabled(False)
         self.file_menu.addAction(clear_dataset_action)
+        # Study
+        self.file_menu.addSeparator()
+        create_study_action = QAction("Create study from loaded datasets", self)
+        create_study_action.triggered.connect(self.create_study_trigger)
+        create_study_action.setEnabled(False)
+        self.file_menu.addAction(create_study_action)
+        clear_study_action = QAction("Clear study", self)
+        clear_study_action.triggered.connect(self.clear_study_trigger)
+        clear_study_action.setEnabled(False)
+        self.file_menu.addAction(clear_study_action)
         # Other
         self.file_menu.addSeparator()
         exit_action = QAction("Exit", self)
@@ -234,6 +253,15 @@ class menubarView(QMenuBar):
         classify_action.triggered.connect(self.classify_trigger)
         self.classification_menu.addAction(classify_action)
 
+    def create_study_menu(self):
+        edit_study_action = QAction("Edit Study Info", self)
+        edit_study_action.triggered.connect(self.edit_study_trigger)
+        self.study_menu.addAction(edit_study_action)
+        self.study_menu.addSeparator()
+        plot_study_action = QAction("Plots", self)
+        plot_study_action.triggered.connect(self.plot_study_trigger)
+        self.study_menu.addAction(plot_study_action)
+
     def create_help_menu(self):
         help_action = QAction("Help", self)
         help_action.triggered.connect(self.help_trigger)
@@ -257,8 +285,11 @@ class menubarView(QMenuBar):
         self.events_menu.setEnabled(new_status)
         self.export_menu.setEnabled(new_status)
         for action in menu_actions:
-            if action.text() == "Save" or action.text() == "Save As" or action.text() == "Clear dataset":
+            if action.text() in ["Save", "Save As", "Clear dataset", "Create study from loaded datasets", "Clear study",
+                                 "Exit"]:
                 action.setEnabled(new_status)
+            if not self.study_exist and action.text() == "Clear study":
+                action.setEnabled(False)
         self.edit_menu.setEnabled(new_status)
         self.tools_menu.setEnabled(new_status)
         self.plot_menu.setEnabled(new_status)
@@ -278,24 +309,52 @@ class menubarView(QMenuBar):
         """
         self.change_menu_status(False)
 
-    def add_dataset(self, dataset_index, dataset_name):
+    def add_dataset(self, dataset_index, dataset_name, study_available):
         """
         Add a dataset in the dataset menu.
         :param dataset_index: The index of new dataset.
         :type dataset_index: int
         :param dataset_name: The name of the new dataset.
         :type dataset_name: str
+        :param study_available: Enable the menu for selecting the study if it is available.
+        :type study_available: bool
         """
+        menu_actions = self.dataset_menu.actions()
+
+        # Recreate all the menus.
+        self.dataset_menu.clear()
+        dataset_counter = 1
+        for i in range(len(menu_actions)-2):    # -2 for the separator and the study
+            dataset = menu_actions[i]
+            dataset_complete_name = dataset.text()
+            dataset_name_to_insert = dataset_complete_name.split(": ")[1]     # Get only the dataset name
+            new_dataset_name = "Dataset " + str(dataset_counter) + " : " + dataset_name_to_insert
+            dataset.setText(new_dataset_name)
+            self.dataset_menu.addAction(dataset)
+            dataset_counter += 1
+
+        # Add new dataset
         dataset_menu_name = "Dataset " + str(dataset_index+1) + " : " + dataset_name
         new_dataset = QAction(dataset_menu_name, self)
         new_dataset.triggered.connect(self.dataset_clicked)
         self.dataset_menu.addAction(new_dataset)
 
-    def remove_dataset(self, dataset_index):
+        # Add study
+        # self.study_exist = study_available
+
+        self.dataset_menu.addSeparator()
+        study = QAction("Select study", self)
+        study.triggered.connect(self.dataset_clicked)
+        study.setEnabled(self.study_exist)
+        self.dataset_menu.addAction(study)
+
+    def remove_dataset(self, dataset_index, study_available):
         """
         Remove a dataset from the dataset menu.
         :param dataset_index: The index of dataset to remove
         :type dataset_index: int
+        :param study_available: Enable the menu for selecting the study if it is available.
+        :type study_available: bool
         """
         menu_actions = self.dataset_menu.actions()
         del menu_actions[dataset_index]     # Remove the dataset in the menus.
@@ -303,13 +362,109 @@ class menubarView(QMenuBar):
         # Recreate all the menus.
         self.dataset_menu.clear()
         dataset_counter = 1
-        for dataset in menu_actions:
+        for i in range(len(menu_actions)-2):    # -2 for separator and study
+            dataset = menu_actions[i]
             dataset_complete_name = dataset.text()
             dataset_name = dataset_complete_name.split(": ")[1]     # Get only the dataset name
             new_dataset_name = "Dataset " + str(dataset_counter) + " : " + dataset_name
             dataset.setText(new_dataset_name)
             self.dataset_menu.addAction(dataset)
             dataset_counter += 1
+
+        # Add study
+        # self.study_exist = study_available
+
+        self.dataset_menu.addSeparator()
+        study = QAction("Select study", self)
+        study.triggered.connect(self.dataset_clicked)
+        study.setEnabled(self.study_exist)
+        self.dataset_menu.addAction(study)
+
+    def dataset_selected_menu_activation(self, study_exist):
+        """
+        Activate the menus when a dataset is selected.
+        :param study_exist: True if the study exists, false otherwise
+        :type study_exist: bool
+        """
+        self.study_exist = study_exist
+
+        # File menu
+        menu_actions = self.file_menu.actions()
+        for action in menu_actions:
+            if action.text() in ["Open", "Import events info", "Export", "Save", "Save As", "Clear dataset",
+                                 "Create study from loaded datasets", "Exit"]:
+                action.setEnabled(True)
+            if action.text() == "Clear study":
+                if self.study_exist:
+                    action.setEnabled(True)
+                else:
+                    action.setEnabled(False)
+
+        # Edit menu
+        menu_actions = self.edit_menu.actions()
+        for action in menu_actions:
+            if action.text() in ["Dataset information", "Event values", "Channel location"]:
+                action.setEnabled(True)
+
+        # Tools menu
+        menu_actions = self.tools_menu.actions()
+        for action in menu_actions:
+            if action.text() in ["Filter", "Resampling", "Re-Referencing", "Decompose data with ICA",
+                                 "Extract epochs", "Signal-to-noise ratio", "Source estimation"]:
+                action.setEnabled(True)
+
+        # Dataset menu
+        self.dataset_menu.setEnabled(True)
+        menu_actions = self.dataset_menu.actions()
+        menu_actions[-1].setEnabled(self.study_exist)  # The last element of the menu is always the study
+
+        # Other menus
+        self.plot_menu.setEnabled(True)
+        self.connectivity_menu.setEnabled(True)
+        self.classification_menu.setEnabled(True)
+        self.study_menu.setEnabled(False)
+
+    def study_selected_menu_activation(self):
+        """
+        Activate the menus when the study is selected.
+        """
+        self.study_exist = True
+
+        # File menu
+        menu_actions = self.file_menu.actions()
+        for action in menu_actions:
+            if action.text() in ["Clear study", "Exit"]:
+                action.setEnabled(True)
+            else:
+                action.setEnabled(False)
+
+        # Edit menu
+        menu_actions = self.edit_menu.actions()
+        for action in menu_actions:
+            if action.text() in ["Channel location"]:
+                action.setEnabled(True)
+            else:
+                action.setEnabled(False)
+
+        # Tools menu
+        menu_actions = self.tools_menu.actions()
+        for action in menu_actions:
+            if action.text() in ["Filter", "Resampling", "Re-Referencing", "Decompose data with ICA",
+                                 "Signal-to-noise ratio", "Source estimation"]:
+                action.setEnabled(True)
+            else:
+                action.setEnabled(False)
+
+        # Dataset menu
+        self.dataset_menu.setEnabled(True)
+        menu_actions = self.dataset_menu.actions()
+        menu_actions[-1].setEnabled(True)               # The last element of the menu is always the study
+
+        # Other menus
+        self.plot_menu.setEnabled(False)
+        self.connectivity_menu.setEnabled(False)
+        self.classification_menu.setEnabled(False)
+        self.study_menu.setEnabled(True)
 
     """
     Triggers
@@ -355,6 +510,14 @@ class menubarView(QMenuBar):
     def clear_dataset_trigger(self):
         self.menubar_listener.clear_dataset_clicked()
 
+    # Study
+    def create_study_trigger(self):
+        self.menubar_listener.create_study_clicked()
+
+    def clear_study_trigger(self):
+        self.menubar_listener.clear_study_clicked()
+
+    # Exit
     def exit_program_trigger(self):
         self.menubar_listener.exit_program_clicked()
 
@@ -441,7 +604,14 @@ class menubarView(QMenuBar):
     def classify_trigger(self):
         self.menubar_listener.classify_clicked()
 
-    # Datasets
+    # Study menu trigger
+    def edit_study_trigger(self):
+        self.menubar_listener.edit_study_clicked()
+
+    def plot_study_trigger(self):
+        self.menubar_listener.plot_study_clicked()
+
+    # Datasets menu trigger
     def dataset_clicked(self):
         menu_actions = self.dataset_menu.actions()
         selected_action = self.sender()
@@ -450,7 +620,12 @@ class menubarView(QMenuBar):
         while selected_action != menu_actions[index_selected]:
             index_selected += 1
 
-        self.menubar_listener.change_dataset(index_selected)
+        if index_selected == len(menu_actions)-1:       # Study selected
+            self.menubar_listener.study_selected()
+            self.study_selected_menu_activation()
+        else:                                           # Dataset selected
+            self.menubar_listener.change_dataset(index_selected)
+            self.dataset_selected_menu_activation(study_exist=self.study_exist)
 
     # Help menu triggers
     def help_trigger(self):
