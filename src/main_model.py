@@ -64,6 +64,7 @@ class mainModel:
         # Study
         self.study = None
         self.study_selected = False
+        self.study_index = None
 
         # The 3 tmp variables are used when loading a dataset, prevents the case that if a new dataset is loaded and an
         # error occurs, the old data won't be overwritten if there was a dataset loaded before.
@@ -444,24 +445,24 @@ class mainModel:
 
     def create_study(self, study_name, task_name, dataset_names, dataset_indexes, subjects, sessions, runs, conditions, groups):
         """
-        Create the study_creation with the given information.
-        :param study_name: The name of the study_creation
+        Create the study with the given information.
+        :param study_name: The name of the study
         :type study_name: str
-        :param task_name: The name of the task linked to the study_creation
+        :param task_name: The name of the task linked to the study
         :type task_name: str
-        :param dataset_names: The name of the datasets linked to the study_creation
+        :param dataset_names: The name of the datasets linked to the study
         :type dataset_names: list of str
-        :param dataset_indexes: The indexes of the datasets selected to be in the study_creation
+        :param dataset_indexes: The indexes of the datasets selected to be in the study
         :type dataset_indexes: list of int
-        :param subjects: The subjects assigned to each dataset in the study_creation
+        :param subjects: The subjects assigned to each dataset in the study
         :type subjects: list of str
-        :param sessions: The sessions assigned to each dataset in the study_creation
+        :param sessions: The sessions assigned to each dataset in the study
         :type sessions: list of str
-        :param runs: The runs assigned to each dataset in the study_creation
+        :param runs: The runs assigned to each dataset in the study
         :type runs: list of str
-        :param conditions: The conditions assigned to each dataset in the study_creation
+        :param conditions: The conditions assigned to each dataset in the study
         :type conditions: list of str
-        :param groups: The groups assigned to each dataset in the study_creation
+        :param groups: The groups assigned to each dataset in the study
         :type groups: list of str
         """
         self.study = studyModel(study_name, task_name, dataset_names, dataset_indexes, subjects, sessions, runs, conditions, groups)
@@ -470,7 +471,7 @@ class mainModel:
 
     def clear_study(self):
         """
-        Clear the current study_creation.
+        Clear the current study.
         """
         self.study = None
         self.study_selected = False
@@ -479,7 +480,7 @@ class mainModel:
     Tools menu
     """
     # Filtering
-    def filter(self, low_frequency, high_frequency, channels_selected, filter_method):
+    def filter(self, low_frequency, high_frequency, channels_selected, filter_method, index=None):
         """
         Creates the parallel runnable for filtering the dataset.
         :param low_frequency: Lowest frequency from where the data will be filtered.
@@ -490,8 +491,14 @@ class mainModel:
         :type channels_selected: list of str
         :param filter_method: Method used for the filtering, either FIR or IIR.
         :type filter_method: str
+        :param index: The index of the dataset of the study.
+        :type index: int
         """
-        file_data = self.file_data[self.current_dataset_index]
+        if self.study_selected:
+            self.study_index = index
+            file_data = self.file_data[index]
+        else:
+            file_data = self.file_data[self.current_dataset_index]
 
         pool = QThreadPool.globalInstance()
         self.filter_runnable = filterRunnable(low_frequency, high_frequency, channels_selected, file_data, filter_method)
@@ -504,8 +511,16 @@ class mainModel:
         Retrieves the data from the runnable when the filtering is computed.
         Notifies the main controller that the computation is done.
         """
-        self.file_data[self.current_dataset_index] = self.filter_runnable.get_file_data()
-        self.main_listener.filter_computation_finished()
+        if self.study_selected:
+            self.file_data[self.study_index] = self.filter_runnable.get_file_data()
+            low_frequency = self.filter_runnable.get_low_frequency()
+            high_frequency = self.filter_runnable.get_high_frequency()
+            channels_selected = self.filter_runnable.get_channels_selected()
+            filter_method = self.filter_runnable.get_filter_method()
+            self.main_listener.filter_computation_finished(low_frequency, high_frequency, channels_selected, filter_method)
+        else:
+            self.file_data[self.current_dataset_index] = self.filter_runnable.get_file_data()
+            self.main_listener.filter_computation_finished()
 
     def filter_computation_error(self):
         """
@@ -514,14 +529,21 @@ class mainModel:
         self.main_listener.filter_computation_error()
 
     # Resampling
-    def resampling(self, new_frequency):
+    def resampling(self, new_frequency, index=None):
         """
         Creates the parallel runnable for performing a resampling.
         :param new_frequency: The new frequency at which the data will be resampled.
         :type new_frequency: int
+        :param index: The index of the dataset of the study.
+        :type index: int
         """
-        file_data = self.file_data[self.current_dataset_index]
-        events = self.get_event_values()
+        if self.study_selected:
+            self.study_index = index
+            file_data = self.file_data[index]
+            events = self.get_event_values(index)
+        else:
+            file_data = self.file_data[self.current_dataset_index]
+            events = self.get_event_values()
 
         pool = QThreadPool.globalInstance()
         self.resampling_runnable = resamplingRunnable(new_frequency, file_data, events)
@@ -534,9 +556,16 @@ class mainModel:
         Retrieves the data from the runnable when the resampling is computed.
         Notifies the main controller that the computation is done.
         """
-        self.file_data[self.current_dataset_index] = self.resampling_runnable.get_file_data()
-        self.set_event_values(self.resampling_runnable.get_events())
-        self.main_listener.resampling_computation_finished()
+        if self.study_selected:
+            self.file_data[self.study_index] = self.resampling_runnable.get_file_data()
+            self.set_event_values(self.resampling_runnable.get_events(), index=self.study_index)
+
+            frequency = self.resampling_runnable.get_frequency()
+            self.main_listener.resampling_computation_finished(frequency)
+        else:
+            self.file_data[self.current_dataset_index] = self.resampling_runnable.get_file_data()
+            self.set_event_values(self.resampling_runnable.get_events())
+            self.main_listener.resampling_computation_finished()
 
     def resampling_computation_error(self):
         """
@@ -545,7 +574,7 @@ class mainModel:
         self.main_listener.resampling_computation_error()
 
     # Re-referencing
-    def re_referencing(self, references, save_data, load_data, n_jobs):
+    def re_referencing(self, references, save_data, load_data, n_jobs, index=None):
         """
         Creates the parallel runnable for performing a re-referencing.
         :param references: References from which the data will be re-referenced. Can be a single or multiple channels;
@@ -557,9 +586,16 @@ class mainModel:
         :type load_data: bool
         :param n_jobs: Number of parallel processes used to compute the re-referencing
         :type n_jobs: int
+        :param index: The index of the dataset of the study.
+        :type index: int
         """
-        file_data = self.file_data[self.current_dataset_index]
-        file_path_name_without_extension = self.get_file_path_name_without_extension()
+        if self.study_selected:
+            self.study_index = index
+            file_data = self.file_data[index]
+            file_path_name_without_extension = self.get_file_path_name_without_extension(index)
+        else:
+            file_data = self.file_data[self.current_dataset_index]
+            file_path_name_without_extension = self.get_file_path_name_without_extension()
 
         pool = QThreadPool.globalInstance()
         self.re_referencing_runnable = reReferencingRunnable(references, file_data, file_path_name_without_extension,
@@ -573,9 +609,19 @@ class mainModel:
         Retrieves the data from the runnable when the re-referencing is computed.
         Notifies the main controller that the computation is done.
         """
-        self.file_data[self.current_dataset_index] = self.re_referencing_runnable.get_file_data()
-        self.references[self.current_dataset_index] = self.re_referencing_runnable.get_references()
-        self.main_listener.re_referencing_computation_finished()
+        if self.study_selected:
+            self.file_data[self.study_index] = self.re_referencing_runnable.get_file_data()
+            self.references[self.study_index] = self.re_referencing_runnable.get_references()
+
+            save_data = self.re_referencing_runnable.get_save_data()
+            load_data = self.re_referencing_runnable.get_load_data()
+            n_jobs = self.re_referencing_runnable.get_n_jobs()
+            self.main_listener.re_referencing_computation_finished(self.references[self.study_index], save_data, load_data,
+                                                                   n_jobs)
+        else:
+            self.file_data[self.current_dataset_index] = self.re_referencing_runnable.get_file_data()
+            self.references[self.current_dataset_index] = self.re_referencing_runnable.get_references()
+            self.main_listener.re_referencing_computation_finished()
 
     def re_referencing_computation_error(self):
         """
@@ -584,13 +630,19 @@ class mainModel:
         self.main_listener.re_referencing_computation_error()
 
     # ICA decomposition
-    def ica_data_decomposition(self, ica_method):
+    def ica_data_decomposition(self, ica_method, index=None):
         """
         Creates the parallel runnable for performing the ICA decomposition of the dataset.
         :param ica_method: Method used for performing the ICA decomposition
         :type ica_method: str
+        :param index: The index of the dataset of the study.
+        :type index: int
         """
-        file_data = self.file_data[self.current_dataset_index]
+        if self.study_selected:
+            self.study_index = index
+            file_data = self.file_data[index]
+        else:
+            file_data = self.file_data[self.current_dataset_index]
 
         pool = QThreadPool.globalInstance()
         self.ica_data_decomposition_runnable = icaRunnable(ica_method, file_data)
@@ -603,9 +655,16 @@ class mainModel:
         Retrieves the data from the runnable when the ICA decomposition is computed.
         Notifies the main controller that the computation is done.
         """
-        self.file_data[self.current_dataset_index] = self.ica_data_decomposition_runnable.get_file_data()
-        self.ica_decomposition[self.current_dataset_index] = "Yes"
-        self.main_listener.ica_data_decomposition_computation_finished()
+        if self.study_selected:
+            self.file_data[self.study_index] = self.ica_data_decomposition_runnable.get_file_data()
+            self.ica_decomposition[self.study_index] = "Yes"
+
+            ica_method = self.ica_data_decomposition_runnable.get_ica_method()
+            self.main_listener.ica_data_decomposition_computation_finished(ica_method)
+        else:
+            self.file_data[self.current_dataset_index] = self.ica_data_decomposition_runnable.get_file_data()
+            self.ica_decomposition[self.current_dataset_index] = "Yes"
+            self.main_listener.ica_data_decomposition_computation_finished()
 
     def ica_data_decomposition_computation_error(self):
         """
@@ -993,19 +1052,19 @@ class mainModel:
     def edit_study_information(self, study_name, task_name, subjects, sessions, runs, conditions, groups):
         """
         Send the information to the study to be edited.
-        :param study_name: The name of the study_creation
+        :param study_name: The name of the study
         :type study_name: str
-        :param task_name: The name of the task linked to the study_creation
+        :param task_name: The name of the task linked to the study
         :type task_name: str
-        :param subjects: The subjects assigned to each dataset in the study_creation
+        :param subjects: The subjects assigned to each dataset in the study
         :type subjects: list of str
-        :param sessions: The sessions assigned to each dataset in the study_creation
+        :param sessions: The sessions assigned to each dataset in the study
         :type sessions: list of str
-        :param runs: The runs assigned to each dataset in the study_creation
+        :param runs: The runs assigned to each dataset in the study
         :type runs: list of str
-        :param conditions: The conditions assigned to each dataset in the study_creation
+        :param conditions: The conditions assigned to each dataset in the study
         :type conditions: list of str
-        :param groups: The groups assigned to each dataset in the study_creation
+        :param groups: The groups assigned to each dataset in the study
         :type groups: list of str
         """
         self.study.set_study_name(study_name)
@@ -1120,13 +1179,17 @@ class mainModel:
         """
         return self.file_path_name
 
-    def get_file_path_name_without_extension(self):
+    def get_file_path_name_without_extension(self, index=None):
         """
         Gets the file path of the dataset without the extension of the file.
+        :param index: The index of the dataset to get the event from. If None, the current dataset index will be taken.
+        :type index: int
         :return: The file path of the dataset without the extension.
         :rtype: str
         """
-        file_path_name = self.file_path_name[self.current_dataset_index]
+        if index is None:
+            index = self.current_dataset_index
+        file_path_name = self.file_path_name[index]
         return splitext(file_path_name)[0]
 
     def get_directory_path_from_file_path(self):
@@ -1183,16 +1246,20 @@ class mainModel:
         else:
             return len(file_data.events)
 
-    def get_event_values(self):
+    def get_event_values(self, index=None):
         """
         Gets the events' information present in the dataset.
+        :param index: The index of the dataset to get the event from. If None, the current dataset index will be taken.
+        :type index: int
         :return: The events' information. Each event is represented by a list of 3 elements: First the latency time of
         the event; Second a "0" for MNE backwards compatibility; Third the event id.
         :rtype: list of, list of int
         """
-        file_data = self.file_data[self.current_dataset_index]
-        file_type = self.file_type[self.current_dataset_index]
-        read_events = self.read_events[self.current_dataset_index]
+        if index is None:
+            index = self.current_dataset_index
+        file_data = self.file_data[index]
+        file_type = self.file_type[index]
+        read_events = self.read_events[index]
 
         if file_type == "Raw":
             return read_events
@@ -1360,7 +1427,7 @@ class mainModel:
 
     def get_all_study_displayed_info(self):
         """
-        Gets all the information of the study_creation that will be displayed on the main window.
+        Gets all the information of the study that will be displayed on the main window.
         :return: A list of all the displayed information.
         :rtype: list of str/float/int
         """
@@ -1368,11 +1435,19 @@ class mainModel:
 
     def get_study(self):
         """
-        Gets the study_creation of the datasets selected.
-        :return: The current study_creation
+        Gets the study of the datasets selected.
+        :return: The current study
         :rtype: studyModel
         """
         return self.study
+
+    def get_study_selected(self):
+        """
+        Gets the state of the study
+        :return: True if the study is selected, False otherwise.
+        :rtype: bool
+        """
+        return self.study_selected
 
     """
     Temporaries
@@ -1529,17 +1604,21 @@ class mainModel:
         """
         self.main_listener = listener
 
-    def set_event_values(self, event_values):
+    def set_event_values(self, event_values, index=None):
         """
         Sets the values of the events for the dataset.
         :param event_values: The event values
         :type event_values: list of, list of int
+        :param index: The index of the dataset to set the event. If None, the current dataset index will be taken.
+        :type index: int
         """
-        file_type = self.file_type[self.current_dataset_index]
+        if index is None:
+            index = self.current_dataset_index
+        file_type = self.file_type[index]
         if file_type == "Raw":
-            self.read_events[self.current_dataset_index] = np.copy(event_values)
+            self.read_events[index] = np.copy(event_values)
         elif file_type == "Epochs":
-            self.file_data[self.current_dataset_index].events = np.copy(event_values)
+            self.file_data[index].events = np.copy(event_values)
 
     def set_event_ids(self, event_ids):
         """
@@ -1601,6 +1680,6 @@ class mainModel:
 
     def set_study_selected(self):
         """
-        Sets the selection of the study_creation to True.
+        Sets the selection of the study to True.
         """
         self.study_selected = True

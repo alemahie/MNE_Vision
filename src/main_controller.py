@@ -5,6 +5,8 @@
 Main controller
 """
 
+from copy import copy
+
 from main_model import mainModel
 from main_view import mainView
 from main_listener import mainListener
@@ -120,9 +122,13 @@ class mainController(mainListener):
         # Study
         self.study_edit_controller = None
 
-        # Others
+        # Utils
         self.waiting_while_processing_controller = None
         self.download_fsaverage_mne_data_controller = None
+
+        # Others
+        self.study_currently_selected = False
+        self.study_indexes_to_compute = None
 
         # splash_screen_runnable.close()
         self.main_view.show()
@@ -484,7 +490,7 @@ class mainController(mainListener):
     # Study
     def create_study_clicked(self):
         """
-        Create the controller for retrieving information about the study_creation that is wanted to be created.
+        Create the controller for retrieving information about the study that is wanted to be created.
         """
         dataset_names = self.main_model.get_all_dataset_names()
         self.study_creation_controller = studyCreationController(dataset_names)
@@ -493,29 +499,29 @@ class mainController(mainListener):
     def create_study_information(self, study_name, task_name, dataset_names, dataset_indexes, subjects, sessions, runs,
                                  conditions, groups):
         """
-        Call the creation of the study_creation with the given parameters.
-        :param study_name: The name of the study_creation
+        Call the creation of the study with the given parameters.
+        :param study_name: The name of the study
         :type study_name: str
-        :param task_name: The name of the task linked to the study_creation
+        :param task_name: The name of the task linked to the study
         :type task_name: str
         :param dataset_names: All the dataset names
         :type dataset_names: list of str
-        :param dataset_indexes: The indexes of the datasets selected to be in the study_creation
+        :param dataset_indexes: The indexes of the datasets selected to be in the study
         :type dataset_indexes: list of int
-        :param subjects: The subjects assigned to each dataset in the study_creation
+        :param subjects: The subjects assigned to each dataset in the study
         :type subjects: list of str
-        :param sessions: The sessions assigned to each dataset in the study_creation
+        :param sessions: The sessions assigned to each dataset in the study
         :type sessions: list of str
-        :param runs: The runs assigned to each dataset in the study_creation
+        :param runs: The runs assigned to each dataset in the study
         :type runs: list of str
-        :param conditions: The conditions assigned to each dataset in the study_creation
+        :param conditions: The conditions assigned to each dataset in the study
         :type conditions: list of str
-        :param groups: The groups assigned to each dataset in the study_creation
+        :param groups: The groups assigned to each dataset in the study
         :type groups: list of str
         """
         self.main_model.create_study(study_name, task_name, dataset_names, dataset_indexes, subjects, sessions, runs,
                                      conditions, groups)
-        # Display the study_creation info
+        # Display the study info
         self.main_view.create_study_display()
         all_info = self.main_model.get_all_study_displayed_info()
         self.main_view.display_study_info(all_info)
@@ -524,7 +530,7 @@ class mainController(mainListener):
 
     def clear_study_clicked(self):
         """
-        Remove the current study_creation loaded.
+        Remove the current study loaded.
         """
         self.main_model.clear_study()
         self.menubar_controller.study_selection_deactivation(study_exist=False)
@@ -652,14 +658,56 @@ class mainController(mainListener):
         processing_title = "Filtering running, please wait."
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.filter_finished)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.filter(low_frequency, high_frequency, channels_selected, filter_method)
 
-    def filter_computation_finished(self):
+        self.study_currently_selected = self.main_model.get_study_selected()
+        if self.study_currently_selected:
+            self.study_indexes_to_compute = copy(self.main_model.get_study().get_dataset_indexes())
+            self.filter_computation(low_frequency, high_frequency, channels_selected, filter_method,
+                                    self.study_indexes_to_compute[0])
+            del self.study_indexes_to_compute[0]
+        else:
+            self.filter_computation(low_frequency, high_frequency, channels_selected, filter_method)
+
+    def filter_computation(self, low_frequency, high_frequency, channels_selected, filter_method, index=None):
+        """
+        Call the model to perform the filtering on the chosen dataset.
+        :param low_frequency: Lowest frequency from where the data will be filtered.
+        :type low_frequency: float
+        :param high_frequency: Highest frequency from where the data will be filtered.
+        :type high_frequency: float
+        :param channels_selected: Channels on which the filtering will be performed.
+        :type channels_selected: list of str
+        :param filter_method: Method used for the filtering, either FIR or IIR.
+        :type filter_method: str
+        :param index: The index of the dataset of the study.
+        :type index: int
+        """
+        self.main_model.filter(low_frequency, high_frequency, channels_selected, filter_method, index)
+
+    def filter_computation_finished(self, low_frequency=None, high_frequency=None, channels_selected=None,
+                                    filter_method=None):
         """
         Close the waiting window when the filtering is done on the dataset.
+        :param low_frequency: Lowest frequency from where the data will be filtered.
+        :type low_frequency: float
+        :param high_frequency: Highest frequency from where the data will be filtered.
+        :type high_frequency: float
+        :param channels_selected: Channels on which the filtering will be performed.
+        :type channels_selected: list of str
+        :param filter_method: Method used for the filtering, either FIR or IIR.
+        :type filter_method: str
         """
-        processing_title_finished = "Filtering finished."
-        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+        if self.study_currently_selected:
+            if len(self.study_indexes_to_compute) == 0:     # All study computation done
+                processing_title_finished = "Filtering finished."
+                self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+            else:
+                self.filter_computation(low_frequency, high_frequency, channels_selected, filter_method,
+                                        self.study_indexes_to_compute[0])
+                del self.study_indexes_to_compute[0]
+        else:
+            processing_title_finished = "Filtering finished."
+            self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     def filter_computation_error(self):
         """
@@ -672,8 +720,12 @@ class mainController(mainListener):
         """
         The filtering is completely done, update the information on the main window.
         """
-        dataset_size = self.main_model.get_dataset_size()
-        self.main_view.update_dataset_size(dataset_size)
+        if self.study_currently_selected:
+            all_info = self.main_model.get_all_study_displayed_info()
+            self.main_view.display_study_info(all_info)
+        else:
+            dataset_size = self.main_model.get_dataset_size()
+            self.main_view.update_dataset_size(dataset_size)
 
     # Resampling
     def resampling_clicked(self):
@@ -686,21 +738,48 @@ class mainController(mainListener):
 
     def resampling_information(self, frequency):
         """
-        Create the waiting window while the resampling is done on the dataset.
+        Create the waiting window while the resampling is done on the dataset or the study.
         :param frequency: The new frequency at which the data will be resampled.
         :type frequency: int
         """
         processing_title = "Resampling running, please wait."
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.resampling_finished)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.resampling(frequency)
 
-    def resampling_computation_finished(self):
+        self.study_currently_selected = self.main_model.get_study_selected()
+        if self.study_currently_selected:
+            self.study_indexes_to_compute = copy(self.main_model.get_study().get_dataset_indexes())
+            self.resampling_computation(frequency, self.study_indexes_to_compute[0])
+            del self.study_indexes_to_compute[0]
+        else:
+            self.resampling_computation(frequency)
+
+    def resampling_computation(self, frequency, index=None):
+        """
+        Call the model to do the resampling.
+        :param frequency: The new frequency at which the data will be resampled.
+        :type frequency: int
+        :param index: The index of the dataset of the study.
+        :type index: int
+        """
+        self.main_model.resampling(frequency, index)
+
+    def resampling_computation_finished(self, frequency=None):
         """
         Close the waiting window when the resampling is done on the dataset.
+        :param frequency: The new frequency at which the data will be resampled.
+        :type frequency: int
         """
-        processing_title_finished = "Resampling finished."
-        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+        if self.study_currently_selected:
+            if len(self.study_indexes_to_compute) == 0:     # All study computation done
+                processing_title_finished = "Resampling finished."
+                self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+            else:
+                self.resampling_computation(frequency, self.study_indexes_to_compute[0])
+                del self.study_indexes_to_compute[0]
+        else:
+            processing_title_finished = "Resampling finished."
+            self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     def resampling_computation_error(self):
         """
@@ -713,12 +792,16 @@ class mainController(mainListener):
         """
         The resampling is completely done, update the information on the main window.
         """
-        frequency = self.main_model.get_sampling_frequency()
-        number_of_frames = self.main_model.get_number_of_frames()
-        dataset_size = self.main_model.get_dataset_size()
-        self.main_view.update_sampling_frequency(frequency)
-        self.main_view.update_number_of_frames(number_of_frames)
-        self.main_view.update_dataset_size(dataset_size)
+        if self.study_currently_selected:
+            all_info = self.main_model.get_all_study_displayed_info()
+            self.main_view.display_study_info(all_info)
+        else:
+            frequency = self.main_model.get_sampling_frequency()
+            number_of_frames = self.main_model.get_number_of_frames()
+            dataset_size = self.main_model.get_dataset_size()
+            self.main_view.update_sampling_frequency(frequency)
+            self.main_view.update_number_of_frames(number_of_frames)
+            self.main_view.update_dataset_size(dataset_size)
 
     # Re-referencing
     def re_referencing_clicked(self):
@@ -751,14 +834,55 @@ class mainController(mainListener):
             processing_title = "Re-referencing running, please wait."
             self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.re_referencing_finished)
             self.waiting_while_processing_controller.set_listener(self)
-            self.main_model.re_referencing(references, save_data, load_data, n_jobs)
 
-    def re_referencing_computation_finished(self):
+            self.study_currently_selected = self.main_model.get_study_selected()
+            if self.study_currently_selected:
+                self.study_indexes_to_compute = copy(self.main_model.get_study().get_dataset_indexes())
+                self.re_referencing_computation(references, save_data, load_data, n_jobs, self.study_indexes_to_compute[0])
+                del self.study_indexes_to_compute[0]
+            else:
+                self.re_referencing_computation(references, save_data, load_data, n_jobs)
+
+    def re_referencing_computation(self, references, save_data, load_data, n_jobs, index=None):
+        """
+        Call the model to do the re-referencing.
+        :param references: References from which the data will be re-referenced. Can be a single or multiple channels;
+        Can be an average of all channels; Can be a "point to infinity".
+        :type references: list of str; str
+        :param save_data: Boolean telling if the data computed must be saved into files.
+        :type save_data: bool
+        :param load_data: Boolean telling if the data used for the computation can be read from computer files.
+        :type load_data: bool
+        :param n_jobs: Number of parallel processes used to compute the re-referencing
+        :type n_jobs: int
+        :param index: The index of the dataset of the study.
+        :type index: int
+        """
+        self.main_model.re_referencing(references, save_data, load_data, n_jobs, index)
+
+    def re_referencing_computation_finished(self, references=None, save_data=None, load_data=None, n_jobs=None):
         """
         Close the waiting window when the re-referencing is done on the dataset.
+        :param references: References from which the data will be re-referenced. Can be a single or multiple channels;
+        Can be an average of all channels; Can be a "point to infinity".
+        :type references: list of str; str
+        :param save_data: Boolean telling if the data computed must be saved into files.
+        :type save_data: bool
+        :param load_data: Boolean telling if the data used for the computation can be read from computer files.
+        :type load_data: bool
+        :param n_jobs: Number of parallel processes used to compute the re-referencing
+        :type n_jobs: int
         """
-        processing_title_finished = "Re-referencing finished."
-        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+        if self.study_currently_selected:
+            if len(self.study_indexes_to_compute) == 0:     # All study computation done
+                processing_title_finished = "Re-referencing finished."
+                self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+            else:
+                self.re_referencing_computation(references, save_data, load_data, n_jobs, self.study_indexes_to_compute[0])
+                del self.study_indexes_to_compute[0]
+        else:
+            processing_title_finished = "Re-referencing finished."
+            self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
         
     def re_referencing_computation_error(self):
         """
@@ -771,8 +895,12 @@ class mainController(mainListener):
         """
         The re-referencing is completely done, update the information on the main window.
         """
-        references = self.main_model.get_reference()
-        self.main_view.update_reference(references)
+        if self.study_currently_selected:
+            all_info = self.main_model.get_all_study_displayed_info()
+            self.main_view.display_study_info(all_info)
+        else:
+            references = self.main_model.get_reference()
+            self.main_view.update_reference(references)
 
     # Reject data
     def inspect_reject_data_clicked(self):
@@ -795,14 +923,41 @@ class mainController(mainListener):
         processing_title = "ICA decomposition running, please wait."
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.ica_decomposition_finished)
         self.waiting_while_processing_controller.set_listener(self)
-        self.main_model.ica_data_decomposition(ica_method)
 
-    def ica_data_decomposition_computation_finished(self):
+        self.study_currently_selected = self.main_model.get_study_selected()
+        if self.study_currently_selected:
+            self.study_indexes_to_compute = copy(self.main_model.get_study().get_dataset_indexes())
+            self.ica_decomposition_computation(ica_method, self.study_indexes_to_compute[0])
+            del self.study_indexes_to_compute[0]
+        else:
+            self.ica_decomposition_computation(ica_method)
+
+    def ica_decomposition_computation(self, ica_method, index=None):
+        """
+        Call the model for computing the ica decomposition on the chosen dataset.
+        :param ica_method: Method used for performing the ICA decomposition
+        :type ica_method: str
+        :param index: The index of the dataset of the study.
+        :type index: int
+        """
+        self.main_model.ica_data_decomposition(ica_method, index)
+
+    def ica_data_decomposition_computation_finished(self, ica_method=None):
         """
         Close the waiting window when the computation the ICA decomposition is done on the dataset.
+        :param ica_method: Method used for performing the ICA decomposition
+        :type ica_method: str
         """
-        processing_title_finished = "ICA decomposition finished."
-        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+        if self.study_currently_selected:
+            if len(self.study_indexes_to_compute) == 0:     # All study computation done
+                processing_title_finished = "ICA decomposition finished."
+                self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+            else:
+                self.ica_decomposition_computation(ica_method, self.study_indexes_to_compute[0])
+                del self.study_indexes_to_compute[0]
+        else:
+            processing_title_finished = "ICA decomposition finished."
+            self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
 
     def ica_data_decomposition_computation_error(self):
         """
@@ -815,8 +970,12 @@ class mainController(mainListener):
         """
         The computation the ICA decomposition is completely done, update the information on the main window.
         """
-        ica_status = self.main_model.get_ica()
-        self.main_view.update_ica_decomposition(ica_status)
+        if self.study_currently_selected:
+            all_info = self.main_model.get_all_study_displayed_info()
+            self.main_view.display_study_info(all_info)
+        else:
+            ica_status = self.main_model.get_ica()
+            self.main_view.update_ica_decomposition(ica_status)
 
     # Extract Epochs
     def extract_epochs_clicked(self):
@@ -1439,28 +1598,28 @@ class mainController(mainListener):
     def edit_study_information(self, study_name, task_name, subjects, sessions, runs, conditions, groups):
         """
         Send the information to the study to be edited.
-        :param study_name: The name of the study_creation
+        :param study_name: The name of the study
         :type study_name: str
-        :param task_name: The name of the task linked to the study_creation
+        :param task_name: The name of the task linked to the study
         :type task_name: str
-        :param subjects: The subjects assigned to each dataset in the study_creation
+        :param subjects: The subjects assigned to each dataset in the study
         :type subjects: list of str
-        :param sessions: The sessions assigned to each dataset in the study_creation
+        :param sessions: The sessions assigned to each dataset in the study
         :type sessions: list of str
-        :param runs: The runs assigned to each dataset in the study_creation
+        :param runs: The runs assigned to each dataset in the study
         :type runs: list of str
-        :param conditions: The conditions assigned to each dataset in the study_creation
+        :param conditions: The conditions assigned to each dataset in the study
         :type conditions: list of str
-        :param groups: The groups assigned to each dataset in the study_creation
+        :param groups: The groups assigned to each dataset in the study
         :type groups: list of str
         """
         self.main_model.edit_study_information(study_name, task_name, subjects, sessions, runs, conditions, groups)
-        # Display the study_creation info
+        # Display the study info
         all_info = self.main_model.get_all_study_displayed_info()
         self.main_view.display_study_info(all_info)
 
     def plot_study_clicked(self):
-        print("plot study_creation")
+        print("plot study")
 
     """
     Dataset Menu
@@ -1478,7 +1637,7 @@ class mainController(mainListener):
 
     def study_selected(self):
         """
-        Select the current study_creation and display the corresponding information.
+        Select the current study and display the corresponding information.
         """
         self.main_model.set_study_selected()
         self.main_view.create_study_display()

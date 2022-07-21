@@ -90,6 +90,38 @@ class filterRunnable(QRunnable):
         """
         return self.file_data
 
+    def get_low_frequency(self):
+        """
+        Gets the low frequency used for the filtering.
+        :return: The low frequency
+        :rtype: float
+        """
+        return self.low_frequency
+
+    def get_high_frequency(self):
+        """
+        Gets the high frequency used for the filtering.
+        :return: The high frequency
+        :rtype: float
+        """
+        return self.high_frequency
+
+    def get_channels_selected(self):
+        """
+        Gets the channels used for the filtering.
+        :return: The channels
+        :rtype: list of str
+        """
+        return self.channels_selected
+
+    def get_filter_method(self):
+        """
+        Gets the method used for the filtering.
+        :return: The method used for the filtering, either FIR or IIR.
+        :rtype: str
+        """
+        return self.filter_method
+
 
 # Resampling
 class resamplingWorkerSignals(QObject):
@@ -155,6 +187,14 @@ class resamplingRunnable(QRunnable):
         :rtype: list of, list of int
         """
         return self.events
+
+    def get_frequency(self):
+        """
+        Get the frequency used for the resampling
+        :return: The frequency
+        :rtype: int
+        """
+        return self.frequency
 
 
 # Re-referencing
@@ -292,6 +332,30 @@ class reReferencingRunnable(QRunnable):
         """
         return self.references
 
+    def get_save_data(self):
+        """
+        Get the boolean indicating if the data must be saved.
+        :return: True if the data must be saved, False otherwise.
+        :rtype: bool
+        """
+        return self.write_files
+
+    def get_load_data(self):
+        """
+        Get the boolean indicating if the data must be loaded.
+        :return: True if the data must be loaded, False otherwise.
+        :rtype: bool
+        """
+        return self.read_files
+
+    def get_n_jobs(self):
+        """
+        Get the number of jobs used for the computation.
+        :return: The number of jobs.
+        :rtype: int
+        """
+        return self.n_jobs
+
 
 # ICA Decomposition
 class icaWorkerSignals(QObject):
@@ -342,6 +406,14 @@ class icaRunnable(QRunnable):
         :rtype: MNE.Epochs/MNE.Raw
         """
         return self.file_data
+
+    def get_ica_method(self):
+        """
+        Gets the method used for the ICA decomposition.
+        :return: Method used for performing the ICA decomposition
+        :return: str
+        """
+        return self.ica_method
 
 
 # Extract Epochs
