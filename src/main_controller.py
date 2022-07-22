@@ -44,6 +44,7 @@ from connectivity.spectro_temporal_connectivity.spectro_temporal_connectivity_co
 from classification.classify.classify_controller import classifyController
 
 from study.study_edit_info.study_edit_info_controller import studyEditInfoController
+from study.study_plots.study_plots_controller import studyPlotsController
 
 from utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller import downloadFsaverageMneDataController
 from utils.waiting_while_processing.waiting_while_processing_controller import waitingWhileProcessingController
@@ -121,6 +122,7 @@ class mainController(mainListener):
 
         # Study
         self.study_edit_controller = None
+        self.study_plots_controller = None
 
         # Utils
         self.waiting_while_processing_controller = None
@@ -1618,8 +1620,11 @@ class mainController(mainListener):
         all_info = self.main_model.get_all_study_displayed_info()
         self.main_view.display_study_info(all_info)
 
+    # Study Plots
     def plot_study_clicked(self):
-        print("plot study")
+        study = self.main_model.get_study()
+        self.study_plots_controller = studyPlotsController(study)
+        self.study_plots_controller.set_listener(self)
 
     """
     Dataset Menu

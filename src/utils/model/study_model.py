@@ -19,24 +19,24 @@ __status__ = "Dev"
 class studyModel:
     def __init__(self, study_name, task_name, dataset_names, dataset_indexes, subjects, sessions, runs, conditions, groups):
         """
-        Model for the study_creation based on the dataset selected by the user
-        :param study_name: The name of the study_creation
+        Model for the study based on the dataset selected by the user
+        :param study_name: The name of the study
         :type study_name: str
-        :param task_name: The name of the task linked to the study_creation
+        :param task_name: The name of the task linked to the study
         :type task_name: str
-        :param dataset_names: The name of the datasets linked to the study_creation
+        :param dataset_names: The name of the datasets linked to the study
         :type dataset_names: list of str
-        :param dataset_indexes: The indexes of the datasets selected to be in the study_creation
+        :param dataset_indexes: The indexes of the datasets selected to be in the study
         :type dataset_indexes: list of int
-        :param subjects: The subjects assigned to each dataset in the study_creation
+        :param subjects: The subjects assigned to each dataset in the study
         :type subjects: list of str
-        :param sessions: The sessions assigned to each dataset in the study_creation
+        :param sessions: The sessions assigned to each dataset in the study
         :type sessions: list of str
-        :param runs: The runs assigned to each dataset in the study_creation
+        :param runs: The runs assigned to each dataset in the study
         :type runs: list of str
-        :param conditions: The conditions assigned to each dataset in the study_creation
+        :param conditions: The conditions assigned to each dataset in the study
         :type conditions: list of str
-        :param groups: The groups assigned to each dataset in the study_creation
+        :param groups: The groups assigned to each dataset in the study
         :type groups: list of str
         """
         self.main_listener = None
@@ -52,6 +52,29 @@ class studyModel:
         self.groups = groups
 
     """
+    Plots
+    """
+    def plot_psd(self, channels_selected, subjects_selected):
+        """
+        Plot the PSD for the dataset of the study with the channels and subjects selected.
+        :param channels_selected: Channels selected
+        :type channels_selected: str/list of str
+        :param subjects_selected: Subjects selected
+        :type subjects_selected: str/list of str
+        """
+        print("plot psd")
+
+    def plot_ersp_itc(self, channels_selected, subjects_selected):
+        """
+        Plot the ERSP and ITC for the dataset of the study with the channels and subjects selected.
+        :param channels_selected: Channels selected
+        :type channels_selected: str/list of str
+        :param subjects_selected: Subjects selected
+        :type subjects_selected: str/list of str
+        """
+        print("plot_ersp_itc")
+
+    """
     Getters
     """
     def get_displayed_info(self):
@@ -62,7 +85,7 @@ class studyModel:
 
     def get_number_of_subjects(self):
         """
-        Gets the number of different subjects in the study_creation
+        Gets the number of different subjects in the study
         :return: The number of subjects
         :rtype: int
         """
@@ -74,7 +97,7 @@ class studyModel:
 
     def get_number_of_conditions(self):
         """
-        Gets the number of different conditions in the study_creation
+        Gets the number of different conditions in the study
         :return: The number of conditions
         :rtype: int
         """
@@ -86,7 +109,7 @@ class studyModel:
 
     def get_number_of_sessions(self):
         """
-        Gets the number of different sessions in the study_creation
+        Gets the number of different sessions in the study
         :return: The number of sessions
         :rtype: int
         """
@@ -98,7 +121,7 @@ class studyModel:
 
     def get_number_of_groups(self):
         """
-        Gets the number of different groups in the study_creation
+        Gets the number of different groups in the study
         :return: The number of groups
         :rtype: int
         """
@@ -130,7 +153,7 @@ class studyModel:
 
     def get_number_of_channels(self):
         """
-        Gets the number of channels that are present in the study_creation.
+        Gets the number of channels that are present in the study.
         :return: The number of channels
         :rtype: int
         """
@@ -139,7 +162,7 @@ class studyModel:
 
     def get_channel_locations(self):
         """
-        Gets the channel location status that is present in the study_creation.
+        Gets the channel location status that is present in the study.
         :return: The status of the channel location
         :rtype: str
         """
@@ -154,7 +177,7 @@ class studyModel:
 
     def get_status(self):
         """
-        Gets the ICA status in the study_creation.
+        Gets the ICA status in the study.
         :return: The status of the ICA
         :rtype: str
         """
@@ -175,8 +198,8 @@ class studyModel:
 
     def get_size(self):
         """
-        Gets the size in megabits of the study_creation.
-        :return: The size of the study_creation.
+        Gets the size in megabits of the study.
+        :return: The size of the study.
         :rtype: float
         """
         all_file_path_name = self.main_listener.get_all_file_path_name()
@@ -195,7 +218,7 @@ class studyModel:
     # Getters utils
     def get_selected_file_data(self):
         """
-        Gets the selected file data in the study_creation
+        Gets the selected file data in the study
         :return: The selected file data.
         :rtype: list of MNE Epochs/Raw
         """
@@ -205,17 +228,30 @@ class studyModel:
             selected_file_data.append(all_file_data[index])
         return selected_file_data
 
+    def get_selected_file_data_with_subjects(self, subjects_selected):
+        """
+        Gets the selected file data in the study in function of the subjects selected.
+        :return: The selected file data.
+        :rtype: list of MNE Epochs/Raw
+        """
+        all_file_data = self.main_listener.get_all_file_data()
+        selected_file_data = []
+        for index in self.dataset_indexes:
+            if self.subjects[index] in subjects_selected:       # If the dataset subject is in the subject selected, ok.
+                selected_file_data.append(all_file_data[index])
+        return selected_file_data
+
     def get_study_name(self):
         """
-        Gets the study_creation name of the study_creation.
-        :return: The study_creation name
+        Gets the study name of the study.
+        :return: The study name
         :rtype: str
         """
         return self.study_name
 
     def get_task_name(self):
         """
-        Gets the task name of the study_creation.
+        Gets the task name of the study.
         :return: The task name
         :rtype: str
         """
@@ -232,7 +268,7 @@ class studyModel:
     def get_dataset_indexes(self):
         """
         Gets the dataset indexes
-        :return: The indexes of the datasets selected to be in the study_creation
+        :return: The indexes of the datasets selected to be in the study
         :rtype: list of int
         """
         return self.dataset_indexes
@@ -240,7 +276,7 @@ class studyModel:
     def get_subjects(self):
         """
         Gets the subjects
-        :return: The subjects assigned to each dataset in the study_creation
+        :return: The subjects assigned to each dataset in the study
         :rtype: list of str
         """
         return self.subjects
@@ -248,7 +284,7 @@ class studyModel:
     def get_sessions(self):
         """
         Gets the sessions
-        :return: The sessions assigned to each dataset in the study_creation
+        :return: The sessions assigned to each dataset in the study
         :rtype: list of str
         """
         return self.sessions
@@ -256,7 +292,7 @@ class studyModel:
     def get_runs(self):
         """
         Gets the runs
-        :return: The runs assigned to each dataset in the study_creation
+        :return: The runs assigned to each dataset in the study
         :rtype: list of str
         """
         return self.runs
@@ -264,7 +300,7 @@ class studyModel:
     def get_conditions(self):
         """
         Gets the conditions
-        :return: The conditions assigned to each dataset in the study_creation
+        :return: The conditions assigned to each dataset in the study
         :rtype: list of str
         """
         return self.conditions
@@ -272,10 +308,19 @@ class studyModel:
     def get_groups(self):
         """
         Gets the groups
-        :return: The groups assigned to each dataset in the study_creation
+        :return: The groups assigned to each dataset in the study
         :rtype: list of str
         """
         return self.groups
+
+    def get_channel_names(self):
+        """
+        Gets the channel names.
+        :return: The channel names of the datasets in the study.
+        :rtype: list of str
+        """
+        file_data = self.get_selected_file_data()
+        return file_data[0].ch_names
 
     """
     Setters
@@ -291,7 +336,7 @@ class studyModel:
     def set_task_name(self, task_name):
         """
         Sets the task name.
-        :param task_name: The name of the task linked to the study_creation
+        :param task_name: The name of the task linked to the study
         :type task_name: str
         """
         self.task_name = task_name
@@ -299,7 +344,7 @@ class studyModel:
     def set_subjects(self, subjects):
         """
         Sets the subjects for each dataset.
-        :param subjects: The subjects assigned to each dataset in the study_creation
+        :param subjects: The subjects assigned to each dataset in the study
         :type subjects: list of str
         """
         self.subjects = subjects
@@ -307,7 +352,7 @@ class studyModel:
     def set_sessions(self, sessions):
         """
         Sets the sessions for each dataset.
-        :param sessions: The sessions assigned to each dataset in the study_creation
+        :param sessions: The sessions assigned to each dataset in the study
         :type sessions: list of str
         """
         self.sessions = sessions
@@ -315,7 +360,7 @@ class studyModel:
     def set_runs(self, runs):
         """
         Sets the runs for each dataset.
-        :param runs: The runs assigned to each dataset in the study_creation
+        :param runs: The runs assigned to each dataset in the study
         :type runs: list of str
         """
         self.runs = runs
@@ -323,7 +368,7 @@ class studyModel:
     def set_conditions(self, conditions):
         """
         Sets the conditions for each dataset.
-        :param conditions: The conditions assigned to each dataset in the study_creation
+        :param conditions: The conditions assigned to each dataset in the study
         :type conditions: list of str
         """
         self.conditions = conditions
@@ -331,7 +376,7 @@ class studyModel:
     def set_groups(self, groups):
         """
         Sets the groups for each dataset.
-        :param groups: The groups assigned to each dataset in the study_creation
+        :param groups: The groups assigned to each dataset in the study
         :type groups: list of str
         """
         self.groups = groups
