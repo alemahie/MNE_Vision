@@ -18,15 +18,17 @@ __status__ = "Dev"
 
 
 class timeFrequencyErspItcController(timeFrequencyErspItcListener):
-    def __init__(self, all_channels_names):
+    def __init__(self, all_channels_names, no_channels=False):
         """
         Controller for computing a time-frequency analysis on the dataset.
         Create a new window for specifying some parameters.
         :param all_channels_names: All the channels' names
         :type all_channels_names: list of str
+        :param no_channels: Check if the channel selection must be done. Not necessary for the study plot.
+        :type no_channels: bool
         """
         self.main_listener = None
-        self.time_frequency_ersp_itc_view = timeFrequencyErspItcView(all_channels_names)
+        self.time_frequency_ersp_itc_view = timeFrequencyErspItcView(all_channels_names, no_channels)
         self.time_frequency_ersp_itc_view.set_listener(self)
 
         self.time_frequency_ersp_itc_view.show()
@@ -54,6 +56,21 @@ class timeFrequencyErspItcController(timeFrequencyErspItcListener):
         self.time_frequency_ersp_itc_view.close()
         self.main_listener.plot_time_frequency_information(method_tfr, channel_selected, min_frequency, max_frequency,
                                                            n_cycles)
+
+    def confirm_button_clicked_from_study(self, method_tfr, min_frequency, max_frequency, n_cycles):
+        """
+        Close the window and send the information to the study controller..
+        :param method_tfr: Method used for computing the time-frequency analysis.
+        :type method_tfr: str
+        :param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.
+        :type min_frequency: float
+        :param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.
+        :type max_frequency: float
+        :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
+        :type n_cycles: int
+        """
+        self.time_frequency_ersp_itc_view.close()
+        self.main_listener.plot_time_frequency_information(method_tfr, min_frequency, max_frequency, n_cycles)
 
     def plot_ersp_itc(self, channel_selected, power, itc):
         """

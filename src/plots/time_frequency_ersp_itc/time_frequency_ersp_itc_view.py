@@ -25,15 +25,20 @@ __status__ = "Dev"
 
 
 class timeFrequencyErspItcView(QWidget):
-    def __init__(self, all_channels_names):
+    def __init__(self, all_channels_names, no_channels=False):
         """
         Window displaying the parameters for computing the ERPs on the dataset.
         :param all_channels_names: All the channels' names
         :type all_channels_names: list of str
+        :param no_channels: Check if the channel selection must be done. Not necessary for the study plot.
+        :type no_channels: bool
         """
         super().__init__()
         self.time_frequency_ersp_itc_listener = None
+
         self.all_channels_names = all_channels_names
+        self.no_channels = no_channels
+
         self.channels_selector_controller = None
         self.channel_selected = None
         self.channels_selection_opened = False
@@ -43,8 +48,9 @@ class timeFrequencyErspItcView(QWidget):
         self.grid_layout = QGridLayout()
         self.setLayout(self.grid_layout)
 
-        self.channels_selection_button = QPushButton("&Channels ...", self)
-        self.channels_selection_button.clicked.connect(self.channels_selection_trigger)
+        if not no_channels:
+            self.channels_selection_button = QPushButton("&Channels ...", self)
+            self.channels_selection_button.clicked.connect(self.channels_selection_trigger)
 
         self.method_box = QComboBox()
         self.method_box.addItems(["Morlet", "Multitaper", "Stockwell"])
@@ -61,8 +67,9 @@ class timeFrequencyErspItcView(QWidget):
         self.confirm = QPushButton("&Confirm", self)
         self.confirm.clicked.connect(self.confirm_time_frequency_ersp_itc_trigger)
 
-        self.grid_layout.addWidget(QLabel("Channels : "), 0, 0)
-        self.grid_layout.addWidget(self.channels_selection_button, 0, 1)
+        if not no_channels:
+            self.grid_layout.addWidget(QLabel("Channels : "), 0, 0)
+            self.grid_layout.addWidget(self.channels_selection_button, 0, 1)
         self.grid_layout.addWidget(QLabel("Method for Time-frequency computation : "), 1, 0)
         self.grid_layout.addWidget(self.method_box, 1, 1)
         self.grid_layout.addWidget(QLabel("Minimum Frequency of interest (Hz) : "), 2, 0)
@@ -107,8 +114,11 @@ class timeFrequencyErspItcView(QWidget):
         """
         Retrieve the parameters and send the information to the controller.
         """
-        if self.channels_selection_opened:
-            channel_selected = self.channel_selected
+        if self.channels_selection_opened or self.no_channels:      # Menu channel must have been opened if it exists.
+            if not self.no_channels:
+                channel_selected = self.channel_selected
+            else:
+                channel_selected = None
             method_tfr = self.method_box.currentText()
             min_frequency = self.low_frequency_line.text()
             min_frequency = float(min_frequency.replace(',', '.'))
@@ -116,8 +126,13 @@ class timeFrequencyErspItcView(QWidget):
             max_frequency = float(max_frequency.replace(',', '.'))
             n_cycles = self.n_cycles_line.text()
             n_cycles = float(n_cycles.replace(',', '.'))
-            self.time_frequency_ersp_itc_listener.confirm_button_clicked(method_tfr, channel_selected, min_frequency,
-                                                                         max_frequency, n_cycles)
+
+            if not self.no_channels:
+                self.time_frequency_ersp_itc_listener.confirm_button_clicked(method_tfr, channel_selected, min_frequency,
+                                                                             max_frequency, n_cycles)
+            else:
+                self.time_frequency_ersp_itc_listener.confirm_button_clicked_from_study(method_tfr, min_frequency,
+                                                                                        max_frequency, n_cycles)
         else:
             error_message = "Please select a channel in the 'channel selection' menu before starting the computation."
             error_window = errorWindow(error_message)

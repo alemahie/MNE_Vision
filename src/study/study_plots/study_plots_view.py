@@ -7,6 +7,7 @@ Study Plots View
 
 from PyQt5.QtWidgets import QWidget, QPushButton, QHBoxLayout, QVBoxLayout, QScrollArea, QButtonGroup, QCheckBox
 
+from utils.view.error_window import errorWindow
 from utils.view.separator import create_layout_separator
 
 __author__ = "Lemahieu Antoine"
@@ -59,7 +60,6 @@ class studyPlotsView(QWidget):
         self.channels_scroll_area = QScrollArea()
         self.channels_scroll_area.setWidgetResizable(True)
         self.channels_scroll_area.setWidget(self.channels_widget)
-
         self.channels_subjects_layout.addWidget(self.channels_scroll_area)
 
         # Subjects
@@ -72,12 +72,11 @@ class studyPlotsView(QWidget):
         self.subjects_scroll_area = QScrollArea()
         self.subjects_scroll_area.setWidgetResizable(True)
         self.subjects_scroll_area.setWidget(self.subjects_widget)
-
         self.channels_subjects_layout.addWidget(self.subjects_scroll_area)
 
         self.channels_subjects_widget.setLayout(self.channels_subjects_layout)
 
-        # Plots buttons
+        # Plot buttons
         self.plot_buttons_widget = QWidget()
         self.plot_buttons_layout = QVBoxLayout()
         self.erps_button = QPushButton("ERPs", self)
@@ -147,7 +146,7 @@ class studyPlotsView(QWidget):
         self.subjects_layout.addWidget(self.select_unselect_subjects_widget)
 
     def create_subjects_check_boxes(self):
-        subjects = self.study.get_subjects()
+        subjects = self.study.get_unique_subjects()
         self.subjects_button.setExclusive(False)
         for i, subject in enumerate(subjects):
             check_box = QCheckBox()
@@ -177,7 +176,16 @@ class studyPlotsView(QWidget):
         """
         channels_selected = self.get_all_channels_selected()
         subjects_selected = self.get_all_subjects_selected()
-        self.study_plots_listener.plot_erps_clicked(channels_selected, subjects_selected)
+        if len(channels_selected) == 0:
+            error_message = "Please select at least one channel to plot the ERPs."
+            error_window = errorWindow(error_message)
+            error_window.show()
+        elif len(subjects_selected) == 0:
+            error_message = "Please select at least one subject to plot the ERPs."
+            error_window = errorWindow(error_message)
+            error_window.show()
+        else:
+            self.study_plots_listener.plot_erps_clicked(channels_selected, subjects_selected)
 
     def psd_trigger(self):
         """
@@ -185,7 +193,16 @@ class studyPlotsView(QWidget):
         """
         channels_selected = self.get_all_channels_selected()
         subjects_selected = self.get_all_subjects_selected()
-        self.study_plots_listener.plot_psd_clicked(channels_selected, subjects_selected)
+        if len(channels_selected) < 1:
+            error_message = "Please select at least two channels to plot the PSD."
+            error_window = errorWindow(error_message)
+            error_window.show()
+        elif len(subjects_selected) == 0:
+            error_message = "Please select at least one subject to plot the PSD."
+            error_window = errorWindow(error_message)
+            error_window.show()
+        else:
+            self.study_plots_listener.plot_psd_clicked(channels_selected, subjects_selected)
 
     def erp_image_trigger(self):
         """
@@ -193,7 +210,16 @@ class studyPlotsView(QWidget):
         """
         channels_selected = self.get_all_channels_selected()
         subjects_selected = self.get_all_subjects_selected()
-        self.study_plots_listener.plot_erp_image_clicked(channels_selected, subjects_selected)
+        if len(channels_selected) != 1:
+            error_message = "Please select exactly one channel to plot the ERP image."
+            error_window = errorWindow(error_message)
+            error_window.show()
+        elif len(subjects_selected) == 0:
+            error_message = "Please select at least one subject to plot the ERP image."
+            error_window = errorWindow(error_message)
+            error_window.show()
+        else:
+            self.study_plots_listener.plot_erp_image_clicked(channels_selected, subjects_selected)
 
     def ersp_itc_trigger(self):
         """
@@ -201,7 +227,16 @@ class studyPlotsView(QWidget):
         """
         channels_selected = self.get_all_channels_selected()
         subjects_selected = self.get_all_subjects_selected()
-        self.study_plots_listener.plot_ersp_itc_clicked(channels_selected, subjects_selected)
+        if len(channels_selected) != 1:
+            error_message = "Please select exactly one channel to plot the ERSP-ITC."
+            error_window = errorWindow(error_message)
+            error_window.show()
+        elif len(subjects_selected) == 0:
+            error_message = "Please select at least one subject to plot the ERSP-ITC."
+            error_window = errorWindow(error_message)
+            error_window.show()
+        else:
+            self.study_plots_listener.plot_ersp_itc_clicked(channels_selected, subjects_selected)
 
     def select_all_channels_trigger(self):
         """
@@ -240,13 +275,20 @@ class studyPlotsView(QWidget):
     """
     def plot_erps(self, evoked):
         """
-        Plot the ERPs for the evoked data provided by the study
+        Plot the ERPs for the evoked data provided by the study.
         :param evoked: The evoked data to plot
         :type evoked: MNE Evoked
         """
         evoked.plot_joint()
 
     def plot_erp_image(self, file_data, channel_selected):
+        """
+        Plot the ERP image for the data provided by the study.
+        :param file_data: The data containing the ERP image to plot
+        :type file_data: MNE Epochs
+        :param channel_selected: The channels selected.
+        :type channel_selected: str
+        """
         file_data.plot_image(picks=channel_selected)
 
     """

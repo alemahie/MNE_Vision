@@ -808,8 +808,9 @@ class mainModel:
         """
         file_data = self.file_data[self.current_dataset_index]
         try:
+            bandwidth = 1.0/(maximum_time-minimum_time)     # To counter bandwidth normalization
             self.fig_psd = file_data.plot_psd(fmin=minimum_frequency, fmax=maximum_frequency, tmin=minimum_time,
-                                              tmax=maximum_time, estimate="power", bandwidth=1.0,
+                                              tmax=maximum_time, estimate="power", bandwidth=bandwidth,
                                               average=False, show=False)
             bands = []
             for time in topo_time_points:
@@ -1209,6 +1210,14 @@ class mainModel:
         """
         file_type = self.file_type[self.current_dataset_index]
         return file_type
+
+    def get_all_file_type(self):
+        """
+        Gets the type of all the files.
+        :return: The type of all the files.
+        :rtype: list of str
+        """
+        return self.file_type
 
     def get_number_of_channels(self):
         """

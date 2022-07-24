@@ -5,7 +5,14 @@
 Study Model
 """
 
+from copy import copy
 from os.path import getsize
+
+from PyQt5.QtCore import QThreadPool
+from mne import concatenate_epochs
+
+from runnables.study_runnable import studyTimeFrequencyRunnable
+from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -40,6 +47,7 @@ class studyModel:
         :type groups: list of str
         """
         self.main_listener = None
+        self.study_listener = None
 
         self.study_name = study_name
         self.task_name = task_name
@@ -51,28 +59,151 @@ class studyModel:
         self.conditions = conditions
         self.groups = groups
 
+        self.time_frequency_runnable = None
+
+        self.fig_psd = None
+        self.fig_topo = None
+
     """
     Plots
     """
-    def plot_psd(self, channels_selected, subjects_selected):
+    # PSD
+    def plot_psd(self, channels_selected, subjects_selected, minimum_frequency, maximum_frequency, minimum_time,
+                 maximum_time, topo_time_points):
         """
         Plot the PSD for the dataset of the study with the channels and subjects selected.
         :param channels_selected: Channels selected
         :type channels_selected: str/list of str
         :param subjects_selected: Subjects selected
         :type subjects_selected: str/list of str
+        :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.
+        :type minimum_frequency: float
+        :param maximum_frequency: Maximum frequency from which the power spectral density will be computed.
+        :type maximum_frequency: float
+        :param minimum_time: Minimum time of the epochs from which the power spectral density will be computed.
+        :type minimum_time: float
+        :param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.
+        :type maximum_time: float
+        :param topo_time_points: The time points for the topomaps.
+        :type topo_time_points: list of float
         """
-        print("plot psd")
+        try:
+            all_file_data = self.get_selected_file_data_with_subjects(subjects_selected)
+            all_file_data = self.adapt_events(all_file_data)
+            file_data = concatenate_epochs(all_file_data)
+            file_data = file_data.pick(channels_selected)
 
-    def plot_ersp_itc(self, channels_selected, subjects_selected):
+            bandwidth = 1.0 / (maximum_time - minimum_time)  # To counter bandwidth normalization
+            self.fig_psd = file_data.plot_psd(fmin=minimum_frequency, fmax=maximum_frequency, tmin=minimum_time,
+                                              tmax=maximum_time, estimate="power", bandwidth=bandwidth,
+                                              average=False, show=False)
+            bands = []
+            for time in topo_time_points:
+                bands.append((time, str(time) + " Hz"))
+            self.fig_topo = file_data.plot_psd_topomap(bands=bands, tmin=minimum_time, tmax=maximum_time, show=False)
+            self.power_spectral_density_computation_finished()
+        except Exception as error:
+            error_message = "An error has occurred during the computation of the PSD"
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.power_spectral_density_computation_error()
+
+    def power_spectral_density_computation_finished(self):
+        """
+        Notifies the main controller that the computation is done.
+        """
+        self.study_listener.plot_spectra_maps_computation_finished()
+
+    def power_spectral_density_computation_error(self):
+        """
+        Notifies the main controller that an error has occurred during the computation
+        """
+        self.study_listener.plot_spectra_maps_computation_error()
+
+    # ERSP ITC
+    def plot_ersp_itc(self, channels_selected, subjects_selected, method_tfr, min_frequency, max_frequency, n_cycles):
         """
         Plot the ERSP and ITC for the dataset of the study with the channels and subjects selected.
         :param channels_selected: Channels selected
         :type channels_selected: str/list of str
         :param subjects_selected: Subjects selected
         :type subjects_selected: str/list of str
+        :param method_tfr: Method used for computing the time-frequency analysis.
+        :type method_tfr: str
+        :param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.
+        :type min_frequency: float
+        :param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.
+        :type max_frequency: float
+        :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
+        :type n_cycles: int
         """
-        print("plot_ersp_itc")
+        try:
+            all_file_data = self.get_selected_file_data_with_subjects(subjects_selected)
+            all_file_data = self.adapt_events(all_file_data)
+            file_data = concatenate_epochs(all_file_data)
+
+            pool = QThreadPool.globalInstance()
+            self.time_frequency_runnable = studyTimeFrequencyRunnable(file_data, method_tfr, channels_selected,
+                                                                      min_frequency, max_frequency, n_cycles)
+            pool.start(self.time_frequency_runnable)
+            self.time_frequency_runnable.signals.finished.connect(self.time_frequency_computation_finished)
+            self.time_frequency_runnable.signals.error.connect(self.time_frequency_computation_error)
+        except Exception as error:
+            error_message = "An error has occurred during the computation of the ERSP-ITC"
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.power_spectral_density_computation_error()
+
+    def time_frequency_computation_finished(self):
+        """
+        Notifies the main controller that the computation is done.
+        """
+        self.study_listener.plot_time_frequency_computation_finished()
+
+    def time_frequency_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.study_listener.plot_time_frequency_computation_error()
+
+    """
+    Utils
+    """
+    @staticmethod
+    def adapt_events(all_file_data):
+        """
+        Adapts the events on all the epochs so that they are all common and the epochs can thus be concatenated.
+        :param all_file_data: The epochs on which the events must be adapted.
+        :type all_file_data: list of MNE Epochs
+        :return: The new epochs with the events adapted for concatenation
+        :rtype: list of MNE Epochs
+        """
+        new_all_file_data = []
+        all_event_ids = {}
+        event_ids_counter = 1
+        for file_data in all_file_data:     # Search
+            event_ids = file_data.event_id
+            for event_id in event_ids.keys():
+                if event_id not in all_event_ids:
+                    all_event_ids[event_id] = event_ids_counter
+                    event_ids_counter += 1
+        for file_data in all_file_data:     # Modify
+            file_data.event_id = copy(all_event_ids)
+            new_all_file_data.append(file_data)
+        return new_all_file_data
+
+    def check_file_type_all_epochs(self, all_file_type):
+        """
+        Check if all the file type in the study are epochs.
+        :param all_file_type: All the file type of each dataset loaded.
+        :type all_file_type: list of str
+        :return: True if all datasets are epoched, False otherwise.
+        :rtype: bool
+        """
+        for index in self.dataset_indexes:
+            if all_file_type[index] == "Raw":
+                return False
+        return True     # All dataset are epochs if not raw, so ok.
 
     """
     Getters
@@ -241,6 +372,18 @@ class studyModel:
                 selected_file_data.append(all_file_data[index])
         return selected_file_data
 
+    def get_unique_subjects(self):
+        """
+        Gets only one copy of each subject.
+        :return: The subjects assigned to each dataset in the study
+        :rtype: list of str
+        """
+        subjects = []
+        for subject in self.subjects:
+            if subject not in subjects:
+                subjects.append(subject)
+        return subjects
+
     def get_study_name(self):
         """
         Gets the study name of the study.
@@ -322,6 +465,47 @@ class studyModel:
         file_data = self.get_selected_file_data()
         return file_data[0].ch_names
 
+    # Runnables
+    def get_psd_fig(self):
+        """
+        Get the power spectral density's figure
+        :return: The figure of the actual power spectral density's data computed
+        :rtype: matplotlib.Figure
+        """
+        return self.fig_topo
+
+    def get_psd_topo_fig(self):
+        """
+        Get the power spectral density's figure fo the topographies
+        :return: The figure of the topographies of the actual power spectral density's data computed
+        :rtype: matplotlib.Figure
+        """
+        return self.fig_psd
+
+    def get_tfr_channel_selected(self):
+        """
+        Gets the channel used for the computation of the time-frequency analysis performed on the dataset.
+        :return: The channel used for the time-frequency analysis computation.
+        :rtype: list of str
+        """
+        return self.time_frequency_runnable.get_channel_selected()
+
+    def get_power(self):
+        """
+        Gets the "power" data of the time-frequency analysis computation performed on the dataset.
+        :return: "power" data of the time-frequency analysis computation.
+        :rtype: MNE.AverageTFR
+        """
+        return self.time_frequency_runnable.get_power()
+
+    def get_itc(self):
+        """
+        Gets the "itc" data of the time-frequency analysis computation performed on the dataset.
+        :return: "itc" data of the time-frequency analysis computation.
+        :rtype: MNE.AverageTFR
+        """
+        return self.time_frequency_runnable.get_itc()
+
     """
     Setters
     """
@@ -385,6 +569,14 @@ class studyModel:
         """
         Set the main listener so that the controller is able to communicate with the main controller.
         :param listener: main listener
-        :type listener: downloadFsaverageMneDataController
+        :type listener: mainModel
         """
         self.main_listener = listener
+
+    def set_study_listener(self, listener):
+        """
+        Set the study listener so that the model is able to communicate with the study controller.
+        :param listener: study plot listener
+        :type listener: studyPlotsListener
+        """
+        self.study_listener = listener

@@ -66,12 +66,10 @@ class loadDataInfoView(QWidget):
         self.channels_selection_button = QPushButton("&Channels ...", self)
         self.channels_selection_button.clicked.connect(self.channels_selection_trigger)
 
-        self.data_start_end_validator = QDoubleValidator()
-        self.data_start_end_validator.setRange(tmin, tmax)
         self.data_start_line = QLineEdit(str(tmin))
-        self.data_start_line.setValidator(self.data_start_end_validator)
+        self.data_start_line.setValidator(QDoubleValidator())
         self.data_end_line = QLineEdit(str(tmax))
-        self.data_end_line.setValidator(self.data_start_end_validator)
+        self.data_end_line.setValidator(QDoubleValidator())
 
         self.grid_layout.addWidget(QLabel("Montage : "), 0, 0)
         self.grid_layout.addWidget(self.montage_box, 0, 1)

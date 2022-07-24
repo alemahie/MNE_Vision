@@ -49,6 +49,7 @@ from study.study_plots.study_plots_controller import studyPlotsController
 from utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller import downloadFsaverageMneDataController
 from utils.waiting_while_processing.waiting_while_processing_controller import waitingWhileProcessingController
 from utils.view.error_window import errorWindow
+from utils.view.warning_window import warningWindow
 from utils.file_path_search import get_project_freesurfer_path
 
 __author__ = "Lemahieu Antoine"
@@ -281,11 +282,28 @@ class mainController(mainListener):
         """
         More information about the dataset are loaded, tell the main window to display all the information about the dataset.
         """
+        study = self.main_model.get_study()
+        if study is not None:
+            warning_message = "Loading a supplementary dataset will clear the current study, are you sure you want to " \
+                              "continue ?"
+            warning_window = warningWindow(warning_message, self.load_data_info_confirmed)
+            warning_window.set_listener(self)
+            warning_window.show()
+        else:
+            self.load_data_info_confirmed()
+
+    def load_data_info_confirmed(self):
+        """
+        The loading of more information is confirmed.
+        """
         current_dataset_index = self.main_model.get_current_dataset_index()
         dataset_name = self.main_model.get_dataset_name()
+
+        self.main_model.clear_study()
         study_available = False
 
         self.menubar_controller.add_dataset(current_dataset_index, dataset_name, study_available)
+        self.menubar_controller.study_selection_deactivation(study_exist=study_available)
 
         self.display_all_info()
 
@@ -469,21 +487,32 @@ class mainController(mainListener):
         """
         Remove the current dataset loaded.
         """
+        study = self.main_model.get_study()
+        if study is not None:
+            warning_message = "Clearing a dataset will clear the current study, are you sure you want to continue ?"
+            warning_window = warningWindow(warning_message, self.clear_data_confirmed)
+            warning_window.set_listener(self)
+            warning_window.show()
+        else:
+            self.clear_data_confirmed()
+
+    def clear_data_confirmed(self):
+        """
+        The clearing of the dataset is confirmed.
+        """
         current_dataset_index = self.main_model.get_current_dataset_index()
+
         study_available = False
+        self.main_model.clear_study()
+        self.menubar_controller.study_selection_deactivation(study_exist=study_available)
 
         self.menubar_controller.remove_dataset(current_dataset_index, study_available)
         self.main_model.clear_current_dataset()
 
         new_current_dataset_index = self.main_model.get_current_dataset_index()
         if new_current_dataset_index == -1:     # No dataset loaded
-            # Clear study
-            self.main_model.clear_study()
-            self.menubar_controller.study_selection_deactivation(study_exist=False)
-            # Clear display
             self.main_view.clear_display()
             self.menubar_controller.disable_menu()
-
         else:       # Display the new current dataset
             self.main_view.create_display()
             all_info = self.main_model.get_all_displayed_info()
@@ -1593,6 +1622,9 @@ class mainController(mainListener):
     Study Menu
     """
     def edit_study_clicked(self):
+        """
+        Create the controller for editing the study.
+        """
         study = self.main_model.get_study()
         self.study_edit_controller = studyEditInfoController(study)
         self.study_edit_controller.set_listener(self)
@@ -1622,9 +1654,20 @@ class mainController(mainListener):
 
     # Study Plots
     def plot_study_clicked(self):
+        """
+        Create the controller for plotting the study.
+        """
+        all_file_type = self.main_model.get_all_file_type()
         study = self.main_model.get_study()
-        self.study_plots_controller = studyPlotsController(study)
-        self.study_plots_controller.set_listener(self)
+        file_type_all_epochs = study.check_file_type_all_epochs(all_file_type)
+        if file_type_all_epochs:      # The file types in the study are all epochs,
+            self.study_plots_controller = studyPlotsController(study)
+            self.study_plots_controller.set_listener(self)
+        else:
+            error_message = "There is at least one dataset in the study that is not epoched, it is not possible to " \
+                            "compute the plots on this study."
+            error_window = errorWindow(error_message)
+            error_window.show()
 
     """
     Dataset Menu

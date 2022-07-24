@@ -285,9 +285,10 @@ class menubarView(QMenuBar):
         self.events_menu.setEnabled(new_status)
         self.export_menu.setEnabled(new_status)
         for action in menu_actions:
-            if action.text() in ["Save", "Save As", "Clear dataset", "Create study from loaded datasets", "Clear study",
-                                 "Exit"]:
+            if action.text() in ["Save", "Save As", "Clear dataset", "Create study from loaded datasets", "Clear study"]:
                 action.setEnabled(new_status)
+            if action.text() == "Exit":
+                action.setEnabled(True)
             if not self.study_exist and action.text() == "Clear study":
                 action.setEnabled(False)
         self.edit_menu.setEnabled(new_status)
@@ -340,8 +341,7 @@ class menubarView(QMenuBar):
         self.dataset_menu.addAction(new_dataset)
 
         # Add study
-        # self.study_exist = study_available
-
+        self.study_exist = study_available
         self.dataset_menu.addSeparator()
         study = QAction("Select study", self)
         study.triggered.connect(self.dataset_clicked)
@@ -372,8 +372,7 @@ class menubarView(QMenuBar):
             dataset_counter += 1
 
         # Add study
-        # self.study_exist = study_available
-
+        self.study_exist = study_available
         self.dataset_menu.addSeparator()
         study = QAction("Select study", self)
         study.triggered.connect(self.dataset_clicked)

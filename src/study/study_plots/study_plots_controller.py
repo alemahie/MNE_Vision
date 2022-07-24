@@ -4,13 +4,17 @@
 """
 Study Plots Controller
 """
+
 from copy import copy
 
 from mne import combine_evoked, concatenate_epochs
 
+from plots.power_spectral_density.power_spectral_density_controller import powerSpectralDensityController
+from plots.time_frequency_ersp_itc.time_frequency_ersp_itc_controller import timeFrequencyErspItcController
 from study.study_plots.study_plots_listener import studyPlotsListener
 from study.study_plots.study_plots_view import studyPlotsView
 
+from utils.waiting_while_processing.waiting_while_processing_controller import waitingWhileProcessingController
 from utils.view.error_window import errorWindow
 
 __author__ = "Lemahieu Antoine"
@@ -35,6 +39,13 @@ class studyPlotsController(studyPlotsListener):
         self.study_plots_view.set_listener(self)
 
         self.study = study
+        self.study.set_study_listener(self)
+        self.channels_selected = None
+        self.subjects_selected = None
+
+        self.power_spectral_density_controller = None
+        self.time_frequency_ersp_itc_controller = None
+        self.waiting_while_processing_controller = None
 
         self.study_plots_view.show()
 
@@ -54,6 +65,7 @@ class studyPlotsController(studyPlotsListener):
     """
     Plots
     """
+    # ERPs
     def plot_erps_clicked(self, channels_selected, subjects_selected):
         """
         Call the study to plot the erps on the given data.
@@ -74,6 +86,7 @@ class studyPlotsController(studyPlotsListener):
             error_window = errorWindow(error_message, detailed_message=str(error))
             error_window.show()
 
+    # PSD
     def plot_psd_clicked(self, channels_selected, subjects_selected):
         """
         Call the study to plot the psd on the given data.
@@ -82,8 +95,62 @@ class studyPlotsController(studyPlotsListener):
         :param subjects_selected: Subjects selected
         :type subjects_selected: str/list of str
         """
-        self.study.plot_psd(channels_selected, subjects_selected)
+        self.channels_selected = channels_selected
+        self.subjects_selected = subjects_selected
 
+        try:
+            all_file_data = self.study.get_selected_file_data()
+            minimum_time = round(all_file_data[0].times[0], 3)     # Epoch start
+            maximum_time = round(all_file_data[0].times[-1], 3)    # Epoch end
+            self.power_spectral_density_controller = powerSpectralDensityController(minimum_time, maximum_time)
+            self.power_spectral_density_controller.set_listener(self)
+        except Exception as e:
+            print(e)
+
+    def plot_spectra_maps_information(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time,
+                                      topo_time_points):
+        """
+        Create the waiting window while the computation of the power spectral density is done on the dataset.
+        :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.
+        :type minimum_frequency: float
+        :param maximum_frequency: Maximum frequency from which the power spectral density will be computed.
+        :type maximum_frequency: float
+        :param minimum_time: Minimum time of the epochs from which the power spectral density will be computed.
+        :type minimum_time: float
+        :param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.
+        :type maximum_time: float
+        :param topo_time_points: The time points for the topomaps.
+        :type topo_time_points: list of float
+        """
+        processing_title = "PSD running, please wait."
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.plot_spectra_maps_finished)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.study.plot_psd(self.channels_selected, self.subjects_selected, minimum_frequency, maximum_frequency,
+                            minimum_time, maximum_time, topo_time_points)
+
+    def plot_spectra_maps_computation_finished(self):
+        """
+        Close the waiting window when the computation of the power spectral density is done on the dataset.
+        """
+        processing_title_finished = "PSD finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def plot_spectra_maps_computation_error(self):
+        """
+        Close the waiting window when the computation of the power spectral density is done on the dataset.
+        """
+        processing_title_finished = "An error has occurred during the computation of the PSD"
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
+
+    def plot_spectra_maps_finished(self):
+        """
+        The computation of the power spectral density is completely done, plot it.
+        """
+        psd_fig = self.study.get_psd_fig()
+        topo_fig = self.study.get_psd_topo_fig()
+        self.power_spectral_density_controller.plot_psd(psd_fig, topo_fig)
+
+    # ERP image
     def plot_erp_image_clicked(self, channels_selected, subjects_selected):
         """
         Call the study to plot the erp image on the given data.
@@ -102,6 +169,7 @@ class studyPlotsController(studyPlotsListener):
             error_window = errorWindow(error_message, detailed_message=str(error))
             error_window.show()
 
+    # ERSP ITC
     def plot_ersp_itc_clicked(self, channels_selected, subjects_selected):
         """
         Call the study to plot the ersp and itc on the given data.
@@ -110,7 +178,56 @@ class studyPlotsController(studyPlotsListener):
         :param subjects_selected: Subjects selected
         :type subjects_selected: str/list of str
         """
-        self.study.plot_ersp_itc(channels_selected, subjects_selected)
+        self.channels_selected = channels_selected
+        self.subjects_selected = subjects_selected
+
+        try:
+            all_channels_names = self.study.get_channel_names()
+            self.time_frequency_ersp_itc_controller = timeFrequencyErspItcController(all_channels_names, no_channels=True)
+            self.time_frequency_ersp_itc_controller.set_listener(self)
+        except Exception as e:
+            print(e)
+
+    def plot_time_frequency_information(self, method_tfr, min_frequency, max_frequency, n_cycles):
+        """
+        Create the waiting window while the computation of the time-frequency analysis is done on the dataset.
+        :param method_tfr: Method used for computing the time-frequency analysis.
+        :type method_tfr: str
+        :param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.
+        :type min_frequency: float
+        :param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.
+        :type max_frequency: float
+        :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
+        :type n_cycles: int
+        """
+        processing_title = "Time frequency analysis running, please wait."
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title, self.plot_time_frequency_finished)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.study.plot_ersp_itc(self.channels_selected, self.subjects_selected, method_tfr, min_frequency, max_frequency,
+                                 n_cycles)
+
+    def plot_time_frequency_computation_finished(self):
+        """
+        Close the waiting window when the computation of the time-frequency analysis is done on the dataset.
+        """
+        processing_title_finished = "Time frequency analysis finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def plot_time_frequency_computation_error(self):
+        """
+        Close the waiting window and display an error message because an error occurred during the computation.
+        """
+        processing_title_finished = "An error as occurred during the time frequency analysis, please try again."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
+
+    def plot_time_frequency_finished(self):
+        """
+        The computation of the time-frequency analysis is completely done, plot it.
+        """
+        channel_selected = self.study.get_tfr_channel_selected()
+        power = self.study.get_power()
+        itc = self.study.get_itc()
+        self.time_frequency_ersp_itc_controller.plot_ersp_itc(channel_selected, power, itc)
 
     """
     Utils

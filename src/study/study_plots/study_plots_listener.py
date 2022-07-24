@@ -30,19 +30,42 @@ class studyPlotsListener(ABC):
     def confirm_button_clicked(self):
         pass
 
-    # Plots
+    """
+    Plots
+    """
+    # ERPs
     @abstractmethod
     def plot_erps_clicked(self, channels_selected, subjects_selected):
         pass
 
+    # PSD
     @abstractmethod
     def plot_psd_clicked(self, channels_selected, subjects_selected):
         pass
 
     @abstractmethod
+    def plot_spectra_maps_information(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time,
+                                      topo_time_points):
+        pass
+
+    @abstractmethod
+    def plot_spectra_maps_computation_finished(self):
+        pass
+
+    @abstractmethod
+    def plot_spectra_maps_computation_error(self):
+        pass
+
+    @abstractmethod
+    def plot_spectra_maps_finished(self):
+        pass
+
+    # ERP image
+    @abstractmethod
     def plot_erp_image_clicked(self, channels_selected, subjects_selected):
         pass
 
+    # ERSP ITC
     @abstractmethod
     def plot_ersp_itc_clicked(self, channels_selected, subjects_selected):
         pass
