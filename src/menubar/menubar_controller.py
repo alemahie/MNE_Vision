@@ -203,6 +203,22 @@ class menubarController(menubarListener):
     def classify_clicked(self):
         self.main_listener.classify_clicked()
 
+    # Statistics menu
+    def statistics_snr_clicked(self):
+        self.main_listener.statistics_snr_clicked()
+
+    def statistics_erp_clicked(self):
+        self.main_listener.statistics_erp_clicked()
+
+    def statistics_psd_clicked(self):
+        self.main_listener.statistics_psd_clicked()
+
+    def statistics_ersp_itc_clicked(self):
+        self.main_listener.statistics_ersp_itc_clicked()
+
+    def statistics_connectivity_clicked(self):
+        self.main_listener.statistics_connectivity_clicked()
+
     # Study menu
     def edit_study_clicked(self):
         self.main_listener.edit_study_clicked()

@@ -22,6 +22,7 @@ from runnables.plots_runnable import timeFrequencyRunnable
 from runnables.connectivity_runnable import envelopeCorrelationRunnable, sourceSpaceConnectivityRunnable, \
     sensorSpaceConnectivityRunnable
 from runnables.classification_runnable import classifyRunnable
+from runnables.statistics_runnable import statisticsSnrRunnable
 
 from exceptions.exceptions import EventFileError
 
@@ -99,6 +100,8 @@ class mainModel:
         self.sensor_space_connectivity_runnable = None
 
         self.classify_runnable = None
+
+        self.statistics_snr_runnable = None
 
         # Others
         self.fig_psd = None     # PSD figure, to plot them in the main thread to avoid matplotlib errors.
@@ -1048,6 +1051,51 @@ class mainModel:
         self.main_listener.classify_computation_error()
 
     """
+    Statistics Menu
+    """
+    # SNR
+    def statistics_snr(self, snr_methods, source_method, read, write, picks, stats_first_variable, stats_second_variable):
+        """
+        Creates the parallel runnable for computing the SNR and statistics on it.
+        :param snr_methods: The methods used for computing the SNR
+        :type snr_methods: list of str
+        :param source_method: The method used for computing the source estimation
+        :type source_method: str
+        :param read: Boolean telling if the data used for the computation can be read from computer files.
+        :type read: bool
+        :param write: Boolean telling if the data computed must be saved into files.
+        :type write: bool
+        :param picks: The list of channels selected used for the computation
+        :type picks: list of str
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
+        """
+        file_data = self.file_data[self.current_dataset_index]
+        file_path_name_without_extension = self.get_file_path_name_without_extension()
+
+        pool = QThreadPool.globalInstance()
+        self.statistics_snr_runnable = statisticsSnrRunnable(file_data, snr_methods, source_method, file_path_name_without_extension,
+                                                             read, write, picks, stats_first_variable, stats_second_variable)
+        pool.start(self.statistics_snr_runnable)
+        self.statistics_snr_runnable.signals.finished.connect(self.statistics_snr_computation_finished)
+        self.statistics_snr_runnable.signals.error.connect(self.statistics_snr_computation_error)
+
+    def statistics_snr_computation_finished(self):
+        """
+        Retrieves the data from the runnable when the SNR and the statistics is computed.
+        Notifies the main controller that the computation is done.
+        """
+        self.main_listener.statistics_snr_computation_finished()
+
+    def statistics_snr_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.statistics_snr_computation_error()
+
+    """
     Study Menu
     """
     def edit_study_information(self, study_name, task_name, subjects, sessions, runs, conditions, groups):
@@ -1601,6 +1649,41 @@ class mainModel:
         :rtype: ApplePyClassifier
         """
         return self.classify_runnable.get_classifier()
+
+    # Statistics SNR
+    def get_statistics_first_SNRs(self):
+        """
+        Get the SNRs computed over the first independent variable.
+        :return: The SNRs computed over the first independent variable.
+        :rtype: list of, list of float
+        """
+        return self.statistics_snr_runnable.get_first_SNRs()
+
+    def get_statistics_second_SNRs(self):
+        """
+        Get the SNRs computed over the second independent variable.
+        :return: The SNRs computed over the second independent variable.
+        :rtype: list of, list of float
+        """
+        return self.statistics_snr_runnable.get_second_SNRs()
+
+    def get_statistics_SNR_t_values(self):
+        """
+        Get the T-values computed over the SNRs of the two independent variables.
+        :return: T-values computed over the SNRs of the two independent variables.
+        :rtype: list of float
+        """
+        return self.statistics_snr_runnable.get_t_values()
+
+    def get_statistics_SNR_methods(self):
+        """
+        Get the SNR methods used for the computation.
+        :return: SNR methods
+        :rtype: list of str
+        """
+        return self.statistics_snr_runnable.get_SNR_methods()
+
+    # Statistics ERP
 
     """
     Setters

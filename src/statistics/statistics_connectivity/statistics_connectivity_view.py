@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Envelope Correlation view
+Statistics Connectivity View
 """
 
 import matplotlib.pyplot as plt
@@ -30,10 +30,10 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class envelopeCorrelationView(QWidget):
+class statisticsConnectivityView(QWidget):
     def __init__(self, number_of_channels, file_data):
         """
-        Window displaying the parameters for computing the connectivity.
+        Window displaying the parameters for computing the connectivity
         :param number_of_channels: The number of channels.
         :type number_of_channels: int
         :param file_data: The dataset data
@@ -54,7 +54,7 @@ class envelopeCorrelationView(QWidget):
         self.psi_values_window = None
         self.psi_data_picks = None
 
-        self.setWindowTitle("Envelope Correlation")
+        self.setWindowTitle("Statistics Connectivity")
         self.vertical_layout = QVBoxLayout()
 
         # Connectivity method

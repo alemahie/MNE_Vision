@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-SNR listener
+Statistics PSD Listener
 """
 
 from abc import ABC, abstractmethod
@@ -16,9 +16,9 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class signalToNoiseRatioListener(ABC):
+class statisticsPsdListener(ABC):
     """
-    Listener doing the connection between the controller and the view for computing the SNR on the dataset.
+    Listener doing the connection between the controller and the view for computing the power spectral density on the dataset.
     It retrieves the information from the view to send it to the controller.
     """
 
@@ -27,9 +27,5 @@ class signalToNoiseRatioListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, snr_methods, source_method, read, write, picks, trials_selected):
-        pass
-
-    @abstractmethod
-    def get_elements_selected(self, elements_selected, element_type):
+    def confirm_button_clicked(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
         pass

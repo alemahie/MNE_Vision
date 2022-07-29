@@ -543,6 +543,54 @@ class mainListener(ABC):
         pass
 
     """
+    Statistics Menu
+    """
+    # SNR
+    @abstractmethod
+    def statistics_snr_clicked(self):
+        pass
+
+    @abstractmethod
+    def statistics_snr_information(self, snr_methods, source_method, read, write, picks, stats_first_variable, stats_second_variable):
+        pass
+
+    # ERP
+    @abstractmethod
+    def statistics_erp_clicked(self):
+        pass
+
+    @abstractmethod
+    def statistics_erp_information(self, channels_selected, stats_first_variable, stats_second_variable):
+        pass
+
+    # PSD
+    @abstractmethod
+    def statistics_psd_clicked(self):
+        pass
+
+    @abstractmethod
+    def statistics_psd_information(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
+        pass
+
+    # ERSP ITC
+    @abstractmethod
+    def statistics_ersp_itc_clicked(self):
+        pass
+
+    @abstractmethod
+    def statistics_ersp_itc_information(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
+        pass
+
+    # Connectivity
+    @abstractmethod
+    def statistics_connectivity_clicked(self):
+        pass
+
+    @abstractmethod
+    def statistics_connectivity_information(self, psi, fmin, fmax, connectivity_method, n_jobs, export_path):
+        pass
+
+    """
     Study Menu
     """
     @abstractmethod

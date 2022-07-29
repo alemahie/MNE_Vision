@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-SNR listener
+Statistics SNR listener
 """
 
 from abc import ABC, abstractmethod
@@ -16,9 +16,9 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class signalToNoiseRatioListener(ABC):
+class statisticsSnrListener(ABC):
     """
-    Listener doing the connection between the controller and the view for computing the SNR on the dataset.
+    Listener doing the connection between the controller and the view for computing the statistics on SNR on the dataset.
     It retrieves the information from the view to send it to the controller.
     """
 
@@ -27,7 +27,7 @@ class signalToNoiseRatioListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, snr_methods, source_method, read, write, picks, trials_selected):
+    def confirm_button_clicked(self, snr_methods, source_method, read, write, picks, stats_first_variable, stats_second_variable):
         pass
 
     @abstractmethod

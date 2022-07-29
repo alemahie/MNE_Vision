@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-SNR listener
+Statistics Connectivity Listener
 """
 
 from abc import ABC, abstractmethod
@@ -16,9 +16,9 @@ __email__ = "Antoine.Lemahieu@ulb.be"
 __status__ = "Dev"
 
 
-class signalToNoiseRatioListener(ABC):
+class statisticsConnectivityListener(ABC):
     """
-    Listener doing the connection between the controller and the view for computing the SNR on the dataset.
+    Listener doing the connection between the controller and the view for computing the envelope correlation on the dataset.
     It retrieves the information from the view to send it to the controller.
     """
 
@@ -27,9 +27,13 @@ class signalToNoiseRatioListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, snr_methods, source_method, read, write, picks, trials_selected):
+    def confirm_button_clicked(self, psi, fmin, fmax, connectivity_method, n_jobs):
         pass
 
     @abstractmethod
-    def get_elements_selected(self, elements_selected, element_type):
+    def additional_parameters_clicked(self):
+        pass
+
+    @abstractmethod
+    def additional_parameters_information(self, export_path):
         pass

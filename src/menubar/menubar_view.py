@@ -71,6 +71,17 @@ class menubarView(QMenuBar):
         self.create_classification_menu()
         self.classification_menu.setEnabled(False)
 
+        # Stats menu
+        self.statistics_menu = QMenu("Statistics", self)
+        self.addMenu(self.statistics_menu)
+        self.create_statistics_menu()
+        self.statistics_menu.setEnabled(False)
+
+        # Separator
+        self.separator_menu_1 = QAction("|", self)
+        self.addAction(self.separator_menu_1)
+        self.separator_menu_1.setEnabled(False)
+
         # Study menu
         self.study_menu = QMenu("Study", self)
         self.addMenu(self.study_menu)
@@ -81,6 +92,11 @@ class menubarView(QMenuBar):
         self.dataset_menu = QMenu("Datasets", self)
         self.addMenu(self.dataset_menu)
         self.dataset_menu.setEnabled(False)
+
+        # Separator 2
+        self.separator_menu_2 = QAction("|", self)
+        self.addAction(self.separator_menu_2)
+        self.separator_menu_2.setEnabled(False)
 
         # Help menu
         self.help_menu = QMenu("Help", self)
@@ -253,6 +269,27 @@ class menubarView(QMenuBar):
         classify_action.triggered.connect(self.classify_trigger)
         self.classification_menu.addAction(classify_action)
 
+    def create_statistics_menu(self):
+        statistics_snr_action = QAction("Signal-to-Noise Ratio", self)
+        statistics_snr_action.triggered.connect(self.statistics_snr_trigger)
+        self.statistics_menu.addAction(statistics_snr_action)
+
+        statistics_erp_action = QAction("ERP", self)
+        statistics_erp_action.triggered.connect(self.statistics_erp_trigger)
+        self.statistics_menu.addAction(statistics_erp_action)
+
+        statistics_psd_action = QAction("PSD", self)
+        statistics_psd_action.triggered.connect(self.statistics_psd_trigger)
+        self.statistics_menu.addAction(statistics_psd_action)
+
+        statistics_ersp_itc_action = QAction("ERSP-ITC", self)
+        statistics_ersp_itc_action.triggered.connect(self.statistics_ersp_itc_trigger)
+        self.statistics_menu.addAction(statistics_ersp_itc_action)
+
+        statistics_connectivity_action = QAction("Connectivity", self)
+        statistics_connectivity_action.triggered.connect(self.statistics_connectivity_trigger)
+        self.statistics_menu.addAction(statistics_connectivity_action)
+
     def create_study_menu(self):
         edit_study_action = QAction("Edit Study Info", self)
         edit_study_action.triggered.connect(self.edit_study_trigger)
@@ -296,6 +333,7 @@ class menubarView(QMenuBar):
         self.plot_menu.setEnabled(new_status)
         self.connectivity_menu.setEnabled(new_status)
         self.classification_menu.setEnabled(new_status)
+        self.statistics_menu.setEnabled(new_status)
         self.dataset_menu.setEnabled(new_status)
 
     def enable_menu(self):
@@ -421,6 +459,7 @@ class menubarView(QMenuBar):
         self.plot_menu.setEnabled(True)
         self.connectivity_menu.setEnabled(True)
         self.classification_menu.setEnabled(True)
+        self.statistics_menu.setEnabled(True)
         self.study_menu.setEnabled(False)
 
     def study_selected_menu_activation(self):
@@ -463,12 +502,16 @@ class menubarView(QMenuBar):
         self.plot_menu.setEnabled(False)
         self.connectivity_menu.setEnabled(False)
         self.classification_menu.setEnabled(False)
+        self.statistics_menu.setEnabled(False)
         self.study_menu.setEnabled(True)
 
     """
     Triggers
     """
-    # File menu triggers
+
+    """
+    File menu triggers
+    """
     def open_fif_file_trigger(self):
         path_to_file = QFileDialog().getOpenFileName(self, "Open file", "*.fif")
         self.menubar_listener.open_fif_file_clicked(path_to_file[0])
@@ -520,7 +563,9 @@ class menubarView(QMenuBar):
     def exit_program_trigger(self):
         self.menubar_listener.exit_program_clicked()
 
-    # Edit menu trigger
+    """
+    Edit menu trigger
+    """
     def dataset_info_trigger(self):
         self.menubar_listener.dataset_info_clicked()
 
@@ -536,7 +581,9 @@ class menubarView(QMenuBar):
     def select_data_events_trigger(self):
         self.menubar_listener.select_data_events_clicked()
 
-    # Tools menu triggers
+    """
+    Tools menu triggers
+    """
     def filter_trigger(self):
         self.menubar_listener.filter_clicked()
 
@@ -561,7 +608,9 @@ class menubarView(QMenuBar):
     def source_estimation_trigger(self):
         self.menubar_listener.source_estimation_clicked()
 
-    # Plot menu triggers
+    """
+    Plot menu triggers
+    """
     def plot_channel_locations(self):
         self.menubar_listener.plot_channel_locations_clicked()
 
@@ -586,7 +635,9 @@ class menubarView(QMenuBar):
     def plot_time_frequency_trigger(self):
         self.menubar_listener.plot_time_frequency_clicked()
 
-    # Connectivity menu triggers
+    """
+    Connectivity menu triggers
+    """
     def envelope_correlation_trigger(self):
         self.menubar_listener.envelope_correlation_clicked()
 
@@ -599,18 +650,42 @@ class menubarView(QMenuBar):
     def spectro_temporal_connectivity_trigger(self):
         self.menubar_listener.spectro_temporal_connectivity_clicked()
 
-    # Classification menu triggers
+    """
+    Statistics menu triggers
+    """
+    def statistics_snr_trigger(self):
+        self.menubar_listener.statistics_snr_clicked()
+
+    def statistics_erp_trigger(self):
+        self.menubar_listener.statistics_erp_clicked()
+
+    def statistics_psd_trigger(self):
+        self.menubar_listener.statistics_psd_clicked()
+
+    def statistics_ersp_itc_trigger(self):
+        self.menubar_listener.statistics_ersp_itc_clicked()
+
+    def statistics_connectivity_trigger(self):
+        self.menubar_listener.statistics_connectivity_clicked()
+
+    """
+    Classification menu triggers
+    """
     def classify_trigger(self):
         self.menubar_listener.classify_clicked()
 
-    # Study menu trigger
+    """
+    Study menu trigger
+    """
     def edit_study_trigger(self):
         self.menubar_listener.edit_study_clicked()
 
     def plot_study_trigger(self):
         self.menubar_listener.plot_study_clicked()
 
-    # Datasets menu trigger
+    """
+    Datasets menu trigger
+    """
     def dataset_clicked(self):
         menu_actions = self.dataset_menu.actions()
         selected_action = self.sender()
@@ -626,7 +701,9 @@ class menubarView(QMenuBar):
             self.menubar_listener.change_dataset(index_selected)
             self.dataset_selected_menu_activation(study_exist=self.study_exist)
 
-    # Help menu triggers
+    """
+    Help menu triggers
+    """
     def help_trigger(self):
         self.menubar_listener.help_clicked()
 

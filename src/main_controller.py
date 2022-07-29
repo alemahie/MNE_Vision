@@ -5,7 +5,9 @@
 Main controller
 """
 
-from copy import copy
+from copy import copy, deepcopy
+
+from mne.stats import ttest_ind_no_p
 
 from main_model import mainModel
 from main_view import mainView
@@ -43,6 +45,12 @@ from connectivity.spectro_temporal_connectivity.spectro_temporal_connectivity_co
 
 from classification.classify.classify_controller import classifyController
 
+from statistics.statistics_snr.statistics_snr_controller import statisticsSnrController
+from statistics.statistics_erp.statistics_erp_controller import statisticsErpController
+from statistics.statistics_connectivity.statistics_connectivity_controller import statisticsConnectivityController
+from statistics.statistics_ersp_itc.statistics_ersp_itc_controller import statisticsErspItcController
+from statistics.statistics_psd.statistics_psd_controller import statisticsPsdController
+
 from study.study_edit_info.study_edit_info_controller import studyEditInfoController
 from study.study_plots.study_plots_controller import studyPlotsController
 
@@ -62,7 +70,7 @@ __status__ = "Dev"
 
 
 class mainController(mainListener):
-    def __init__(self, screen_size, splash_screen_runnable=False):
+    def __init__(self, screen_size):
         """
         The main controller is the link between the main model and the main view.
         It will "control" where the information needs to go and who does what.
@@ -71,8 +79,6 @@ class mainController(mainListener):
         It is responsible for creating the other controllers that will display other windows.
         :param screen_size: Tuple of int corresponding to the size of the screen.
         :type screen_size: QSize
-        :param splash_screen_runnable: Runnable for the splash screen, that will be closed on the opening of the main window.
-        :type splash_screen_runnable: splashScreenRunnable
         """
         self.main_model = mainModel()
         self.main_model.set_listener(self)
@@ -121,6 +127,13 @@ class mainController(mainListener):
         # Classification
         self.classify_controller = None
 
+        # Statistics
+        self.statistics_snr_controller = None
+        self.statistics_erp_controller = None
+        self.statistics_psd_controller = None
+        self.statistics_ersp_itc_controller = None
+        self.statistics_connectivity_controller = None
+
         # Study
         self.study_edit_controller = None
         self.study_plots_controller = None
@@ -132,9 +145,6 @@ class mainController(mainListener):
         # Others
         self.study_currently_selected = False
         self.study_indexes_to_compute = None
-
-        # splash_screen_runnable.close()
-        self.main_view.show()
 
     """
     File menu
@@ -1093,6 +1103,18 @@ class mainController(mainListener):
     def snr_information(self, snr_methods, source_method, read, write, picks, trials_selected):
         """
         Create the waiting window while the SNR computation is done on the dataset.
+        :param snr_methods: The methods used for computing the SNR
+        :type snr_methods: list of str
+        :param source_method: The method used for computing the source estimation
+        :type source_method: str
+        :param read: Boolean telling if the data used for the computation can be read from computer files.
+        :type read: bool
+        :param write: Boolean telling if the data computed must be saved into files.
+        :type write: bool
+        :param picks: The list of channels selected used for the computation
+        :type picks: list of str
+        :param trials_selected: The indexes of the trials selected for the computation
+        :type trials_selected: list of int
         """
         processing_title = "SNR running, please wait."
         self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title,
@@ -1619,6 +1641,186 @@ class mainController(mainListener):
         self.classify_controller.plot_results(classifier)
 
     """
+    Statistics Menu
+    """
+    # SNR
+    def statistics_snr_clicked(self):
+        """
+        Create the controller for computing the SNR from the dataset and the statistics on specified data.
+        """
+        all_channels_names = self.main_model.get_all_channels_names()
+        event_values = self.main_model.get_event_values()
+        event_ids = self.main_model.get_event_ids()
+        self.statistics_snr_controller = statisticsSnrController(all_channels_names, event_values, event_ids)
+        self.statistics_snr_controller.set_listener(self)
+
+    def statistics_snr_information(self, snr_methods, source_method, read, write, picks, stats_first_variable, stats_second_variable):
+        """
+        Create the waiting window while the SNR computation and the statistics is done on the dataset.
+        :param snr_methods: The methods used for computing the SNR
+        :type snr_methods: list of str
+        :param source_method: The method used for computing the source estimation
+        :type source_method: str
+        :param read: Boolean telling if the data used for the computation can be read from computer files.
+        :type read: bool
+        :param write: Boolean telling if the data computed must be saved into files.
+        :type write: bool
+        :param picks: The list of channels selected used for the computation
+        :type picks: list of str
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
+        """
+        processing_title = "SNR running, please wait."
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title,
+                                                                                    self.statistics_snr_finished)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.main_model.statistics_snr(snr_methods, source_method, read, write, picks, stats_first_variable, stats_second_variable)
+
+    def statistics_snr_computation_finished(self):
+        """
+        Close the waiting window when the computation of the SNR and the statistics are done on the dataset.
+        """
+        processing_title_finished = "SNR computation finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def statistics_snr_computation_error(self):
+        """
+        Close the waiting window because the computation of the SNR and the statistics had an error.
+        """
+        processing_title_finished = "SNR computation had an error."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
+
+    def statistics_snr_finished(self):
+        """
+        The computation of the SNR and the statistics are completely done, plot the results.
+        """
+        first_SNRs = self.main_model.get_statistics_first_SNRs()
+        second_SNRs = self.main_model.get_statistics_second_SNRs()
+        t_values = self.main_model.get_statistics_SNR_t_values()
+        SNR_methods = self.main_model.get_statistics_SNR_methods()
+        self.statistics_snr_controller.plot_SNRs(first_SNRs, second_SNRs, t_values, SNR_methods)
+
+    # ERP
+    def statistics_erp_clicked(self):
+        """
+        Create the controller for computing the ERPs the dataset.
+        """
+        all_channels_names = self.main_model.get_all_channels_names()
+        event_ids = self.main_model.get_event_ids()
+        self.statistics_erp_controller = statisticsErpController(all_channels_names, event_ids)
+        self.statistics_erp_controller.set_listener(self)
+
+    def statistics_erp_information(self, channels_selected, stats_first_variable, stats_second_variable):
+        """
+        The computation of the ERPs is completely done, plot it.
+        :param channels_selected: Channels selected for the ERP.
+        :type channels_selected: list of str
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
+        """
+        file_data = self.main_model.get_file_data()
+        # First variable
+        file_data_save = deepcopy(file_data)
+        mask = self.create_mask_from_variable_to_keep(file_data, stats_first_variable)
+        file_data = file_data.drop(mask)
+        erps_first = file_data.average()
+        # Second variable
+        file_data = deepcopy(file_data_save)
+        mask = self.create_mask_from_variable_to_keep(file_data, stats_second_variable)
+        file_data = file_data.drop(mask)
+        erps_second = file_data.average()
+        # Stats
+        t_values = []
+        for i in range(len(erps_first.get_data())):
+            t_values.append(ttest_ind_no_p(erps_first.get_data()[i], erps_second.get_data()[i]))
+        # Plot
+        self.statistics_erp_controller.plot_erps(channels_selected, erps_first, erps_second, t_values)
+
+    # PSD
+    def statistics_psd_clicked(self):
+        """
+        Create the controller for computing the power spectral density and the statistics of the dataset.
+        """
+        minimum_time = self.main_model.get_epochs_start()
+        maximum_time = self.main_model.get_epochs_end()
+        self.statistics_psd_controller = statisticsPsdController(minimum_time, maximum_time)
+        self.statistics_psd_controller.set_listener(self)
+
+    def statistics_psd_information(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
+        """
+        Create the waiting window while the computation of the power spectral density is done on the dataset.
+        :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.
+        :type minimum_frequency: float
+        :param maximum_frequency: Maximum frequency from which the power spectral density will be computed.
+        :type maximum_frequency: float
+        :param minimum_time: Minimum time of the epochs from which the power spectral density will be computed.
+        :type minimum_time: float
+        :param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.
+        :type maximum_time: float
+        :param topo_time_points: The time points for the topomaps.
+        :type topo_time_points: list of float
+        """
+        print("Statistics PSD")
+
+    # ERSP ITC
+    def statistics_ersp_itc_clicked(self):
+        """
+        Create the controller for computing the time-frequency analysis and the statistics on the dataset.
+        """
+        all_channels_names = self.main_model.get_all_channels_names()
+        self.statistics_ersp_itc_controller = statisticsErspItcController(all_channels_names)
+        self.statistics_ersp_itc_controller.set_listener(self)
+
+    def statistics_ersp_itc_information(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
+        """
+        Create the waiting window while the computation of the time-frequency analysis is done on the dataset.
+        :param method_tfr: Method used for computing the time-frequency analysis.
+        :type method_tfr: str
+        :param channel_selected: Channel on which the time-frequency analysis will be computed.
+        :type channel_selected: str
+        :param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.
+        :type min_frequency: float
+        :param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.
+        :type max_frequency: float
+        :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
+        :type n_cycles: int
+        """
+        print("Statistics ERSP ITC")
+
+    # Connectivity
+    def statistics_connectivity_clicked(self):
+        """
+        Create the controller for computing the envelope correlation and the statistics on the dataset.
+        """
+        number_of_channels = self.main_model.get_number_of_channels()
+        file_data = self.main_model.get_file_data()
+        self.statistics_connectivity_controller = statisticsConnectivityController(number_of_channels, file_data)
+        self.statistics_connectivity_controller.set_listener(self)
+
+    def statistics_connectivity_information(self, psi, fmin, fmax, connectivity_method, n_jobs, export_path):
+        """
+        Create the waiting window while the computation of the envelope correlation is done on the dataset.
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
+        :param fmin: Minimum frequency from which the envelope correlation will be computed.
+        :type fmin: float
+        :param fmax: Maximum frequency from which the envelope correlation will be computed.
+        :type fmax: float
+        :param connectivity_method: Method used for computing the source space connectivity.
+        :type connectivity_method: str
+        :param n_jobs: Number of processes used to compute the source estimation
+        :type n_jobs: int
+        :param export_path: Path where the envelope correlation data will be stored.
+        :type export_path: str
+        """
+        print("Statistics Connectivity")
+
+    """
     Study Menu
     """
     def edit_study_clicked(self):
@@ -1695,6 +1897,12 @@ class mainController(mainListener):
     """
     Others
     """
+    def show(self):
+        """
+        Shows the main view.
+        """
+        self.main_view.show()
+
     def display_all_info(self):
         """
         Retrieve all the information that will be displayed on the main window and unlock all the menus.
@@ -1720,3 +1928,32 @@ class mainController(mainListener):
         """
         processing_title_finished = "Download finished. \n You can now use the tools where the source space is needed."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    """
+    Utils
+    """
+    @staticmethod
+    def create_mask_from_variable_to_keep(file_data, stats_variable):
+        """
+        Create a mask to know which trial to keep and which one to remove for the computation.
+        :return mask: Mask of trials to remove. True means remove, and False means keep.
+        :rtype mask: list of boolean
+        """
+        mask = [True for _ in range(len(file_data.events))]
+        event_ids = file_data.event_id
+        event_id_to_keep = event_ids[stats_variable]
+        for i, event in enumerate(file_data.events):
+            if event[2] == event_id_to_keep:        # 2 is the event id in the events
+                mask[i] = False
+        return mask
+
+    """
+    Getters
+    """
+    def get_main_view(self):
+        """
+        Gets the main view.
+        :return: The main view
+        :rtype: mainView
+        """
+        return self.main_view

@@ -202,6 +202,29 @@ class menubarListener(ABC):
         pass
 
     """
+    Statistics menu
+    """
+    @abstractmethod
+    def statistics_snr_clicked(self):
+        pass
+
+    @abstractmethod
+    def statistics_erp_clicked(self):
+        pass
+
+    @abstractmethod
+    def statistics_psd_clicked(self):
+        pass
+
+    @abstractmethod
+    def statistics_ersp_itc_clicked(self):
+        pass
+
+    @abstractmethod
+    def statistics_connectivity_clicked(self):
+        pass
+
+    """
     Study menu
     """
     @abstractmethod
