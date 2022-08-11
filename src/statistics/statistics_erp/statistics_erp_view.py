@@ -5,9 +5,16 @@
 Statistics ERP view
 """
 
+import numpy as np
+from matplotlib import pyplot as plt
+
 from copy import deepcopy
 
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QVBoxLayout, QHBoxLayout, QButtonGroup, QScrollArea, QCheckBox
+from matplotlib.scale import LogScale
+from mne import combine_evoked
+from mne.stats import ttest_ind_no_p, permutation_t_test, ttest_1samp_no_p
+from scipy.stats import ttest_ind
 
 from utils.view.separator import create_layout_separator
 from utils.elements_selector.elements_selector_controller import multipleSelectorController
@@ -148,16 +155,15 @@ class statisticsErpView(QWidget):
         Retrieve the parameters and send the information to the controller.
         """
         if self.channels_selection_opened:
-            if len(self.channels_selected) >= 2:
-                # Need at least 2 channels, because with 0 we have no info, and with 1 we can plot the topographies.
+            if len(self.channels_selected) >= 1:
+                # Need at least 1 channels, because with 0 we have no info.
 
                 stats_first_variable = self.get_first_independent_variable_selected()
                 stats_second_variable = self.get_second_independent_variable_selected()
 
                 self.erp_listener.confirm_button_clicked(self.channels_selected, stats_first_variable, stats_second_variable)
             else:
-                error_message = "Please select at least 2 channels in the 'channel selection' menu before starting the computation. \n" \
-                                "Otherwise we do not have enough information do compute the ERPs"
+                error_message = "Please select at least 1 channel in the 'channel selection' menu before starting the computation."
                 error_window = errorWindow(error_message)
                 error_window.show()
         else:
@@ -170,30 +176,81 @@ class statisticsErpView(QWidget):
         Open the multiple selector window.
         The user can select multiple channels.
         """
-        title = "Select the channels used for the ERP computation :"
-        self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=True)
+        title = "Select the channel used for the ERP computation :"
+        self.channels_selector_controller = multipleSelectorController(self.all_channels_names, title, box_checked=True, unique_box=True)
         self.channels_selector_controller.set_listener(self.erp_listener)
         self.channels_selection_opened = True
 
     """
     Plots
     """
-    def plot_erps(self, channels_selected, erps_first, erps_second, t_values):
+    def plot_erps(self, channels_selected, file_data, stats_first_variable, stats_second_variable):
         """
         Plot the ERPs and the statistics.
         :param channels_selected: The channels selected for the computation
         :type channels_selected: list of str
-        :param erps_first: The evoked data of the data of the first independent variable.
-        :type erps_first: MNE Evoked
-        :param erps_second: The evoked data of the data of the second independent variable.
-        :type erps_second: MNE Evoked
-        :param t_values: T-values computed over the SNRs of the two independent variables.
-        :type t_values: list of float
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
         """
-        erps_first.plot_joint(picks=channels_selected)
-        erps_second.plot_joint(picks=channels_selected)
+        # First variable
+        file_data_one = deepcopy(file_data)
+        mask = self.create_mask_from_variable_to_keep(file_data_one, stats_first_variable)
+        file_data_one = file_data_one.drop(mask)
+        erps_first = file_data_one.average(picks=channels_selected, )
+        # Second variable
+        file_data_two = deepcopy(file_data)
+        mask = self.create_mask_from_variable_to_keep(file_data_two, stats_second_variable)
+        file_data_two = file_data_two.drop(mask)
+        erps_second = file_data_two.average(picks=channels_selected)
         # Stats
-        print(t_values)
+        try:
+            p_values = []
+
+            data_first = file_data_one.get_data(picks=channels_selected)
+            data_second = file_data_two.get_data(picks=channels_selected)
+
+            for i in range(len(data_first[0, 0])):
+                new_t_values, new_p_values = ttest_ind(data_first[:, 0, i], data_second[:, 0, i])
+                p_values.append(new_p_values)
+
+            fig_one = erps_first.plot(show=False)
+            fig_two = erps_second.plot(show=False)
+
+            fig_one.show()
+            fig_two.show()
+
+            fig, ax = plt.subplots()
+            ax.plot(file_data.times, p_values)
+            ax.set_title("P-values for ERP")
+
+            ax.set_ylim([0.001, 1.0])
+            ax.set_yscale("log")
+
+            fig.show()
+        except Exception as e:
+            print(e)
+
+    """
+    Utils
+    """
+    @staticmethod
+    def create_mask_from_variable_to_keep(file_data, stats_variable):
+        """
+        Create a mask to know which trial to keep and which one to remove for the computation.
+        :return mask: Mask of trials to remove. True means remove, and False means keep.
+        :rtype mask: list of boolean
+        """
+        mask = [True for _ in range(len(file_data.events))]
+        event_ids = file_data.event_id
+        event_id_to_keep = event_ids[stats_variable]
+        for i, event in enumerate(file_data.events):
+            if event[2] == event_id_to_keep:        # 2 is the event id in the events
+                mask[i] = False
+        return mask
 
     """
     Setters

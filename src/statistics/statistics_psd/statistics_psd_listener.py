@@ -27,5 +27,6 @@ class statisticsPsdListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
+    def confirm_button_clicked(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points,
+                               channel_selected, stats_first_variable, stats_second_variable):
         pass

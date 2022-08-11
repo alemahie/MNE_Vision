@@ -6,12 +6,13 @@ Main model
 """
 
 import numpy as np
-from os.path import getsize, splitext
-from copy import copy
-from mne import read_events, find_events, events_from_annotations
-from PyQt5.QtCore import QThreadPool
 
-from utils.model.study_model import studyModel
+from os.path import getsize, splitext
+from copy import copy, deepcopy
+
+from mne import read_events, find_events, events_from_annotations
+
+from PyQt5.QtCore import QThreadPool
 
 from runnables.tools_runnable import filterRunnable, icaRunnable, sourceEstimationRunnable, resamplingRunnable, \
     reReferencingRunnable, extractEpochsRunnable, signalToNoiseRatioRunnable
@@ -22,12 +23,14 @@ from runnables.plots_runnable import timeFrequencyRunnable
 from runnables.connectivity_runnable import envelopeCorrelationRunnable, sourceSpaceConnectivityRunnable, \
     sensorSpaceConnectivityRunnable
 from runnables.classification_runnable import classifyRunnable
-from runnables.statistics_runnable import statisticsSnrRunnable
+from runnables.statistics_runnable import statisticsSnrRunnable, statisticsErspItcRunnable, \
+    statisticsConnectivityRunnable
 
 from exceptions.exceptions import EventFileError
 
 from utils.file_path_search import get_directory_path_from_file_path
 from utils.view.error_window import errorWindow
+from utils.model.study_model import studyModel
 
 __author__ = "Lemahieu Antoine"
 __copyright__ = "Copyright 2022"
@@ -102,10 +105,17 @@ class mainModel:
         self.classify_runnable = None
 
         self.statistics_snr_runnable = None
+        self.statistics_ersp_itc_runnable = None
+        self.statistics_connectivity_runnable = None
 
         # Others
         self.fig_psd = None     # PSD figure, to plot them in the main thread to avoid matplotlib errors.
         self.fig_topo = None
+
+        self.statistics_fig_psd_one = None
+        self.statistics_fig_topo_one = None
+        self.statistics_fig_psd_two = None
+        self.statistics_fig_topo_two = None
 
     """
     File menu
@@ -1095,6 +1105,159 @@ class mainModel:
         """
         self.main_listener.statistics_snr_computation_error()
 
+    # PSD
+    def statistics_psd(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points,
+                       channel_selected, stats_first_variable, stats_second_variable):
+        """
+        Creates the parallel runnable for computing the power spectral density.
+        :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.
+        :type minimum_frequency: float
+        :param maximum_frequency: Maximum frequency from which the power spectral density will be computed.
+        :type maximum_frequency: float
+        :param minimum_time: Minimum time of the epochs from which the power spectral density will be computed.
+        :type minimum_time: float
+        :param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.
+        :type maximum_time: float
+        :param topo_time_points: The time points for the topomaps.
+        :type topo_time_points: list of float
+        :param channel_selected: Channel selected for the ERP.
+        :type channel_selected: str
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
+        """
+        file_data = self.file_data[self.current_dataset_index]
+        try:
+            # Initialize variables
+            bandwidth = 1.0 / (maximum_time - minimum_time)  # To counter bandwidth normalization
+            bands = []
+            for time in topo_time_points:
+                bands.append((time, str(time) + " Hz"))
+            # First variable
+            file_data_one = deepcopy(file_data)
+            mask = self.create_mask_from_variable_to_keep(file_data_one, stats_first_variable)
+            file_data_one = file_data_one.drop(mask)
+            self.statistics_fig_psd_one = file_data_one.plot_psd(fmin=minimum_frequency, fmax=maximum_frequency, tmin=minimum_time,
+                                                                 tmax=maximum_time, estimate="power", bandwidth=bandwidth,
+                                                                 average=False, show=False, picks=channel_selected)
+            self.statistics_fig_topo_one = file_data_one.plot_psd_topomap(bands=bands, tmin=minimum_time, tmax=maximum_time,
+                                                                          show=False)
+            # Second variable
+            file_data_two = deepcopy(file_data)
+            mask = self.create_mask_from_variable_to_keep(file_data_two, stats_second_variable)
+            file_data_two = file_data_two.drop(mask)
+            self.statistics_fig_psd_two = file_data_two.plot_psd(fmin=minimum_frequency, fmax=maximum_frequency, tmin=minimum_time,
+                                                                 tmax=maximum_time, estimate="power", bandwidth=bandwidth,
+                                                                 average=False, show=False, picks=channel_selected)
+            self.statistics_fig_topo_two = file_data_two.plot_psd_topomap(bands=bands, tmin=minimum_time, tmax=maximum_time,
+                                                                          show=False)
+            self.statistics_psd_computation_finished()
+        except Exception as error:
+            error_message = "An error has occurred during the computation of the PSD"
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.statistics_psd_computation_error()
+
+    def statistics_psd_computation_finished(self):
+        """
+        Notifies the main controller that the computation is done.
+        """
+        self.main_listener.statistics_psd_computation_finished()
+
+    def statistics_psd_computation_error(self):
+        """
+        Notifies the main controller that an error has occurred during the computation
+        """
+        self.main_listener.statistics_psd_computation_error()
+
+    # ERSP-ITC
+    def statistics_ersp_itc(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles, stats_first_variable,
+                            stats_second_variable):
+        """
+        Creates the parallel runnable for computing a time-frequency analysis of the data.
+        :param method_tfr: Method used for computing the time-frequency analysis.
+        :type method_tfr: str
+        :param channel_selected: Channel on which the time-frequency analysis will be computed.
+        :type channel_selected: str
+        :param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.
+        :type min_frequency: float
+        :param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.
+        :type max_frequency: float
+        :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
+        :type n_cycles: int
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
+        """
+        file_data = self.file_data[self.current_dataset_index]
+
+        pool = QThreadPool.globalInstance()
+        self.statistics_ersp_itc_runnable = statisticsErspItcRunnable(file_data, method_tfr, channel_selected, min_frequency,
+                                                                      max_frequency, n_cycles, stats_first_variable,
+                                                                      stats_second_variable)
+        pool.start(self.statistics_ersp_itc_runnable)
+        self.statistics_ersp_itc_runnable.signals.finished.connect(self.statistics_ersp_itc_computation_finished)
+        self.statistics_ersp_itc_runnable.signals.error.connect(self.statistics_ersp_itc_computation_error)
+
+    def statistics_ersp_itc_computation_finished(self):
+        """
+        Notifies the main controller that the computation is done.
+        """
+        self.main_listener.statistics_ersp_itc_computation_finished()
+
+    def statistics_ersp_itc_computation_error(self):
+        """
+        Notifies the main controller that the computation had an error.
+        """
+        self.main_listener.statistics_ersp_itc_computation_error()
+
+    # Connectivity
+    def statistics_connectivity(self, psi, fmin, fmax, connectivity_method, n_jobs, export_path, stats_first_variable,
+                                stats_second_variable):
+        """
+        Creates the parallel runnable for computing the envelope correlation between the channels of the dataset.
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
+        :param fmin: Minimum frequency from which the envelope correlation will be computed.
+        :type fmin: float
+        :param fmax: Maximum frequency from which the envelope correlation will be computed.
+        :type fmax: float
+        :param connectivity_method: Method used for computing the source space connectivity.
+        :type connectivity_method: str
+        :param n_jobs: Number of processes used to compute the source estimation
+        :type n_jobs: int
+        :param export_path: Path where the envelope correlation data will be stored.
+        :type export_path: str
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
+        """
+        file_data = self.file_data[self.current_dataset_index]
+
+        pool = QThreadPool.globalInstance()
+        self.statistics_connectivity_runnable = statisticsConnectivityRunnable(file_data, psi, fmin, fmax, connectivity_method,
+                                                                               n_jobs, export_path, stats_first_variable,
+                                                                               stats_second_variable)
+        pool.start(self.statistics_connectivity_runnable)
+        self.statistics_connectivity_runnable.signals.finished.connect(self.statistics_connectivity_computation_finished)
+        self.statistics_connectivity_runnable.signals.error.connect(self.statistics_connectivity_computation_error)
+
+    def statistics_connectivity_computation_finished(self):
+        """
+        Notifies the main controller that the computation of the envelope correlation is done.
+        """
+        self.main_listener.statistics_connectivity_computation_finished()
+
+    def statistics_connectivity_computation_error(self):
+        """
+        Notifies the main controller that an error has occurred during the computation
+        """
+        self.main_listener.statistics_connectivity_computation_error()
+
     """
     Study Menu
     """
@@ -1173,7 +1336,25 @@ class mainModel:
                 print(e)
                 print(type(e))
 
+    @staticmethod
+    def create_mask_from_variable_to_keep(file_data, stats_variable):
+        """
+        Create a mask to know which trial to keep and which one to remove for the computation.
+        :return mask: Mask of trials to remove. True means remove, and False means keep.
+        :rtype mask: list of boolean
+        """
+        mask = [True for _ in range(len(file_data.events))]
+        event_ids = file_data.event_id
+        event_id_to_keep = event_ids[stats_variable]
+        for i, event in enumerate(file_data.events):
+            if event[2] == event_id_to_keep:        # 2 is the event id in the events
+                mask[i] = False
+        return mask
+
     def reset_tmp_attributes(self):
+        """
+        Resets the temporary variable when a new dataset is completely loaded.
+        """
         self.file_data_tmp = None
         self.file_type_tmp = None
         self.file_path_name_tmp = None
@@ -1683,7 +1864,112 @@ class mainModel:
         """
         return self.statistics_snr_runnable.get_SNR_methods()
 
-    # Statistics ERP
+    # Statistics PSD
+    def get_statistics_psd_fig_one(self):
+        """
+        Get the power spectral density's figure of the first independent variable
+        :return: The figure of the actual power spectral density's data computed
+        :rtype: matplotlib.Figure
+        """
+        return self.statistics_fig_psd_one
+
+    def get_statistics_psd_topo_fig_one(self):
+        """
+        Get the power spectral density's figure of the topographies of the first independent variable
+        :return: The figure of the topographies of the actual power spectral density's data computed
+        :rtype: matplotlib.Figure
+        """
+        return self.statistics_fig_topo_one
+
+    def get_statistics_psd_fig_two(self):
+        """
+        Get the power spectral density's figure of the second independent variable
+        :return: The figure of the actual power spectral density's data computed
+        :rtype: matplotlib.Figure
+        """
+        return self.statistics_fig_psd_two
+
+    def get_statistics_psd_topo_fig_two(self):
+        """
+        Get the power spectral density's figure of the topographies of the second independent variable
+        :return: The figure of the topographies of the actual power spectral density's data computed
+        :rtype: matplotlib.Figure
+        """
+        return self.statistics_fig_topo_two
+
+    # Statistics ERSP ITC
+    def get_statistics_ersp_itc_channel_selected(self):
+        """
+        Gets the channel used for the computation of the time-frequency analysis performed on the dataset.
+        :return: The channel used for the time-frequency analysis computation.
+        :rtype: list of str
+        """
+        return self.statistics_ersp_itc_runnable.get_channel_selected()
+
+    def get_statistics_power_one(self):
+        """
+        Gets the "power" data of the time-frequency analysis computation performed on the dataset of the first independent variable.
+        :return: "power" data of the time-frequency analysis computation.
+        :rtype: MNE.AverageTFR
+        """
+        return self.statistics_ersp_itc_runnable.get_power_one()
+
+    def get_statistics_itc_one(self):
+        """
+        Gets the "itc" data of the time-frequency analysis computation performed on the dataset of the first independent variable.
+        :return: "itc" data of the time-frequency analysis computation.
+        :rtype: MNE.AverageTFR
+        """
+        return self.statistics_ersp_itc_runnable.get_itc_one()
+
+    def get_statistics_power_two(self):
+        """
+        Gets the "power" data of the time-frequency analysis computation performed on the dataset of the second independent variable.
+        :return: "power" data of the time-frequency analysis computation.
+        :rtype: MNE.AverageTFR
+        """
+        return self.statistics_ersp_itc_runnable.get_power_two()
+
+    def get_statistics_itc_two(self):
+        """
+        Gets the "itc" data of the time-frequency analysis computation performed on the dataset of the second independent variable.
+        :return: "itc" data of the time-frequency analysis computation.
+        :rtype: MNE.AverageTFR
+        """
+        return self.statistics_ersp_itc_runnable.get_itc_two()
+
+    # Statistics Connectivity
+    def get_statistics_connectivity_data_one(self):
+        """
+        Gets the data of the envelope correlation computation performed on the dataset of the first independent variable.
+        :return: The envelope correlation's data.
+        :rtype: list of, list of float
+        """
+        return self.statistics_connectivity_runnable.get_connectivity_data_one()
+
+    def get_statistics_connectivity_data_two(self):
+        """
+        Gets the data of the envelope correlation computation performed on the dataset of the second independent variable.
+        :return: The envelope correlation's data.
+        :rtype: list of, list of float
+        """
+        return self.statistics_connectivity_runnable.get_connectivity_data_two()
+
+    def get_statistics_psi_data_one(self):
+        """
+        Get the psi's data for the envelope correlation of the first independent variable.
+        :return: The psi's data. Or nothing if the psi's data has not been computed.
+        :rtype: list of, list of float
+        """
+        return self.statistics_connectivity_runnable.get_psi_data_one()
+
+    def get_statistics_psi_data_two(self):
+        """
+        Get the psi's data for the envelope correlation of the second independent variable.
+        :return: The psi's data. Or nothing if the psi's data has not been computed.
+        :rtype: list of, list of float
+        """
+        return self.statistics_connectivity_runnable.get_psi_data_two()
 
     """
     Setters

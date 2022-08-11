@@ -18,17 +18,17 @@ __status__ = "Dev"
 
 
 class statisticsErspItcController(statisticsErspItcListener):
-    def __init__(self, all_channels_names, no_channels=False):
+    def __init__(self, all_channels_names, event_ids):
         """
         Controller for computing a time-frequency analysis on the dataset.
         Create a new window for specifying some parameters.
         :param all_channels_names: All the channels' names
         :type all_channels_names: list of str
-        :param no_channels: Check if the channel selection must be done. Not necessary for the study plot.
-        :type no_channels: bool
+        :param event_ids: The events' ids
+        :type event_ids: dict
         """
         self.main_listener = None
-        self.statistics_ersp_itc_view = statisticsErspItcView(all_channels_names, no_channels)
+        self.statistics_ersp_itc_view = statisticsErspItcView(all_channels_names, event_ids)
         self.statistics_ersp_itc_view.set_listener(self)
 
         self.statistics_ersp_itc_view.show()
@@ -39,7 +39,8 @@ class statisticsErspItcController(statisticsErspItcListener):
         """
         self.statistics_ersp_itc_view.close()
 
-    def confirm_button_clicked(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
+    def confirm_button_clicked(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles,
+                               stats_first_variable, stats_second_variable):
         """
         Close the window and send the information to the main controller.
         :param method_tfr: Method used for computing the time-frequency analysis.
@@ -52,37 +53,33 @@ class statisticsErspItcController(statisticsErspItcListener):
         :type max_frequency: float
         :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
         :type n_cycles: int
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
         """
         self.statistics_ersp_itc_view.close()
         self.main_listener.statistics_ersp_itc_information(method_tfr, channel_selected, min_frequency, max_frequency,
-                                                           n_cycles)
+                                                           n_cycles, stats_first_variable, stats_second_variable)
 
-    def confirm_button_clicked_from_study(self, method_tfr, min_frequency, max_frequency, n_cycles):
-        """
-        Close the window and send the information to the study controller..
-        :param method_tfr: Method used for computing the time-frequency analysis.
-        :type method_tfr: str
-        :param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.
-        :type min_frequency: float
-        :param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.
-        :type max_frequency: float
-        :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
-        :type n_cycles: int
-        """
-        self.statistics_ersp_itc_view.close()
-        self.main_listener.statistics_ersp_itc_information(method_tfr, min_frequency, max_frequency, n_cycles)
-
-    def plot_ersp_itc(self, channel_selected, power, itc):
+    """
+    Plots
+    """
+    def plot_ersp_itc(self, channel_selected, power_one, itc_one, power_two, itc_two):
         """
         Send the information to the view for the plotting of the time-frequency analysis.
         :param channel_selected: The channel selected for the time-frequency analysis.
         :type channel_selected: str
-        :param power: "power" data of the time-frequency analysis computation.
-        :type power: MNE.AverageTFR
-        :param itc: "itc" data of the time-frequency analysis computation.
-        :type itc: MNE.AverageTFR
+        :param power_one: "power" data of the time-frequency analysis computation of the first independent variable.
+        :type power_one: MNE.AverageTFR
+        :param itc_one: "itc" data of the time-frequency analysis computation of the first independent variable.
+        :type itc_one: MNE.AverageTFR
+        :param power_two: "power" data of the time-frequency analysis computation of the second independent variable.
+        :type power_two: MNE.AverageTFR
+        :param itc_two: "itc" data of the time-frequency analysis computation of the second independent variable.
+        :type itc_two: MNE.AverageTFR
         """
-        self.statistics_ersp_itc_view.plot_ersp_itc(channel_selected, power, itc)
+        self.statistics_ersp_itc_view.plot_ersp_itc(channel_selected, power_one, itc_one, power_two, itc_two)
 
     """
     Getters

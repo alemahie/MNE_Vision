@@ -27,7 +27,7 @@ class statisticsConnectivityListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, psi, fmin, fmax, connectivity_method, n_jobs):
+    def confirm_button_clicked(self, psi, fmin, fmax, connectivity_method, n_jobs, stats_first_variable, stats_second_variable):
         pass
 
     @abstractmethod

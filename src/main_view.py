@@ -220,7 +220,10 @@ class mainView(QMainWindow):
         :type channels_selected: list of str
         """
         erps = file_data.average()
-        erps.plot_joint(picks=channels_selected)
+        if len(channels_selected) == 1:
+            erps.plot(picks=channels_selected)
+        else:
+            erps.plot_joint(picks=channels_selected)
 
     """
     Updates

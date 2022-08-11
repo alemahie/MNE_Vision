@@ -8,6 +8,7 @@ Statistics runnable
 import numpy as np
 
 from copy import deepcopy
+from scipy.signal import welch
 
 from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 from matplotlib import pyplot as plt
@@ -16,9 +17,11 @@ from mne import make_forward_solution, write_forward_solution, compute_covarianc
     write_source_spaces, make_bem_model, make_bem_solution, write_bem_solution, read_forward_solution, read_cov
 from mne.minimum_norm import read_inverse_operator, make_inverse_operator, apply_inverse, write_inverse_operator
 from mne.stats import ttest_ind_no_p
-from mne.time_frequency import psd_welch
+from mne.time_frequency import psd_welch, tfr_morlet, tfr_multitaper, tfr_stockwell
 from mne.viz import plot_snr_estimate
-from scipy.signal import welch
+
+from mne_connectivity import envelope_correlation, spectral_connectivity_epochs, phase_slope_index
+from scipy.stats import ttest_ind
 
 from utils.view.error_window import errorWindow
 from utils.file_path_search import get_project_freesurfer_path
@@ -107,7 +110,9 @@ class statisticsSnrRunnable(QRunnable):
             self.second_SNRs = deepcopy(self.SNRs)
             # Statistics
             for i in range(len(self.first_SNRs)):
-                self.t_values.append(ttest_ind_no_p(self.first_SNRs[i], self.second_SNRs[i]))
+                t_values, p_values = ttest_ind(self.first_SNRs[i], self.second_SNRs[i])
+                self.t_values.append(p_values)
+
             self.signals.finished.emit()
         except Exception as error:
             error_message = "An error as occurred during the computation of the SNR."
@@ -633,3 +638,346 @@ class statisticsSnrRunnable(QRunnable):
         """
         return self.snr_methods
 
+
+# Time Frequency
+class statisticsErspItcWorkerSignals(QObject):
+    """
+    Contain the signals used by the time-frequency runnable.
+    """
+    finished = pyqtSignal()
+    error = pyqtSignal()
+
+
+class statisticsErspItcRunnable(QRunnable):
+    def __init__(self, file_data, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles, stats_first_variable,
+                 stats_second_variable):
+        """
+        Runnable for the computation of the time-frequency analysis of the given data.
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param method_tfr: Method used for computing the time-frequency analysis.
+        :type method_tfr: str
+        :param channel_selected: Channel on which the time-frequency analysis will be computed.
+        :type channel_selected: str
+        :param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.
+        :type min_frequency: float
+        :param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.
+        :type max_frequency: float
+        :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
+        :type n_cycles: int
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
+        """
+        super().__init__()
+        self.signals = statisticsErspItcWorkerSignals()
+
+        self.file_data = file_data
+        self.method_tfr = method_tfr
+        self.channel_selected = channel_selected
+        self.min_frequency = min_frequency
+        self.max_frequency = max_frequency
+        self.n_cycles = n_cycles
+        self.stats_first_variable = stats_first_variable
+        self.stats_second_variable = stats_second_variable
+
+        self.power_one = None
+        self.power_two = None
+        self.itc_one = None
+        self.itc_two = None
+
+    def run(self):
+        """
+        Launch the computation of the time-frequency analysis on the given data.
+        Notifies the main model that the computation is finished.
+        If to extreme parameters are given and the computation fails, an error message is displayed describing the error.
+        Notifies the main model when an error occurs.
+        """
+        try:
+            file_data_one = deepcopy(self.file_data)
+            mask = self.create_mask_from_variable_to_keep(file_data_one, self.stats_first_variable)
+            file_data_one = file_data_one.drop(mask)
+
+            file_data_two = deepcopy(self.file_data)
+            mask = self.create_mask_from_variable_to_keep(file_data_two, self.stats_second_variable)
+            file_data_two = file_data_two.drop(mask)
+
+            freqs = np.arange(self.min_frequency, self.max_frequency)
+            if self.method_tfr == "Morlet":
+                self.power_one, self.itc_one = tfr_morlet(file_data_one, freqs=freqs, n_cycles=self.n_cycles,
+                                                          picks=self.channel_selected)
+                self.power_two, self.itc_two = tfr_morlet(file_data_two, freqs=freqs, n_cycles=self.n_cycles,
+                                                          picks=self.channel_selected)
+            elif self.method_tfr == "Multitaper":
+                self.power_one, self.itc_one = tfr_multitaper(file_data_one, freqs=freqs, n_cycles=self.n_cycles,
+                                                              picks=self.channel_selected)
+                self.power_two, self.itc_two = tfr_multitaper(file_data_two, freqs=freqs, n_cycles=self.n_cycles,
+                                                              picks=self.channel_selected)
+            elif self.method_tfr == "Stockwell":
+                self.power_one, self.itc_one = tfr_stockwell(file_data_one, freqs=freqs, n_cycles=self.n_cycles,
+                                                             picks=self.channel_selected)
+                self.power_two, self.itc_two = tfr_stockwell(file_data_two, freqs=freqs, n_cycles=self.n_cycles,
+                                                             picks=self.channel_selected)
+            self.signals.finished.emit()
+        except ValueError as error:
+            error_message = "An error as occurred during the computation of the time frequency analysis."
+            detailed_message = str(error)
+            error_window = errorWindow(error_message, detailed_message)
+            error_window.show()
+            self.signals.error.emit()
+
+    """
+    Utils
+    """
+    @staticmethod
+    def create_mask_from_variable_to_keep(file_data, stats_variable):
+        """
+        Create a mask to know which trial to keep and which one to remove for the computation.
+        :return mask: Mask of trials to remove. True means remove, and False means keep.
+        :rtype mask: list of boolean
+        """
+        mask = [True for _ in range(len(file_data.events))]
+        event_ids = file_data.event_id
+        event_id_to_keep = event_ids[stats_variable]
+        for i, event in enumerate(file_data.events):
+            if event[2] == event_id_to_keep:        # 2 is the event id in the events
+                mask[i] = False
+        return mask
+
+    """
+    Getters
+    """
+    def get_channel_selected(self):
+        """
+        Get the channel selected for the computation.
+        :return: The channel selected.
+        :rtype: str
+        """
+        return self.channel_selected
+
+    def get_power_one(self):
+        """
+        Get the "power" data of the time-frequency analysis computation for the first independent variable.
+        :return: "power" data of the time-frequency analysis computation.
+        :rtype: MNE.AverageTFR
+        """
+        return self.power_one
+
+    def get_power_two(self):
+        """
+        Get the "power" data of the time-frequency analysis computation for the second independent variable.
+        :return: "power" data of the time-frequency analysis computation.
+        :rtype: MNE.AverageTFR
+        """
+        return self.power_two
+
+    def get_itc_one(self):
+        """
+        Get the "itc" data of the time-frequency analysis computation for the first independent variable.
+        :return: "itc" data of the time-frequency analysis computation.
+        :rtype: MNE.AverageTFR
+        """
+        return self.itc_one
+
+    def get_itc_two(self):
+        """
+        Get the "itc" data of the time-frequency analysis computation for the second independent variable.
+        :return: "itc" data of the time-frequency analysis computation.
+        :rtype: MNE.AverageTFR
+        """
+        return self.itc_two
+
+
+# Envelope Correlation
+class statisticsConnectivityWorkerSignals(QObject):
+    """
+    Contain the signals used by the envelope correlation runnable.
+    """
+    finished = pyqtSignal()
+    error = pyqtSignal()
+
+
+# noinspection PyUnresolvedReferences
+class statisticsConnectivityRunnable(QRunnable):
+    def __init__(self, file_data, psi, fmin, fmax, connectivity_method, n_jobs, export_path, stats_first_variable,
+                 stats_second_variable):
+        """
+        Runnable for the computation of the envelope correlation of the dataset.
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+        directionality of the connectivity.
+        :type psi: bool
+        :param fmin: Minimum frequency from which the envelope correlation will be computed.
+        :type fmin: float
+        :param fmax: Maximum frequency from which the envelope correlation will be computed.
+        :type fmax: float
+        :param connectivity_method: Method used for computing the source space connectivity.
+        :type connectivity_method: str
+        :param n_jobs: Number of processes used to compute the source estimation
+        :type n_jobs: int
+        :param export_path: Path where the envelope correlation data will be stored.
+        :type export_path: str
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
+        """
+        super().__init__()
+        self.signals = statisticsConnectivityWorkerSignals()
+
+        self.file_data = deepcopy(file_data)
+        self.psi = psi
+        self.fmin = fmin
+        self.fmax = fmax
+        self.connectivity_method = connectivity_method
+        self.n_jobs = n_jobs
+        self.export_path = export_path
+        self.stats_first_variable = stats_first_variable
+        self.stats_second_variable = stats_second_variable
+
+        self.connectivity_data_one = None
+        self.connectivity_data_two = None
+        self.psi_data_one = None
+        self.psi_data_two = None
+
+    def run(self):
+        """
+        Launch the computation of the envelope correlation on the given data.
+        Notifies the main model that the computation is finished.
+        """
+        try:
+            file_data_one = deepcopy(self.file_data)
+            mask = self.create_mask_from_variable_to_keep(self.file_data, self.stats_first_variable)
+            file_data_one = file_data_one.drop(mask)
+
+            file_data_two = deepcopy(self.file_data)
+            mask = self.create_mask_from_variable_to_keep(self.file_data, self.stats_second_variable)
+            file_data_two = file_data_two.drop(mask)
+
+            self.compute_correlation_data(file_data_one, file_data_two)
+            if self.psi:
+                psi_data_one = phase_slope_index(file_data_one, fmin=self.fmin, fmax=self.fmax)
+                self.psi_data_one = psi_data_one.get_data(output="dense")[:, :, 0]
+
+                psi_data_two = phase_slope_index(file_data_two, fmin=self.fmin, fmax=self.fmax)
+                self.psi_data_two = psi_data_two.get_data(output="dense")[:, :, 0]
+            self.check_data_export()
+            self.signals.finished.emit()
+        except Exception as error:
+            error_message = "An error as occurred during the computation of the envelope correlation."
+            error_window = errorWindow(error_message, detailed_message=str(error))
+            error_window.show()
+            self.signals.error.emit()
+
+    def compute_correlation_data(self, file_data_one, file_data_two):
+        """
+        Compute the correct correlation data depending on the method chosen by the user.
+        """
+        if self.connectivity_method == "envelope_correlation":
+            connectivity_data_one = envelope_correlation(file_data_one).combine()
+            self.connectivity_data_one = connectivity_data_one.get_data(output="dense")[:, :, 0]
+
+            connectivity_data_two = envelope_correlation(file_data_two).combine()
+            self.connectivity_data_two = connectivity_data_two.get_data(output="dense")[:, :, 0]
+        else:
+            sfreq = self.file_data.info["sfreq"]
+            connectivity_data_one = spectral_connectivity_epochs(file_data_one, method=self.connectivity_method, mode="multitaper",
+                                                                 sfreq=sfreq, fmin=self.fmin, fmax=self.fmax, faverage=True,
+                                                                 mt_adaptive=True, n_jobs=self.n_jobs)
+            self.connectivity_data_one = connectivity_data_one.get_data(output="dense")[:, :, 0]
+            connectivity_data_two = spectral_connectivity_epochs(file_data_one, method=self.connectivity_method, mode="multitaper",
+                                                                 sfreq=sfreq, fmin=self.fmin, fmax=self.fmax, faverage=True,
+                                                                 mt_adaptive=True, n_jobs=self.n_jobs)
+            self.connectivity_data_two = connectivity_data_two.get_data(output="dense")[:, :, 0]
+
+    def check_data_export(self):
+        """
+        Check if the envelope correlation data and the PSI must be exported.
+        """
+        if self.export_path is not None:
+            data = self.envelope_correlation_data
+            channels = self.file_data.ch_names
+            self.save_data(data, channels, "-connectivity")
+            if self.psi:
+                data = self.psi_data
+                self.save_data(data, channels, "-PSI")
+
+    def save_data(self, data, channels, file_name):
+        """
+        If it is the case, create the file and write the data in it.
+        :param data: The data to save, either the connectivity of PSI.
+        :type data: list of, list of float
+        :param channels: The channels names to save.
+        :type channels: list of str
+        :param file_name: The name of the data to save.
+        :type file_name: str
+        """
+        file = open(self.export_path + file_name + ".txt", "x")
+        # Write header
+        for i in range(len(channels)):
+            if i != len(channels) - 1:
+                file.write(channels[i] + ", ")
+            else:
+                file.write(channels[i])
+        file.write("\n")
+        # Write data
+        for i in range(len(data)):  # Channels 1
+            for j in range(len(data)):  # Channels 2
+                if j != len(data) - 1:
+                    file.write(str(data[i][j]) + ", ")
+                else:
+                    file.write(str(data[i][j]))
+            file.write("\n")
+        file.close()
+
+    @staticmethod
+    def create_mask_from_variable_to_keep(file_data, stats_variable):
+        """
+        Create a mask to know which trial to keep and which one to remove for the computation.
+        :return mask: Mask of trials to remove. True means remove, and False means keep.
+        :rtype mask: list of boolean
+        """
+        mask = [True for _ in range(len(file_data.events))]
+        event_ids = file_data.event_id
+        event_id_to_keep = event_ids[stats_variable]
+        for i, event in enumerate(file_data.events):
+            if event[2] == event_id_to_keep:        # 2 is the event id in the events
+                mask[i] = False
+        return mask
+
+    """
+    Getters
+    """
+    def get_connectivity_data_one(self):
+        """
+        Get the connectivity's data of the first independent variable.
+        :return: The connectivity's data.
+        :rtype: list of, list of float
+        """
+        return self.connectivity_data_one
+
+    def get_connectivity_data_two(self):
+        """
+        Get the connectivity's data of the second independent variable.
+        :return: The connectivity's data.
+        :rtype: list of, list of float
+        """
+        return self.connectivity_data_two
+
+    def get_psi_data_one(self):
+        """
+        Get the psi's data of the first independent variable.
+        :return: The psi's data. Or nothing if the psi's data has not been computed.
+        :rtype: list of, list of float
+        """
+        return self.psi_data_one
+
+    def get_psi_data_two(self):
+        """
+        Get the psi's data of the first independent variable.
+        :return: The psi's data. Or nothing if the psi's data has not been computed.
+        :rtype: list of, list of float
+        """
+        return self.psi_data_two

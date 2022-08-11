@@ -5,9 +5,7 @@
 Main controller
 """
 
-from copy import copy, deepcopy
-
-from mne.stats import ttest_ind_no_p
+from copy import copy
 
 from main_model import mainModel
 from main_view import mainView
@@ -1252,8 +1250,14 @@ class mainController(mainListener):
         """
         Create the controller for plotting the topographies of the dataset.
         """
-        self.topographies_controller = topographiesController()
-        self.topographies_controller.set_listener(self)
+        file_type = self.main_model.get_file_type()
+        if file_type == "Epochs":
+            self.topographies_controller = topographiesController()
+            self.topographies_controller.set_listener(self)
+        else:
+            error_message = "You can not compute the topographies on a raw file"
+            error_window = errorWindow(error_message)
+            error_window.show()
 
     def plot_topographies_information(self, time_points, mode):
         """
@@ -1271,10 +1275,16 @@ class mainController(mainListener):
         """
         Create the controller for computing the power spectral density of the dataset.
         """
-        minimum_time = self.main_model.get_epochs_start()
-        maximum_time = self.main_model.get_epochs_end()
-        self.power_spectral_density_controller = powerSpectralDensityController(minimum_time, maximum_time)
-        self.power_spectral_density_controller.set_listener(self)
+        file_type = self.main_model.get_file_type()
+        if file_type == "Epochs":
+            minimum_time = self.main_model.get_epochs_start()
+            maximum_time = self.main_model.get_epochs_end()
+            self.power_spectral_density_controller = powerSpectralDensityController(minimum_time, maximum_time)
+            self.power_spectral_density_controller.set_listener(self)
+        else:
+            error_message = "You can not compute the PSD on a raw file"
+            error_window = errorWindow(error_message)
+            error_window.show()
 
     def plot_spectra_maps_information(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
         """
@@ -1322,9 +1332,15 @@ class mainController(mainListener):
         """
         Create the controller for computing the ERP image the dataset.
         """
-        all_channels_names = self.main_model.get_all_channels_names()
-        self.erp_image_controller = erpImageController(all_channels_names)
-        self.erp_image_controller.set_listener(self)
+        file_type = self.main_model.get_file_type()
+        if file_type == "Epochs":
+            all_channels_names = self.main_model.get_all_channels_names()
+            self.erp_image_controller = erpImageController(all_channels_names)
+            self.erp_image_controller.set_listener(self)
+        else:
+            error_message = "You can not compute the ERP image on a raw file"
+            error_window = errorWindow(error_message)
+            error_window.show()
 
     def plot_ERP_image_information(self, channel_selected):
         """
@@ -1340,9 +1356,15 @@ class mainController(mainListener):
         """
         Create the controller for computing the ERPs the dataset.
         """
-        all_channels_names = self.main_model.get_all_channels_names()
-        self.erp_controller = erpController(all_channels_names)
-        self.erp_controller.set_listener(self)
+        file_type = self.main_model.get_file_type()
+        if file_type == "Epochs":
+            all_channels_names = self.main_model.get_all_channels_names()
+            self.erp_controller = erpController(all_channels_names)
+            self.erp_controller.set_listener(self)
+        else:
+            error_message = "You can not compute the ERPs on a raw file"
+            error_window = errorWindow(error_message)
+            error_window.show()
 
     def plot_ERPs_information(self, channels_selected):
         """
@@ -1358,9 +1380,15 @@ class mainController(mainListener):
         """
         Create the controller for computing the time-frequency analysis on the dataset.
         """
-        all_channels_names = self.main_model.get_all_channels_names()
-        self.time_frequency_ersp_itc_controller = timeFrequencyErspItcController(all_channels_names)
-        self.time_frequency_ersp_itc_controller.set_listener(self)
+        file_type = self.main_model.get_file_type()
+        if file_type == "Epochs":
+            all_channels_names = self.main_model.get_all_channels_names()
+            self.time_frequency_ersp_itc_controller = timeFrequencyErspItcController(all_channels_names)
+            self.time_frequency_ersp_itc_controller.set_listener(self)
+        else:
+            error_message = "You can not compute the ERSP-ITC on a raw file"
+            error_window = errorWindow(error_message)
+            error_window.show()
 
     def plot_time_frequency_information(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
         """
@@ -1723,22 +1751,7 @@ class mainController(mainListener):
         :type stats_second_variable: str
         """
         file_data = self.main_model.get_file_data()
-        # First variable
-        file_data_save = deepcopy(file_data)
-        mask = self.create_mask_from_variable_to_keep(file_data, stats_first_variable)
-        file_data = file_data.drop(mask)
-        erps_first = file_data.average()
-        # Second variable
-        file_data = deepcopy(file_data_save)
-        mask = self.create_mask_from_variable_to_keep(file_data, stats_second_variable)
-        file_data = file_data.drop(mask)
-        erps_second = file_data.average()
-        # Stats
-        t_values = []
-        for i in range(len(erps_first.get_data())):
-            t_values.append(ttest_ind_no_p(erps_first.get_data()[i], erps_second.get_data()[i]))
-        # Plot
-        self.statistics_erp_controller.plot_erps(channels_selected, erps_first, erps_second, t_values)
+        self.statistics_erp_controller.plot_erps(channels_selected, file_data, stats_first_variable, stats_second_variable)
 
     # PSD
     def statistics_psd_clicked(self):
@@ -1747,10 +1760,13 @@ class mainController(mainListener):
         """
         minimum_time = self.main_model.get_epochs_start()
         maximum_time = self.main_model.get_epochs_end()
-        self.statistics_psd_controller = statisticsPsdController(minimum_time, maximum_time)
+        event_ids = self.main_model.get_event_ids()
+        all_channels_names = self.main_model.get_all_channels_names()
+        self.statistics_psd_controller = statisticsPsdController(minimum_time, maximum_time, event_ids, all_channels_names)
         self.statistics_psd_controller.set_listener(self)
 
-    def statistics_psd_information(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
+    def statistics_psd_information(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points,
+                                   channel_selected, stats_first_variable, stats_second_variable):
         """
         Create the waiting window while the computation of the power spectral density is done on the dataset.
         :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.
@@ -1763,8 +1779,43 @@ class mainController(mainListener):
         :type maximum_time: float
         :param topo_time_points: The time points for the topomaps.
         :type topo_time_points: list of float
+        :param channel_selected: Channel selected for the ERP.
+        :type channel_selected: str
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
         """
-        print("Statistics PSD")
+        processing_title = "PSD running, please wait."
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title,
+                                                                                    self.statistics_psd_finished)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.main_model.statistics_psd(minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points,
+                                       channel_selected, stats_first_variable, stats_second_variable)
+
+    def statistics_psd_computation_finished(self):
+        """
+        Close the waiting window when the computation of the power spectral density is done on the dataset.
+        """
+        processing_title_finished = "PSD finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def statistics_psd_computation_error(self):
+        """
+        Close the waiting window when the computation of the power spectral density is done on the dataset.
+        """
+        processing_title_finished = "An error has occurred during the computation of the PSD"
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
+
+    def statistics_psd_finished(self):
+        """
+        The computation of the power spectral density is completely done, plot it.
+        """
+        psd_fig_one = self.main_model.get_statistics_psd_fig_one()
+        topo_fig_one = self.main_model.get_statistics_psd_topo_fig_one()
+        psd_fig_two = self.main_model.get_statistics_psd_fig_two()
+        topo_fig_two = self.main_model.get_statistics_psd_topo_fig_two()
+        self.statistics_psd_controller.plot_psd(psd_fig_one, topo_fig_one, psd_fig_two, topo_fig_two)
 
     # ERSP ITC
     def statistics_ersp_itc_clicked(self):
@@ -1772,10 +1823,12 @@ class mainController(mainListener):
         Create the controller for computing the time-frequency analysis and the statistics on the dataset.
         """
         all_channels_names = self.main_model.get_all_channels_names()
-        self.statistics_ersp_itc_controller = statisticsErspItcController(all_channels_names)
+        event_ids = self.main_model.get_event_ids()
+        self.statistics_ersp_itc_controller = statisticsErspItcController(all_channels_names, event_ids)
         self.statistics_ersp_itc_controller.set_listener(self)
 
-    def statistics_ersp_itc_information(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
+    def statistics_ersp_itc_information(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles,
+                                        stats_first_variable, stats_second_variable):
         """
         Create the waiting window while the computation of the time-frequency analysis is done on the dataset.
         :param method_tfr: Method used for computing the time-frequency analysis.
@@ -1788,8 +1841,42 @@ class mainController(mainListener):
         :type max_frequency: float
         :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
         :type n_cycles: int
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
         """
-        print("Statistics ERSP ITC")
+        processing_title = "Time frequency analysis running, please wait."
+        self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title,
+                                                                                    self.statistics_ersp_itc_finished)
+        self.waiting_while_processing_controller.set_listener(self)
+        self.main_model.statistics_ersp_itc(method_tfr, channel_selected, min_frequency, max_frequency, n_cycles,
+                                            stats_first_variable, stats_second_variable)
+
+    def statistics_ersp_itc_computation_finished(self):
+        """
+        Close the waiting window when the computation of the time-frequency analysis is done on the dataset.
+        """
+        processing_title_finished = "Time frequency analysis finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def statistics_ersp_itc_computation_error(self):
+        """
+        Close the waiting window and display an error message because an error occurred during the computation.
+        """
+        processing_title_finished = "An error as occurred during the time frequency analysis, please try again."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
+
+    def statistics_ersp_itc_finished(self):
+        """
+        The computation of the time-frequency analysis is completely done, plot it.
+        """
+        channel_selected = self.main_model.get_statistics_ersp_itc_channel_selected()
+        power_one = self.main_model.get_statistics_power_one()
+        itc_one = self.main_model.get_statistics_itc_one()
+        power_two = self.main_model.get_statistics_power_two()
+        itc_two = self.main_model.get_statistics_itc_two()
+        self.statistics_ersp_itc_controller.plot_ersp_itc(channel_selected, power_one, itc_one, power_two, itc_two)
 
     # Connectivity
     def statistics_connectivity_clicked(self):
@@ -1798,10 +1885,12 @@ class mainController(mainListener):
         """
         number_of_channels = self.main_model.get_number_of_channels()
         file_data = self.main_model.get_file_data()
-        self.statistics_connectivity_controller = statisticsConnectivityController(number_of_channels, file_data)
+        event_ids = self.main_model.get_event_ids()
+        self.statistics_connectivity_controller = statisticsConnectivityController(number_of_channels, file_data, event_ids)
         self.statistics_connectivity_controller.set_listener(self)
 
-    def statistics_connectivity_information(self, psi, fmin, fmax, connectivity_method, n_jobs, export_path):
+    def statistics_connectivity_information(self, psi, fmin, fmax, connectivity_method, n_jobs, export_path, stats_first_variable,
+                                            stats_second_variable):
         """
         Create the waiting window while the computation of the envelope correlation is done on the dataset.
         :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
@@ -1817,8 +1906,47 @@ class mainController(mainListener):
         :type n_jobs: int
         :param export_path: Path where the envelope correlation data will be stored.
         :type export_path: str
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
         """
         print("Statistics Connectivity")
+        try:
+            processing_title = "Envelope correlation running, please wait."
+            self.waiting_while_processing_controller = waitingWhileProcessingController(processing_title,
+                                                                                        self.statistics_connectivity_finished)
+            self.waiting_while_processing_controller.set_listener(self)
+            self.main_model.statistics_connectivity(psi, fmin, fmax, connectivity_method, n_jobs, export_path, stats_first_variable,
+                                                    stats_second_variable)
+        except Exception as e:
+            print(e)
+
+    def statistics_connectivity_computation_finished(self):
+        """
+        Close the waiting window when the computation of the envelope correlation is done on the dataset.
+        """
+        processing_title_finished = "Envelope correlation finished."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
+
+    def statistics_connectivity_computation_error(self):
+        """
+        Close the waiting window and display an error message because an error occurred during the computation.
+        """
+        processing_title_finished = "An error as occurred during the computation of the envelope correlation, please try again."
+        self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished, error=True)
+
+    def statistics_connectivity_finished(self):
+        """
+        The computation of the envelope correlation is completely done, plot it.
+        """
+        connectivity_data_one = self.main_model.get_statistics_connectivity_data_one()
+        psi_data_one = self.main_model.get_statistics_psi_data_one()
+        connectivity_data_two = self.main_model.get_statistics_connectivity_data_two()
+        psi_data_two = self.main_model.get_statistics_psi_data_two()
+        channel_names = self.main_model.get_all_channels_names()
+        self.statistics_connectivity_controller.plot_envelope_correlation(connectivity_data_one, connectivity_data_two,
+                                                                          psi_data_one, psi_data_two, channel_names)
 
     """
     Study Menu
@@ -1928,24 +2056,6 @@ class mainController(mainListener):
         """
         processing_title_finished = "Download finished. \n You can now use the tools where the source space is needed."
         self.waiting_while_processing_controller.stop_progress_bar(processing_title_finished)
-
-    """
-    Utils
-    """
-    @staticmethod
-    def create_mask_from_variable_to_keep(file_data, stats_variable):
-        """
-        Create a mask to know which trial to keep and which one to remove for the computation.
-        :return mask: Mask of trials to remove. True means remove, and False means keep.
-        :rtype mask: list of boolean
-        """
-        mask = [True for _ in range(len(file_data.events))]
-        event_ids = file_data.event_id
-        event_id_to_keep = event_ids[stats_variable]
-        for i, event in enumerate(file_data.events):
-            if event[2] == event_id_to_keep:        # 2 is the event id in the events
-                mask[i] = False
-        return mask
 
     """
     Getters

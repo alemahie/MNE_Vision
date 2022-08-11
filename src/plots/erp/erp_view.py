@@ -66,11 +66,11 @@ class erpView(QWidget):
         Retrieve the parameters and send the information to the controller.
         """
         if self.channels_selection_opened:
-            if len(self.channels_selected) >= 2:
-                # Need at least 2 channels, because with 0 we have no info, and with 1 we can plot the topographies.
+            if len(self.channels_selected) >= 1:
+                # Need at least 1 channels, because with 0 we have no info.
                 self.erp_listener.confirm_button_clicked(self.channels_selected)
             else:
-                error_message = "Please select at least 2 channels in the 'channel selection' menu before starting the computation. \n" \
+                error_message = "Please select at least 1 channel in the 'channel selection' menu before starting the computation. \n" \
                                 "Otherwise we do not have enough information do compute the ERPs"
                 error_window = errorWindow(error_message)
                 error_window.show()

@@ -290,7 +290,7 @@ class statisticsSnrView(QWidget):
         ax.table(cellText=res, rowLabels=SNR_methods,
                  colLabels=['First variable\nSNR mean\nvalue (dB)', 'First variable\nSNR standard\ndeviation (dB)',
                             'Second variable\nSNR mean\nvalue (dB)', 'Second variable\nSNR standard\ndeviation (dB)',
-                            'T-values'],
+                            'P-values'],
                  cellLoc='center', rowLoc='center', colLoc='center', loc='center')
         fig.tight_layout()
         plt.show()

@@ -51,19 +51,19 @@ class statisticsErpController(statisticsErpListener):
     """
     Plots
     """
-    def plot_erps(self, channels_selected, erps_first, erps_second, t_values):
+    def plot_erps(self, channels_selected, file_data, stats_first_variable, stats_second_variable):
         """
         Plot the ERPs
         :param channels_selected: The channels selected for the computation
         :type channels_selected: list of str
-        :param erps_first: The evoked data of the data of the first independent variable.
-        :type erps_first: MNE Evoked
-        :param erps_second: The evoked data of the data of the second independent variable.
-        :type erps_second: MNE Evoked
-        :param t_values: T-values computed over the SNRs of the two independent variables.
-        :type t_values: list of float
+        :param file_data: MNE data of the dataset.
+        :type file_data: MNE.Epochs/MNE.Raw
+        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+        :type stats_first_variable: str
+        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+        :type stats_second_variable: str
         """
-        self.statistics_erp_view.plot_erps(channels_selected, erps_first, erps_second, t_values)
+        self.statistics_erp_view.plot_erps(channels_selected, file_data, stats_first_variable, stats_second_variable)
 
     """
     Getters

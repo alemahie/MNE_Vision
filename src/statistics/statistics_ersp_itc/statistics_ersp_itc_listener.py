@@ -27,9 +27,6 @@ class statisticsErspItcListener(ABC):
         pass
 
     @abstractmethod
-    def confirm_button_clicked(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
-        pass
-
-    @abstractmethod
-    def confirm_button_clicked_from_study(self, method_tfr, min_frequency, max_frequency, n_cycles):
+    def confirm_button_clicked(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles, stats_first_variable,
+                               stats_second_variable):
         pass

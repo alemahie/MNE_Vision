@@ -569,7 +569,8 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def statistics_psd_information(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points):
+    def statistics_psd_information(self, minimum_frequency, maximum_frequency, minimum_time, maximum_time, topo_time_points,
+                                   channel_selected, stats_first_variable, stats_second_variable):
         pass
 
     # ERSP ITC
@@ -578,7 +579,8 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def statistics_ersp_itc_information(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles):
+    def statistics_ersp_itc_information(self, method_tfr, channel_selected, min_frequency, max_frequency, n_cycles,
+                                        stats_first_variable, stats_second_variable):
         pass
 
     # Connectivity
@@ -587,7 +589,8 @@ class mainListener(ABC):
         pass
 
     @abstractmethod
-    def statistics_connectivity_information(self, psi, fmin, fmax, connectivity_method, n_jobs, export_path):
+    def statistics_connectivity_information(self, psi, fmin, fmax, connectivity_method, n_jobs, export_path,
+                                            stats_first_variable, stats_second_variable):
         pass
 
     """
