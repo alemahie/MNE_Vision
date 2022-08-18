@@ -1,0 +1,153 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Download fsaverage MNE Data Controller</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">utils.download_fsaverage_mne_data.download_fsaverage_mne_data_listener</span> <span class="kn">import</span> <span class="n">downloadFsaverageMneDataListener</span>
+<span class="kn">from</span> <span class="nn">utils.download_fsaverage_mne_data.download_fsaverage_mne_data_model</span> <span class="kn">import</span> <span class="n">downloadFsaverageMneDataModel</span>
+<span class="kn">from</span> <span class="nn">utils.download_fsaverage_mne_data.download_fsaverage_mne_data_view</span> <span class="kn">import</span> <span class="n">downloadFsaverageMneDataView</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<div class="viewcode-block" id="downloadFsaverageMneDataController"><a class="viewcode-back" href="../../../../src.utils.download_fsaverage_mne_data.html#src.utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller.downloadFsaverageMneDataController">[docs]</a><span class="k">class</span> <span class="nc">downloadFsaverageMneDataController</span><span class="p">(</span><span class="n">downloadFsaverageMneDataListener</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Controller for downloading the mne sample and fsaverage datasets.</span>
+<span class="sd">        Create a new window for asking if the download wants to be done</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_fsaverage_mne_data_model</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_fsaverage_mne_data_view</span> <span class="o">=</span> <span class="n">downloadFsaverageMneDataView</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_fsaverage_mne_data_view</span><span class="o">.</span><span class="n">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_fsaverage_mne_data_view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<div class="viewcode-block" id="downloadFsaverageMneDataController.cancel_button_clicked"><a class="viewcode-back" href="../../../../src.utils.download_fsaverage_mne_data.html#src.utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller.downloadFsaverageMneDataController.cancel_button_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">cancel_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_fsaverage_mne_data_view</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="downloadFsaverageMneDataController.confirm_button_clicked"><a class="viewcode-back" href="../../../../src.utils.download_fsaverage_mne_data.html#src.utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller.downloadFsaverageMneDataController.confirm_button_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the window and send the information to the main controller.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_fsaverage_mne_data_view</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span><span class="o">.</span><span class="n">download_fsaverage_mne_data_information</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Download</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="downloadFsaverageMneDataController.download_fsaverage_mne_data"><a class="viewcode-back" href="../../../../src.utils.download_fsaverage_mne_data.html#src.utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller.downloadFsaverageMneDataController.download_fsaverage_mne_data">[docs]</a>    <span class="k">def</span> <span class="nf">download_fsaverage_mne_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the download of the fsaverage and sample datasets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_fsaverage_mne_data_model</span> <span class="o">=</span> <span class="n">downloadFsaverageMneDataModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_fsaverage_mne_data_model</span><span class="o">.</span><span class="n">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_fsaverage_mne_data_model</span><span class="o">.</span><span class="n">download_fsaverage_mne_data</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="downloadFsaverageMneDataController.download_fsaverage_mne_data_computation_finished"><a class="viewcode-back" href="../../../../src.utils.download_fsaverage_mne_data.html#src.utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller.downloadFsaverageMneDataController.download_fsaverage_mne_data_computation_finished">[docs]</a>    <span class="k">def</span> <span class="nf">download_fsaverage_mne_data_computation_finished</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span><span class="o">.</span><span class="n">download_fsaverage_mne_data_computation_finished</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Setters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="downloadFsaverageMneDataController.set_listener"><a class="viewcode-back" href="../../../../src.utils.download_fsaverage_mne_data.html#src.utils.download_fsaverage_mne_data.download_fsaverage_mne_data_controller.downloadFsaverageMneDataController.set_listener">[docs]</a>    <span class="k">def</span> <span class="nf">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the main listener so that the controller is able to communicate with the main controller.</span>
+<span class="sd">        :param listener: main listener</span>
+<span class="sd">        :type listener: mainController</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span> <span class="o">=</span> <span class="n">listener</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

@@ -5,14 +5,14 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
 
-   src.classification.classify
+    src.classification.applePy
+    src.classification.classify
 
 Module contents
 ---------------
 
 .. automodule:: src.classification
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:

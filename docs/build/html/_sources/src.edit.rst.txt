@@ -5,16 +5,15 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
 
-   src.edit.channel_location
-   src.edit.dataset_info
-   src.edit.event_values
+    src.edit.channel_location
+    src.edit.dataset_info
+    src.edit.event_values
 
 Module contents
 ---------------
 
 .. automodule:: src.edit
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:

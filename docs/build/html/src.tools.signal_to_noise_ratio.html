@@ -1,0 +1,321 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.tools.signal_to_noise_ratio package &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.tools.source_estimation package" href="src.tools.source_estimation.html" />
+    <link rel="prev" title="src.tools.resampling package" href="src.tools.resampling.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.tools.source_estimation.html" title="src.tools.source_estimation package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.tools.resampling.html" title="src.tools.resampling package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.tools.html" accesskey="U">src.tools package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="src-tools-signal-to-noise-ratio-package">
+<h1>src.tools.signal_to_noise_ratio package<a class="headerlink" href="#src-tools-signal-to-noise-ratio-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller">
+<span id="src-tools-signal-to-noise-ratio-signal-to-noise-ratio-controller-module"></span><h2>src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller module<a class="headerlink" href="#module-src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller" title="Permalink to this headline">¶</a></h2>
+<p>SNR controller</p>
+<dl class="class">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.signalToNoiseRatioController">
+<em class="property">class </em><code class="descclassname">src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.</code><code class="descname">signalToNoiseRatioController</code><span class="sig-paren">(</span><em>all_channels_names</em>, <em>event_values</em>, <em>event_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_controller.html#signalToNoiseRatioController"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.signalToNoiseRatioController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tools.signal_to_noise_ratio.signal_to_noise_ratio_listener.signalToNoiseRatioListener</span></code></p>
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.signalToNoiseRatioController.cancel_button_clicked">
+<code class="descname">cancel_button_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_controller.html#signalToNoiseRatioController.cancel_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.signalToNoiseRatioController.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.signalToNoiseRatioController.confirm_button_clicked">
+<code class="descname">confirm_button_clicked</code><span class="sig-paren">(</span><em>snr_methods</em>, <em>source_method</em>, <em>read</em>, <em>write</em>, <em>picks</em>, <em>trials_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_controller.html#signalToNoiseRatioController.confirm_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.signalToNoiseRatioController.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window and send the information to the main controller.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.signalToNoiseRatioController.get_elements_selected">
+<code class="descname">get_elements_selected</code><span class="sig-paren">(</span><em>elements_selected</em>, <em>element_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_controller.html#signalToNoiseRatioController.get_elements_selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.signalToNoiseRatioController.get_elements_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the elements selected by the user in the multiple elements’ selector.
+:param elements_selected: Elements selected in the multiple elements’ selector.
+:type elements_selected: list of str
+:param element_type: Type of the element selected, used in case multiple element selector windows can be open in
+a window. Can thus distinguish the returned elements.
+:type element_type: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.signalToNoiseRatioController.plot_SNRs">
+<code class="descname">plot_SNRs</code><span class="sig-paren">(</span><em>SNRs</em>, <em>SNR_methods</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_controller.html#signalToNoiseRatioController.plot_SNRs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.signalToNoiseRatioController.plot_SNRs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the SNRs
+:param SNRs: SNRs
+:type SNRs: list of, list of float
+:param SNR_methods: SNR methods
+:type SNR_methods: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.signalToNoiseRatioController.set_listener">
+<code class="descname">set_listener</code><span class="sig-paren">(</span><em>listener</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_controller.html#signalToNoiseRatioController.set_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller.signalToNoiseRatioController.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the main listener so that the controller is able to communicate with the main controller.
+:param listener: main listener
+:type listener: mainController</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener">
+<span id="src-tools-signal-to-noise-ratio-signal-to-noise-ratio-listener-module"></span><h2>src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener module<a class="headerlink" href="#module-src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener" title="Permalink to this headline">¶</a></h2>
+<p>SNR listener</p>
+<dl class="class">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener.signalToNoiseRatioListener">
+<em class="property">class </em><code class="descclassname">src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener.</code><code class="descname">signalToNoiseRatioListener</code><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_listener.html#signalToNoiseRatioListener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener.signalToNoiseRatioListener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Listener doing the connection between the controller and the view for computing the SNR on the dataset.
+It retrieves the information from the view to send it to the controller.</p>
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener.signalToNoiseRatioListener.cancel_button_clicked">
+<code class="descname">cancel_button_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_listener.html#signalToNoiseRatioListener.cancel_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener.signalToNoiseRatioListener.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener.signalToNoiseRatioListener.confirm_button_clicked">
+<code class="descname">confirm_button_clicked</code><span class="sig-paren">(</span><em>snr_methods</em>, <em>source_method</em>, <em>read</em>, <em>write</em>, <em>picks</em>, <em>trials_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_listener.html#signalToNoiseRatioListener.confirm_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener.signalToNoiseRatioListener.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener.signalToNoiseRatioListener.get_elements_selected">
+<code class="descname">get_elements_selected</code><span class="sig-paren">(</span><em>elements_selected</em>, <em>element_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_listener.html#signalToNoiseRatioListener.get_elements_selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener.signalToNoiseRatioListener.get_elements_selected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view">
+<span id="src-tools-signal-to-noise-ratio-signal-to-noise-ratio-view-module"></span><h2>src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view module<a class="headerlink" href="#module-src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view" title="Permalink to this headline">¶</a></h2>
+<p>SNR view</p>
+<dl class="class">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView">
+<em class="property">class </em><code class="descclassname">src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.</code><code class="descname">signalToNoiseRatioView</code><span class="sig-paren">(</span><em>all_channels_names</em>, <em>event_values</em>, <em>event_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QWidget</span></code></p>
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.cancel_snr_trigger">
+<code class="descname">cancel_snr_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.cancel_snr_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.cancel_snr_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the information to the controller that the computation is cancelled.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.channels_selection_trigger">
+<code class="descname">channels_selection_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.channels_selection_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.channels_selection_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the multiple selector window.
+The user can select multiple channels.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.check_element_type">
+<code class="descname">check_element_type</code><span class="sig-paren">(</span><em>elements_selected</em>, <em>element_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.check_element_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.check_element_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.confirm_snr_trigger">
+<code class="descname">confirm_snr_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.confirm_snr_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.confirm_snr_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the parameters and send the information to the controller.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.get_save_load_button_checked">
+<code class="descname">get_save_load_button_checked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.get_save_load_button_checked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.get_save_load_button_checked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the values of the save and load buttons.
+:return: save_data: True if the data must be saved. Otherwise, False.
+load_data: True if the data must be loaded. Otherwise, False.
+:rtype: boolean, boolean</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.plot_SNRs">
+<em class="property">static </em><code class="descname">plot_SNRs</code><span class="sig-paren">(</span><em>SNRs</em>, <em>SNR_methods</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.plot_SNRs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.plot_SNRs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the SNRs
+:param SNRs: SNRs
+:type SNRs: list of, list of float
+:param SNR_methods: SNR methods
+:type SNR_methods: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.set_channels_selected">
+<code class="descname">set_channels_selected</code><span class="sig-paren">(</span><em>channels_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.set_channels_selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.set_channels_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the channels selected in the multiple selector window.
+:param channels_selected: Channels selected.
+:type channels_selected: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.set_listener">
+<code class="descname">set_listener</code><span class="sig-paren">(</span><em>listener</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.set_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the listener to the controller.
+:param listener: Listener to the controller.
+:type listener: signalToNoiseRatioController</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.set_snr_methods_selected">
+<code class="descname">set_snr_methods_selected</code><span class="sig-paren">(</span><em>snr_methods</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.set_snr_methods_selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.set_snr_methods_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the SNR methods selected in the multiple selector window.
+:param snr_methods: SNR methods selected
+:type snr_methods: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.set_trials_selected">
+<code class="descname">set_trials_selected</code><span class="sig-paren">(</span><em>elements_selected</em>, <em>element_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.set_trials_selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.set_trials_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the channels selected in the multiple selector window.
+:param elements_selected: Trials or Events selected.
+:type elements_selected: list of str
+:param element_type: Type of the element selected, used in case multiple element selector windows can be open in
+a window. Can thus distinguish the returned elements.
+:type element_type: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.snr_selection_trigger">
+<code class="descname">snr_selection_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.snr_selection_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.snr_selection_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the multiple selector window.
+The user can select a multiple pipelines used for the classification.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.trial_selection_events_trigger">
+<code class="descname">trial_selection_events_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.trial_selection_events_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.trial_selection_events_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the multiple selector window.
+The user can select the events he wants the source estimation to be computed on.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.trial_selection_indexes_trigger">
+<code class="descname">trial_selection_indexes_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/tools/signal_to_noise_ratio/signal_to_noise_ratio_view.html#signalToNoiseRatioView.trial_selection_indexes_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view.signalToNoiseRatioView.trial_selection_indexes_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the multiple selector window.
+The user can select the trials indexes he wants the source estimation to be computed on.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.tools.signal_to_noise_ratio">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.tools.signal_to_noise_ratio" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">src.tools.signal_to_noise_ratio package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller">src.tools.signal_to_noise_ratio.signal_to_noise_ratio_controller module</a></li>
+<li><a class="reference internal" href="#module-src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener">src.tools.signal_to_noise_ratio.signal_to_noise_ratio_listener module</a></li>
+<li><a class="reference internal" href="#module-src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view">src.tools.signal_to_noise_ratio.signal_to_noise_ratio_view module</a></li>
+<li><a class="reference internal" href="#module-src.tools.signal_to_noise_ratio">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="src.tools.resampling.html"
+                        title="previous chapter">src.tools.resampling package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="src.tools.source_estimation.html"
+                        title="next chapter">src.tools.source_estimation package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.tools.signal_to_noise_ratio.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.tools.source_estimation.html" title="src.tools.source_estimation package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.tools.resampling.html" title="src.tools.resampling package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.tools.html" >src.tools package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

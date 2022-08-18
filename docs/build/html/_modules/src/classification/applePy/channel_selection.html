@@ -1,0 +1,263 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.classification.applePy.channel_selection &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.classification.applePy.channel_selection</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Code for channel selection.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pyriemann.utils.distance</span> <span class="kn">import</span> <span class="n">distance</span>
+<span class="kn">from</span> <span class="nn">pyriemann.classification</span> <span class="kn">import</span> <span class="n">MDM</span>
+<span class="kn">from</span> <span class="nn">pyriemann.tangentspace</span> <span class="kn">import</span> <span class="n">TangentSpace</span>
+<span class="kn">from</span> <span class="nn">pyriemann.estimation</span> <span class="kn">import</span> <span class="n">Covariances</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">make_pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+
+
+<div class="viewcode-block" id="ElectrodeSelection"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.channel_selection.ElectrodeSelection">[docs]</a><span class="k">class</span> <span class="nc">ElectrodeSelection</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Channel selection based on a Riemannian geometry criterion. \n</span>
+
+<span class="sd">    For each class, a centroid is estimated, and the channel selection is based</span>
+<span class="sd">    on the maximization of the distance between centroids. This is done by a</span>
+<span class="sd">    backward elimination where the electrode that carries the less distance is</span>
+<span class="sd">    removed from the subset at each iteration.</span>
+<span class="sd">    This algorithm is described in [1].</span>
+
+<span class="sd">    Parameters \n</span>
+<span class="sd">    ---------- \n</span>
+<span class="sd">    nelec : int (default 16) \n</span>
+<span class="sd">        the number of electrode to keep in the final subset. \n</span>
+<span class="sd">    metric : string | dict (default: &#39;riemann&#39;) \n</span>
+<span class="sd">        The type of metric used for centroid and distance estimation. </span>
+<span class="sd">        see `mean_covariance` for the list of supported metric. </span>
+<span class="sd">        the metric could be a dict with two keys, `mean` and `distance` in</span>
+<span class="sd">        order to pass different metric for the centroid estimation and the</span>
+<span class="sd">        distance estimation. Typical usecase is to pass &#39;logeuclid&#39; metric for</span>
+<span class="sd">        the mean in order to boost the computional speed and &#39;riemann&#39; for the</span>
+<span class="sd">        distance in order to keep the good sensitivity for the selection. \n</span>
+<span class="sd">    n_jobs : int, (default: 1) \n</span>
+<span class="sd">        The number of jobs to use for the computation. This works by computing</span>
+<span class="sd">        each of the class centroid in parallel.</span>
+<span class="sd">        If -1 all CPUs are used. If 1 is given, no parallel computing code is</span>
+<span class="sd">        used at all, which is useful for debugging. For n_jobs below -1,</span>
+<span class="sd">        (n_cpus + 1 + n_jobs) are used. Thus for n_jobs = -2, all CPUs but one</span>
+<span class="sd">        are used. \n</span>
+
+<span class="sd">    Attributes \n</span>
+<span class="sd">    ---------- \n</span>
+<span class="sd">    covmeans_ : list \n</span>
+<span class="sd">        the class centroids. \n</span>
+<span class="sd">    dist_ : list \n</span>
+<span class="sd">        list of distance at each interaction. \n</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [1] A. Barachant and S. Bonnet, &quot;Channel selection procedure using</span>
+<span class="sd">    riemannian distance for BCI applications,&quot; in 2011 5th International</span>
+<span class="sd">    IEEE/EMBS Conference on Neural Engineering (NER), 2011, 348-351</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nelec</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;riemann&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nelec</span> <span class="o">=</span> <span class="n">nelec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="n">metric</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span> <span class="o">=</span> <span class="n">n_jobs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mdm</span> <span class="o">=</span> <span class="n">MDM</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">TangentSpace</span><span class="p">(</span><span class="s1">&#39;riemann&#39;</span><span class="p">),</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="s1">&#39;l2&#39;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ElectrodeSelection.fit"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.channel_selection.ElectrodeSelection.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find the optimal subset of electrodes. \n</span>
+
+<span class="sd">        Parameters \n</span>
+<span class="sd">        ---------- \n</span>
+<span class="sd">        X : ndarray, shape (n_trials, n_channels, n_channels) \n</span>
+<span class="sd">            ndarray of SPD matrices. \n</span>
+<span class="sd">        y : ndarray shape (n_trials, 1) \n</span>
+<span class="sd">            labels corresponding to each trial. \n</span>
+<span class="sd">        sample_weight : None | ndarray shape (n_trials, 1) \n</span>
+<span class="sd">            the weights of each sample. if None, each sample is treated with </span>
+<span class="sd">            equal weights. \n</span>
+
+<span class="sd">        Returns \n</span>
+<span class="sd">        ------- \n</span>
+<span class="sd">        self : ElectrodeSelection instance \n</span>
+<span class="sd">            The ElectrodeSelection instance. \n</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mdm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdm</span><span class="o">.</span><span class="n">covmeans_</span>
+
+        <span class="n">Ne</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Ne</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="p">))</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nelec</span><span class="p">:</span>
+            <span class="n">di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="p">)):</span>
+                <span class="n">sub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="p">[:]</span>
+                <span class="n">sub</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+                <span class="n">di</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span><span class="p">)):</span>
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span><span class="p">)):</span>
+                        <span class="n">di</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="n">sub</span><span class="p">][</span><span class="n">sub</span><span class="p">,</span> <span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span><span class="p">[</span><span class="n">j</span><span class="p">][:,</span> <span class="n">sub</span><span class="p">][</span><span class="n">sub</span><span class="p">,</span> <span class="p">:],</span>
+                                            <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mdm</span><span class="o">.</span><span class="n">metric_dist</span><span class="p">)</span>
+            <span class="n">torm</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dist_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">torm</span><span class="p">)</span>
+
+        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="ElectrodeSelection.transform"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.channel_selection.ElectrodeSelection.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return reduced matrices. \n</span>
+
+<span class="sd">        Parameters \n</span>
+<span class="sd">        ---------- \n</span>
+<span class="sd">        X : ndarray, shape (n_trials, n_channels, n_channels) \n</span>
+<span class="sd">            ndarray of SPD matrices. \n</span>
+
+<span class="sd">        Returns \n</span>
+<span class="sd">        ------- \n</span>
+<span class="sd">        covs : ndarray, shape (n_trials, n_elec, n_elec) \n</span>
+<span class="sd">            The covariances matrices after reduction of the number of channels. \n</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">X</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="p">,</span> <span class="p">:][:,</span> <span class="p">:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ElectrodeSelection.score"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.channel_selection.ElectrodeSelection.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">):</span>
+        <span class="n">x_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">predictions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">y_test</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">score</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">score</span><span class="o">/</span><span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">score</span></div></div>
+
+
+<div class="viewcode-block" id="ElectrodeSelectionRaw"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.channel_selection.ElectrodeSelectionRaw">[docs]</a><span class="k">class</span> <span class="nc">ElectrodeSelectionRaw</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nelec</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;riemann&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Init.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nelec</span> <span class="o">=</span> <span class="n">nelec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="n">metric</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span> <span class="o">=</span> <span class="n">n_jobs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mdm</span> <span class="o">=</span> <span class="n">MDM</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ElectrodeSelectionRaw.fit"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.channel_selection.ElectrodeSelectionRaw.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find the optimal subset of electrodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cov</span> <span class="o">=</span> <span class="n">Covariances</span><span class="p">(</span><span class="s2">&quot;oas&quot;</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">cov</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mdm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdm</span><span class="o">.</span><span class="n">covmeans_</span>
+
+        <span class="n">Ne</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Ne</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="p">))</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nelec</span><span class="p">:</span>
+            <span class="n">di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="p">)):</span>
+                <span class="n">sub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="p">[:]</span>
+                <span class="n">sub</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+                <span class="n">di</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span><span class="p">)):</span>
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span><span class="p">)):</span>
+                        <span class="n">di</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="n">sub</span><span class="p">][</span><span class="n">sub</span><span class="p">,</span> <span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">covmeans_</span><span class="p">[</span><span class="n">j</span><span class="p">][:,</span> <span class="n">sub</span><span class="p">][</span><span class="n">sub</span><span class="p">,</span> <span class="p">:],</span>
+                                            <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mdm</span><span class="o">.</span><span class="n">metric_dist</span><span class="p">)</span>
+            <span class="n">torm</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dist_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">torm</span><span class="p">)</span>
+
+        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="ElectrodeSelectionRaw.transform"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.channel_selection.ElectrodeSelectionRaw.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return reduced matrices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">X</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">subelec_</span><span class="p">,</span> <span class="p">:]</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

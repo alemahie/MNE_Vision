@@ -1,0 +1,315 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.utils.view package &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.utils.waiting_while_processing package" href="src.utils.waiting_while_processing.html" />
+    <link rel="prev" title="src.utils.model package" href="src.utils.model.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.utils.waiting_while_processing.html" title="src.utils.waiting_while_processing package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.utils.model.html" title="src.utils.model package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.utils.html" accesskey="U">src.utils package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="src-utils-view-package">
+<h1>src.utils.view package<a class="headerlink" href="#src-utils-view-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.utils.view.error_window">
+<span id="src-utils-view-error-window-module"></span><h2>src.utils.view.error_window module<a class="headerlink" href="#module-src.utils.view.error_window" title="Permalink to this headline">¶</a></h2>
+<p>Error Window View</p>
+<dl class="class">
+<dt id="src.utils.view.error_window.errorWindow">
+<em class="property">class </em><code class="descclassname">src.utils.view.error_window.</code><code class="descname">errorWindow</code><span class="sig-paren">(</span><em>error_message</em>, <em>detailed_message=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/view/error_window.html#errorWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.error_window.errorWindow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QWidget</span></code></p>
+<dl class="method">
+<dt id="src.utils.view.error_window.errorWindow.show">
+<code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/view/error_window.html#errorWindow.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.error_window.errorWindow.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the error message.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.utils.view.plot_connectivity_circle_arrows">
+<span id="src-utils-view-plot-connectivity-circle-arrows-module"></span><h2>src.utils.view.plot_connectivity_circle_arrows module<a class="headerlink" href="#module-src.utils.view.plot_connectivity_circle_arrows" title="Permalink to this headline">¶</a></h2>
+<p>Functions to plot on circle as for connectivity.</p>
+<dl class="function">
+<dt id="src.utils.view.plot_connectivity_circle_arrows.plot_connectivity_circle_arrows">
+<code class="descclassname">src.utils.view.plot_connectivity_circle_arrows.</code><code class="descname">plot_connectivity_circle_arrows</code><span class="sig-paren">(</span><em>con</em>, <em>node_names</em>, <em>psi</em>, <em>indices=None</em>, <em>n_lines=None</em>, <em>node_angles=None</em>, <em>node_width=None</em>, <em>node_colors=None</em>, <em>facecolor='black'</em>, <em>textcolor='white'</em>, <em>node_edgecolor='black'</em>, <em>linewidth=1.5</em>, <em>colormap='hot'</em>, <em>vmin=None</em>, <em>vmax=None</em>, <em>colorbar=True</em>, <em>title=None</em>, <em>colorbar_size=0.2</em>, <em>colorbar_pos=(-0.3</em>, <em>0.1)</em>, <em>fontsize_title=12</em>, <em>fontsize_names=8</em>, <em>fontsize_colorbar=8</em>, <em>padding=6.0</em>, <em>fig=None</em>, <em>subplot=111</em>, <em>interactive=True</em>, <em>node_linewidth=2.0</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/view/plot_connectivity_circle_arrows.html#plot_connectivity_circle_arrows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.plot_connectivity_circle_arrows.plot_connectivity_circle_arrows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize the connectivity and directionality as a circular graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>con</strong> (<em>array | Connectivity</em>) – Connectivity scores. Can be a square matrix, or a 1D array. If a 1D
+array is provided, “indices” has to be used to define the connection
+indices.</li>
+<li><strong>node_names</strong> (<em>list of str</em>) – Node names. The order corresponds to the order in con.</li>
+<li><strong>psi</strong> (<em>list of float</em>) – Directionality Values</li>
+<li><strong>indices</strong> (<em>tuple of array | None</em>) – Two arrays with indices of connections for which the connections
+strengths are defined in con. Only needed if con is a 1D array.</li>
+<li><strong>n_lines</strong> (<em>int | None</em>) – If not None, only the n_lines strongest connections (strength=abs(con))
+are drawn.</li>
+<li><strong>node_angles</strong> (<em>array</em><em>, </em><em>shape</em><em> (</em><em>n_node_names</em><em>,</em><em>) </em><em>| None</em>) – Array with node positions in degrees. If None, the nodes are equally
+spaced on the circle. See mne.viz.circular_layout.</li>
+<li><strong>node_width</strong> (<em>float | None</em>) – Width of each node in degrees. If None, the minimum angle between any
+two nodes is used as the width.</li>
+<li><strong>node_colors</strong> (<em>list of tuple | list of str</em>) – List with the color to use for each node. If fewer colors than nodes
+are provided, the colors will be repeated. Any color supported by
+matplotlib can be used, e.g., RGBA tuples, named colors.</li>
+<li><strong>facecolor</strong> (<em>str</em>) – Color to use for background. See matplotlib.colors.</li>
+<li><strong>textcolor</strong> (<em>str</em>) – Color to use for text. See matplotlib.colors.</li>
+<li><strong>node_edgecolor</strong> (<em>str</em>) – Color to use for lines around nodes. See matplotlib.colors.</li>
+<li><strong>linewidth</strong> (<em>float</em>) – Line width to use for connections.</li>
+<li><strong>colormap</strong> (<em>str | instance of matplotlib.colors.LinearSegmentedColormap</em>) – Colormap to use for coloring the connections.</li>
+<li><strong>vmin</strong> (<em>float | None</em>) – Minimum value for colormap. If None, it is determined automatically.</li>
+<li><strong>vmax</strong> (<em>float | None</em>) – Maximum value for colormap. If None, it is determined automatically.</li>
+<li><strong>colorbar</strong> (<em>bool</em>) – Display a colorbar or not.</li>
+<li><strong>title</strong> (<em>str</em>) – The figure title.</li>
+<li><strong>colorbar_size</strong> (<em>float</em>) – Size of the colorbar.</li>
+<li><strong>colorbar_pos</strong> (<em>tuple</em><em>, </em><em>shape</em><em> (</em><em>2</em><em>,</em><em>)</em>) – Position of the colorbar.</li>
+<li><strong>fontsize_title</strong> (<em>int</em>) – Font size to use for title.</li>
+<li><strong>fontsize_names</strong> (<em>int</em>) – Font size to use for node names.</li>
+<li><strong>fontsize_colorbar</strong> (<em>int</em>) – Font size to use for colorbar.</li>
+<li><strong>padding</strong> (<em>float</em>) – Space to add around figure to accommodate long labels.</li>
+<li><strong>fig</strong> (<em>None | instance of matplotlib.figure.Figure</em>) – The figure to use. If None, a new figure with the specified background
+color will be created.</li>
+<li><strong>subplot</strong> (<em>int | tuple</em><em>, </em><em>shape</em><em> (</em><em>3</em><em>,</em><em>)</em>) – Location of the subplot when creating figures with multiple plots. E.g.
+121 or (1, 2, 1) for 1 row, 2 columns, plot 1. See
+matplotlib.pyplot.subplot.</li>
+<li><strong>interactive</strong> (<em>bool</em>) – When enabled, left-click on a node to show only connections to that
+node. Right-click shows all connections.</li>
+<li><strong>node_linewidth</strong> (<em>float</em>) – Line with for nodes.</li>
+<li><strong>show</strong> (<em>bool</em>) – Show figure if True.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>fig</strong> (<em>instance of matplotlib.figure.Figure</em>) – The figure handle.</li>
+<li><strong>axes</strong> (<em>instance of matplotlib.projections.polar.PolarAxes</em>) – The subplot handle.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This code is based on a circle graph example by Nicolas P. Rougier</p>
+<p>By default, <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.savefig()</span></code> does not take <code class="docutils literal notranslate"><span class="pre">facecolor</span></code>
+into account when saving, even if set when a figure is generated. This
+can be addressed via, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># &gt;&gt;&gt; fig.savefig(fname_fig, facecolor=&#39;black&#39;) # doctest:+SKIP</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">facecolor</span></code> is not set via <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.savefig()</span></code>, the
+figure labels, title, and legend may be cut off in the output figure.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.utils.view.progress_bar">
+<span id="src-utils-view-progress-bar-module"></span><h2>src.utils.view.progress_bar module<a class="headerlink" href="#module-src.utils.view.progress_bar" title="Permalink to this headline">¶</a></h2>
+<p>Progress bar</p>
+<dl class="class">
+<dt id="src.utils.view.progress_bar.ProgressBar">
+<em class="property">class </em><code class="descclassname">src.utils.view.progress_bar.</code><code class="descname">ProgressBar</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/view/progress_bar.html#ProgressBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.progress_bar.ProgressBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QProgressBar</span></code></p>
+<dl class="method">
+<dt id="src.utils.view.progress_bar.ProgressBar.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/view/progress_bar.html#ProgressBar.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.progress_bar.ProgressBar.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.utils.view.separator">
+<span id="src-utils-view-separator-module"></span><h2>src.utils.view.separator module<a class="headerlink" href="#module-src.utils.view.separator" title="Permalink to this headline">¶</a></h2>
+<p>Separator</p>
+<dl class="function">
+<dt id="src.utils.view.separator.create_layout_separator">
+<code class="descclassname">src.utils.view.separator.</code><code class="descname">create_layout_separator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/view/separator.html#create_layout_separator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.separator.create_layout_separator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-src.utils.view.splash_screen">
+<span id="src-utils-view-splash-screen-module"></span><h2>src.utils.view.splash_screen module<a class="headerlink" href="#module-src.utils.view.splash_screen" title="Permalink to this headline">¶</a></h2>
+<p>Splash Screen</p>
+<dl class="class">
+<dt id="src.utils.view.splash_screen.splashScreen">
+<em class="property">class </em><code class="descclassname">src.utils.view.splash_screen.</code><code class="descname">splashScreen</code><a class="reference internal" href="_modules/src/utils/view/splash_screen.html#splashScreen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.splash_screen.splashScreen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QWidget</span></code></p>
+<dl class="method">
+<dt id="src.utils.view.splash_screen.splashScreen.center">
+<code class="descname">center</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/view/splash_screen.html#splashScreen.center"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.splash_screen.splashScreen.center" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the window to the center of the screen.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.utils.view.stylesheet">
+<span id="src-utils-view-stylesheet-module"></span><h2>src.utils.view.stylesheet module<a class="headerlink" href="#module-src.utils.view.stylesheet" title="Permalink to this headline">¶</a></h2>
+<p>Stylesheet</p>
+<dl class="function">
+<dt id="src.utils.view.stylesheet.get_stylesheet">
+<code class="descclassname">src.utils.view.stylesheet.</code><code class="descname">get_stylesheet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/view/stylesheet.html#get_stylesheet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.stylesheet.get_stylesheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the stylesheet of the project.
+:return: The stylesheet.
+:rtype: str</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.utils.view.warning_window">
+<span id="src-utils-view-warning-window-module"></span><h2>src.utils.view.warning_window module<a class="headerlink" href="#module-src.utils.view.warning_window" title="Permalink to this headline">¶</a></h2>
+<p>Warning Window View</p>
+<dl class="class">
+<dt id="src.utils.view.warning_window.warningWindow">
+<em class="property">class </em><code class="descclassname">src.utils.view.warning_window.</code><code class="descname">warningWindow</code><span class="sig-paren">(</span><em>warning_message</em>, <em>ok_function</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/view/warning_window.html#warningWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.warning_window.warningWindow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QWidget</span></code></p>
+<dl class="method">
+<dt id="src.utils.view.warning_window.warningWindow.message_button">
+<code class="descname">message_button</code><span class="sig-paren">(</span><em>button</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/view/warning_window.html#warningWindow.message_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.warning_window.warningWindow.message_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive the signal of a button being clicked.
+:param button: The button object
+:type button: QPushButton</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.view.warning_window.warningWindow.set_listener">
+<code class="descname">set_listener</code><span class="sig-paren">(</span><em>listener</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/view/warning_window.html#warningWindow.set_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.warning_window.warningWindow.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the listener
+:param listener: The listener
+:type listener: mainController</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.view.warning_window.warningWindow.show">
+<code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/view/warning_window.html#warningWindow.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.view.warning_window.warningWindow.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the error message.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.utils.view">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.utils.view" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">src.utils.view package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.utils.view.error_window">src.utils.view.error_window module</a></li>
+<li><a class="reference internal" href="#module-src.utils.view.plot_connectivity_circle_arrows">src.utils.view.plot_connectivity_circle_arrows module</a></li>
+<li><a class="reference internal" href="#module-src.utils.view.progress_bar">src.utils.view.progress_bar module</a></li>
+<li><a class="reference internal" href="#module-src.utils.view.separator">src.utils.view.separator module</a></li>
+<li><a class="reference internal" href="#module-src.utils.view.splash_screen">src.utils.view.splash_screen module</a></li>
+<li><a class="reference internal" href="#module-src.utils.view.stylesheet">src.utils.view.stylesheet module</a></li>
+<li><a class="reference internal" href="#module-src.utils.view.warning_window">src.utils.view.warning_window module</a></li>
+<li><a class="reference internal" href="#module-src.utils.view">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="src.utils.model.html"
+                        title="previous chapter">src.utils.model package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="src.utils.waiting_while_processing.html"
+                        title="next chapter">src.utils.waiting_while_processing package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.utils.view.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.utils.waiting_while_processing.html" title="src.utils.waiting_while_processing package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.utils.model.html" title="src.utils.model package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.utils.html" >src.utils package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

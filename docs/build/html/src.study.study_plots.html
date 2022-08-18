@@ -1,0 +1,474 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.study.study_plots package &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.tools package" href="src.tools.html" />
+    <link rel="prev" title="src.study.study_edit_info package" href="src.study.study_edit_info.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.tools.html" title="src.tools package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.study.study_edit_info.html" title="src.study.study_edit_info package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.study.html" accesskey="U">src.study package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="src-study-study-plots-package">
+<h1>src.study.study_plots package<a class="headerlink" href="#src-study-study-plots-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.study.study_plots.study_plots_controller">
+<span id="src-study-study-plots-study-plots-controller-module"></span><h2>src.study.study_plots.study_plots_controller module<a class="headerlink" href="#module-src.study.study_plots.study_plots_controller" title="Permalink to this headline">¶</a></h2>
+<p>Study Plots Controller</p>
+<dl class="class">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController">
+<em class="property">class </em><code class="descclassname">src.study.study_plots.study_plots_controller.</code><code class="descname">studyPlotsController</code><span class="sig-paren">(</span><em>study</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">study.study_plots.study_plots_listener.studyPlotsListener</span></code></p>
+<dl class="staticmethod">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.adapt_events">
+<em class="property">static </em><code class="descname">adapt_events</code><span class="sig-paren">(</span><em>all_file_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.adapt_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.adapt_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adapts the events on all the epochs so that they are all common and the epochs can thus be concatenated.
+:param all_file_data: The epochs on which the events must be adapted.
+:type all_file_data: list of MNE Epochs
+:return: The new epochs with the events adapted for concatenation
+:rtype: list of MNE Epochs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.cancel_button_clicked">
+<code class="descname">cancel_button_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.cancel_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.confirm_button_clicked">
+<code class="descname">confirm_button_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.confirm_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window and send the information to the main controller</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.plot_erp_image_clicked">
+<code class="descname">plot_erp_image_clicked</code><span class="sig-paren">(</span><em>channels_selected</em>, <em>subjects_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.plot_erp_image_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.plot_erp_image_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the study to plot the erp image on the given data.
+:param channels_selected: Channels selected
+:type channels_selected: str/list of str
+:param subjects_selected: Subjects selected
+:type subjects_selected: str/list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.plot_erps_clicked">
+<code class="descname">plot_erps_clicked</code><span class="sig-paren">(</span><em>channels_selected</em>, <em>subjects_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.plot_erps_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.plot_erps_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the study to plot the erps on the given data.
+:param channels_selected: Channels selected
+:type channels_selected: str/list of str
+:param subjects_selected: Subjects selected
+:type subjects_selected: str/list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.plot_ersp_itc_clicked">
+<code class="descname">plot_ersp_itc_clicked</code><span class="sig-paren">(</span><em>channels_selected</em>, <em>subjects_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.plot_ersp_itc_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.plot_ersp_itc_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the study to plot the ersp and itc on the given data.
+:param channels_selected: Channels selected
+:type channels_selected: str/list of str
+:param subjects_selected: Subjects selected
+:type subjects_selected: str/list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.plot_psd_clicked">
+<code class="descname">plot_psd_clicked</code><span class="sig-paren">(</span><em>channels_selected</em>, <em>subjects_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.plot_psd_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.plot_psd_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the study to plot the psd on the given data.
+:param channels_selected: Channels selected
+:type channels_selected: str/list of str
+:param subjects_selected: Subjects selected
+:type subjects_selected: str/list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.plot_spectra_maps_computation_error">
+<code class="descname">plot_spectra_maps_computation_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.plot_spectra_maps_computation_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.plot_spectra_maps_computation_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the waiting window when the computation of the power spectral density is done on the dataset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.plot_spectra_maps_computation_finished">
+<code class="descname">plot_spectra_maps_computation_finished</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.plot_spectra_maps_computation_finished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.plot_spectra_maps_computation_finished" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the waiting window when the computation of the power spectral density is done on the dataset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.plot_spectra_maps_finished">
+<code class="descname">plot_spectra_maps_finished</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.plot_spectra_maps_finished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.plot_spectra_maps_finished" title="Permalink to this definition">¶</a></dt>
+<dd><p>The computation of the power spectral density is completely done, plot it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.plot_spectra_maps_information">
+<code class="descname">plot_spectra_maps_information</code><span class="sig-paren">(</span><em>minimum_frequency</em>, <em>maximum_frequency</em>, <em>minimum_time</em>, <em>maximum_time</em>, <em>topo_time_points</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.plot_spectra_maps_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.plot_spectra_maps_information" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the waiting window while the computation of the power spectral density is done on the dataset.
+:param minimum_frequency: Minimum frequency from which the power spectral density will be computed.
+:type minimum_frequency: float
+:param maximum_frequency: Maximum frequency from which the power spectral density will be computed.
+:type maximum_frequency: float
+:param minimum_time: Minimum time of the epochs from which the power spectral density will be computed.
+:type minimum_time: float
+:param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.
+:type maximum_time: float
+:param topo_time_points: The time points for the topomaps.
+:type topo_time_points: list of float</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.plot_time_frequency_computation_error">
+<code class="descname">plot_time_frequency_computation_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.plot_time_frequency_computation_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.plot_time_frequency_computation_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the waiting window and display an error message because an error occurred during the computation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.plot_time_frequency_computation_finished">
+<code class="descname">plot_time_frequency_computation_finished</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.plot_time_frequency_computation_finished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.plot_time_frequency_computation_finished" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the waiting window when the computation of the time-frequency analysis is done on the dataset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.plot_time_frequency_finished">
+<code class="descname">plot_time_frequency_finished</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.plot_time_frequency_finished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.plot_time_frequency_finished" title="Permalink to this definition">¶</a></dt>
+<dd><p>The computation of the time-frequency analysis is completely done, plot it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.plot_time_frequency_information">
+<code class="descname">plot_time_frequency_information</code><span class="sig-paren">(</span><em>method_tfr</em>, <em>min_frequency</em>, <em>max_frequency</em>, <em>n_cycles</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.plot_time_frequency_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.plot_time_frequency_information" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the waiting window while the computation of the time-frequency analysis is done on the dataset.
+:param method_tfr: Method used for computing the time-frequency analysis.
+:type method_tfr: str
+:param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.
+:type min_frequency: float
+:param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.
+:type max_frequency: float
+:param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
+:type n_cycles: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_controller.studyPlotsController.set_listener">
+<code class="descname">set_listener</code><span class="sig-paren">(</span><em>listener</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_controller.html#studyPlotsController.set_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_controller.studyPlotsController.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the main listener so that the controller is able to communicate with the main controller.
+:param listener: main listener
+:type listener: mainController</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.study.study_plots.study_plots_listener">
+<span id="src-study-study-plots-study-plots-listener-module"></span><h2>src.study.study_plots.study_plots_listener module<a class="headerlink" href="#module-src.study.study_plots.study_plots_listener" title="Permalink to this headline">¶</a></h2>
+<p>Study Plots Listener</p>
+<dl class="class">
+<dt id="src.study.study_plots.study_plots_listener.studyPlotsListener">
+<em class="property">class </em><code class="descclassname">src.study.study_plots.study_plots_listener.</code><code class="descname">studyPlotsListener</code><a class="reference internal" href="_modules/src/study/study_plots/study_plots_listener.html#studyPlotsListener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_listener.studyPlotsListener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Listener doing the connection between the controller and the view for plotting data of the study.
+It retrieves the information from the view to send it to the controller.</p>
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_listener.studyPlotsListener.cancel_button_clicked">
+<code class="descname">cancel_button_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_listener.html#studyPlotsListener.cancel_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_listener.studyPlotsListener.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_listener.studyPlotsListener.confirm_button_clicked">
+<code class="descname">confirm_button_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_listener.html#studyPlotsListener.confirm_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_listener.studyPlotsListener.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_listener.studyPlotsListener.plot_erp_image_clicked">
+<code class="descname">plot_erp_image_clicked</code><span class="sig-paren">(</span><em>channels_selected</em>, <em>subjects_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_listener.html#studyPlotsListener.plot_erp_image_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_listener.studyPlotsListener.plot_erp_image_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_listener.studyPlotsListener.plot_erps_clicked">
+<code class="descname">plot_erps_clicked</code><span class="sig-paren">(</span><em>channels_selected</em>, <em>subjects_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_listener.html#studyPlotsListener.plot_erps_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_listener.studyPlotsListener.plot_erps_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_listener.studyPlotsListener.plot_ersp_itc_clicked">
+<code class="descname">plot_ersp_itc_clicked</code><span class="sig-paren">(</span><em>channels_selected</em>, <em>subjects_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_listener.html#studyPlotsListener.plot_ersp_itc_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_listener.studyPlotsListener.plot_ersp_itc_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_listener.studyPlotsListener.plot_psd_clicked">
+<code class="descname">plot_psd_clicked</code><span class="sig-paren">(</span><em>channels_selected</em>, <em>subjects_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_listener.html#studyPlotsListener.plot_psd_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_listener.studyPlotsListener.plot_psd_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_listener.studyPlotsListener.plot_spectra_maps_computation_error">
+<code class="descname">plot_spectra_maps_computation_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_listener.html#studyPlotsListener.plot_spectra_maps_computation_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_listener.studyPlotsListener.plot_spectra_maps_computation_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_listener.studyPlotsListener.plot_spectra_maps_computation_finished">
+<code class="descname">plot_spectra_maps_computation_finished</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_listener.html#studyPlotsListener.plot_spectra_maps_computation_finished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_listener.studyPlotsListener.plot_spectra_maps_computation_finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_listener.studyPlotsListener.plot_spectra_maps_finished">
+<code class="descname">plot_spectra_maps_finished</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_listener.html#studyPlotsListener.plot_spectra_maps_finished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_listener.studyPlotsListener.plot_spectra_maps_finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_listener.studyPlotsListener.plot_spectra_maps_information">
+<code class="descname">plot_spectra_maps_information</code><span class="sig-paren">(</span><em>minimum_frequency</em>, <em>maximum_frequency</em>, <em>minimum_time</em>, <em>maximum_time</em>, <em>topo_time_points</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_listener.html#studyPlotsListener.plot_spectra_maps_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_listener.studyPlotsListener.plot_spectra_maps_information" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.study.study_plots.study_plots_view">
+<span id="src-study-study-plots-study-plots-view-module"></span><h2>src.study.study_plots.study_plots_view module<a class="headerlink" href="#module-src.study.study_plots.study_plots_view" title="Permalink to this headline">¶</a></h2>
+<p>Study Plots View</p>
+<dl class="class">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView">
+<em class="property">class </em><code class="descclassname">src.study.study_plots.study_plots_view.</code><code class="descname">studyPlotsView</code><span class="sig-paren">(</span><em>study</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QWidget</span></code></p>
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.cancel_study_trigger">
+<code class="descname">cancel_study_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.cancel_study_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.cancel_study_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the information to the controller that the computation is cancelled.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.confirm_study_trigger">
+<code class="descname">confirm_study_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.confirm_study_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.confirm_study_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all the additional information and send the information to the controller.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.create_channels_check_boxes">
+<code class="descname">create_channels_check_boxes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.create_channels_check_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.create_channels_check_boxes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.create_select_unselect_channels_buttons">
+<code class="descname">create_select_unselect_channels_buttons</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.create_select_unselect_channels_buttons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.create_select_unselect_channels_buttons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.create_select_unselect_subjects_buttons">
+<code class="descname">create_select_unselect_subjects_buttons</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.create_select_unselect_subjects_buttons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.create_select_unselect_subjects_buttons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.create_subjects_check_boxes">
+<code class="descname">create_subjects_check_boxes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.create_subjects_check_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.create_subjects_check_boxes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.erp_image_trigger">
+<code class="descname">erp_image_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.erp_image_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.erp_image_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all the information for plotting the erp image.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.erps_trigger">
+<code class="descname">erps_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.erps_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.erps_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all the information for plotting the erps.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.ersp_itc_trigger">
+<code class="descname">ersp_itc_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.ersp_itc_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.ersp_itc_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all the information for plotting the ersp and itc.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.get_all_channels_selected">
+<code class="descname">get_all_channels_selected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.get_all_channels_selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.get_all_channels_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the elements selected by the user.
+:return: Channels selected
+:rtype: str/list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.get_all_subjects_selected">
+<code class="descname">get_all_subjects_selected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.get_all_subjects_selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.get_all_subjects_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the subjects selected by the user.
+:return: Subjects selected
+:rtype: str/list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.plot_erp_image">
+<code class="descname">plot_erp_image</code><span class="sig-paren">(</span><em>file_data</em>, <em>channel_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.plot_erp_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.plot_erp_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the ERP image for the data provided by the study.
+:param file_data: The data containing the ERP image to plot
+:type file_data: MNE Epochs
+:param channel_selected: The channels selected.
+:type channel_selected: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.plot_erps">
+<code class="descname">plot_erps</code><span class="sig-paren">(</span><em>evoked</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.plot_erps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.plot_erps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the ERPs for the evoked data provided by the study.
+:param evoked: The evoked data to plot
+:type evoked: MNE Evoked</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.psd_trigger">
+<code class="descname">psd_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.psd_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.psd_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all the information for plotting the psd.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.select_all_channels_trigger">
+<code class="descname">select_all_channels_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.select_all_channels_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.select_all_channels_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select all the channels of the window.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.select_all_subjects_trigger">
+<code class="descname">select_all_subjects_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.select_all_subjects_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.select_all_subjects_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select all the subjects of the window.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.set_listener">
+<code class="descname">set_listener</code><span class="sig-paren">(</span><em>listener</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.set_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the listener to the controller.
+:param listener: Listener to the controller.
+:type listener: loadDataInfoController</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.unselect_all_channels_trigger">
+<code class="descname">unselect_all_channels_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.unselect_all_channels_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.unselect_all_channels_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unselect all the channels of the window.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.study.study_plots.study_plots_view.studyPlotsView.unselect_all_subjects_trigger">
+<code class="descname">unselect_all_subjects_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/study/study_plots/study_plots_view.html#studyPlotsView.unselect_all_subjects_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.study.study_plots.study_plots_view.studyPlotsView.unselect_all_subjects_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unselect all the subjects of the window.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.study.study_plots">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.study.study_plots" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">src.study.study_plots package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.study.study_plots.study_plots_controller">src.study.study_plots.study_plots_controller module</a></li>
+<li><a class="reference internal" href="#module-src.study.study_plots.study_plots_listener">src.study.study_plots.study_plots_listener module</a></li>
+<li><a class="reference internal" href="#module-src.study.study_plots.study_plots_view">src.study.study_plots.study_plots_view module</a></li>
+<li><a class="reference internal" href="#module-src.study.study_plots">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="src.study.study_edit_info.html"
+                        title="previous chapter">src.study.study_edit_info package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="src.tools.html"
+                        title="next chapter">src.tools package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.study.study_plots.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.tools.html" title="src.tools package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.study.study_edit_info.html" title="src.study.study_edit_info package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.study.html" >src.study package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

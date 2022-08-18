@@ -1,0 +1,969 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.classification.applePy package &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.classification.classify package" href="src.classification.classify.html" />
+    <link rel="prev" title="src.classification package" href="src.classification.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.classification.classify.html" title="src.classification.classify package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.classification.html" title="src.classification package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.classification.html" accesskey="U">src.classification package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="src-classification-applepy-package">
+<h1>src.classification.applePy package<a class="headerlink" href="#src-classification-applepy-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.classification.applePy.channel_selection">
+<span id="src-classification-applepy-channel-selection-module"></span><h2>src.classification.applePy.channel_selection module<a class="headerlink" href="#module-src.classification.applePy.channel_selection" title="Permalink to this headline">¶</a></h2>
+<p>Code for channel selection.</p>
+<dl class="class">
+<dt id="src.classification.applePy.channel_selection.ElectrodeSelection">
+<em class="property">class </em><code class="descclassname">src.classification.applePy.channel_selection.</code><code class="descname">ElectrodeSelection</code><span class="sig-paren">(</span><em>nelec=16</em>, <em>metric='riemann'</em>, <em>n_jobs=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/channel_selection.html#ElectrodeSelection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.channel_selection.ElectrodeSelection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></p>
+<p>Channel selection based on a Riemannian geometry criterion.</p>
+<p>For each class, a centroid is estimated, and the channel selection is based
+on the maximization of the distance between centroids. This is done by a
+backward elimination where the electrode that carries the less distance is
+removed from the subset at each iteration.
+This algorithm is described in [1].</p>
+<p>Parameters</p>
+<p>nelec : int (default 16)</p>
+<blockquote>
+<div>the number of electrode to keep in the final subset.</div></blockquote>
+<p>metric : string | dict (default: ‘riemann’)</p>
+<blockquote>
+<div>The type of metric used for centroid and distance estimation.
+see <cite>mean_covariance</cite> for the list of supported metric.
+the metric could be a dict with two keys, <cite>mean</cite> and <cite>distance</cite> in
+order to pass different metric for the centroid estimation and the
+distance estimation. Typical usecase is to pass ‘logeuclid’ metric for
+the mean in order to boost the computional speed and ‘riemann’ for the
+distance in order to keep the good sensitivity for the selection.</div></blockquote>
+<p>n_jobs : int, (default: 1)</p>
+<blockquote>
+<div>The number of jobs to use for the computation. This works by computing
+each of the class centroid in parallel.
+If -1 all CPUs are used. If 1 is given, no parallel computing code is
+used at all, which is useful for debugging. For n_jobs below -1,
+(n_cpus + 1 + n_jobs) are used. Thus for n_jobs = -2, all CPUs but one
+are used.</div></blockquote>
+<p>Attributes</p>
+<p><a href="#system-message-1"><span class="problematic" id="problematic-1">covmeans_</span></a> : list</p>
+<blockquote>
+<div>the class centroids.</div></blockquote>
+<p><a href="#system-message-2"><span class="problematic" id="problematic-2">dist_</span></a> : list</p>
+<blockquote>
+<div>list of distance at each interaction.</div></blockquote>
+<p class="rubric">References</p>
+<p>[1] A. Barachant and S. Bonnet, “Channel selection procedure using
+riemannian distance for BCI applications,” in 2011 5th International
+IEEE/EMBS Conference on Neural Engineering (NER), 2011, 348-351</p>
+<dl class="method">
+<dt id="src.classification.applePy.channel_selection.ElectrodeSelection.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>sample_weight=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/channel_selection.html#ElectrodeSelection.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.channel_selection.ElectrodeSelection.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the optimal subset of electrodes.</p>
+<p>Parameters</p>
+<p>X : ndarray, shape (n_trials, n_channels, n_channels)</p>
+<blockquote>
+<div>ndarray of SPD matrices.</div></blockquote>
+<p>y : ndarray shape (n_trials, 1)</p>
+<blockquote>
+<div>labels corresponding to each trial.</div></blockquote>
+<p>sample_weight : None | ndarray shape (n_trials, 1)</p>
+<blockquote>
+<div>the weights of each sample. if None, each sample is treated with
+equal weights.</div></blockquote>
+<p>Returns</p>
+<p>self : ElectrodeSelection instance</p>
+<blockquote>
+<div>The ElectrodeSelection instance.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.channel_selection.ElectrodeSelection.score">
+<code class="descname">score</code><span class="sig-paren">(</span><em>estimator</em>, <em>x_test</em>, <em>y_test</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/channel_selection.html#ElectrodeSelection.score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.channel_selection.ElectrodeSelection.score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.channel_selection.ElectrodeSelection.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/channel_selection.html#ElectrodeSelection.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.channel_selection.ElectrodeSelection.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return reduced matrices.</p>
+<p>Parameters</p>
+<p>X : ndarray, shape (n_trials, n_channels, n_channels)</p>
+<blockquote>
+<div>ndarray of SPD matrices.</div></blockquote>
+<p>Returns</p>
+<p>covs : ndarray, shape (n_trials, n_elec, n_elec)</p>
+<blockquote>
+<div>The covariances matrices after reduction of the number of channels.</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.classification.applePy.channel_selection.ElectrodeSelectionRaw">
+<em class="property">class </em><code class="descclassname">src.classification.applePy.channel_selection.</code><code class="descname">ElectrodeSelectionRaw</code><span class="sig-paren">(</span><em>nelec=16</em>, <em>metric='riemann'</em>, <em>n_jobs=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/channel_selection.html#ElectrodeSelectionRaw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.channel_selection.ElectrodeSelectionRaw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></p>
+<dl class="method">
+<dt id="src.classification.applePy.channel_selection.ElectrodeSelectionRaw.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>sample_weight=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/channel_selection.html#ElectrodeSelectionRaw.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.channel_selection.ElectrodeSelectionRaw.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the optimal subset of electrodes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.channel_selection.ElectrodeSelectionRaw.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/channel_selection.html#ElectrodeSelectionRaw.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.channel_selection.ElectrodeSelectionRaw.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return reduced matrices.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.classification.applePy.channel_selection_without_covariances">
+<span id="src-classification-applepy-channel-selection-without-covariances-module"></span><h2>src.classification.applePy.channel_selection_without_covariances module<a class="headerlink" href="#module-src.classification.applePy.channel_selection_without_covariances" title="Permalink to this headline">¶</a></h2>
+<p>Code for channel selection.</p>
+</div>
+<div class="section" id="module-src.classification.applePy.classifier">
+<span id="src-classification-applepy-classifier-module"></span><h2>src.classification.applePy.classifier module<a class="headerlink" href="#module-src.classification.applePy.classifier" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier">
+<em class="property">class </em><code class="descclassname">src.classification.applePy.classifier.</code><code class="descname">ApplePyClassifier</code><span class="sig-paren">(</span><em>used_pipelines=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></p>
+<p>Global class dealing with automated classification. Inherits BaseEstimator and TransformerMix, in order to make it adaptable to
+other estimators from other libraries. This class contains :</p>
+<blockquote>
+<div><ul class="simple">
+<li>A pipeline catalogue with all the pipelines and the important information about the parameters to fit</li>
+<li>All the predictions and the prediction probabilities for all pipelines</li>
+<li>All the correct answers</li>
+<li>All the scores, confusion matrices, precisions, recalls, and ROC infos for all matrices</li>
+<li>The dataset and the labels, as well as source dataset</li>
+<li>The group indices</li>
+<li>The eventual test dataset, labels and groups</li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.classify">
+<code class="descname">classify</code><span class="sig-paren">(</span><em>dataset</em>, <em>dataset_path=None</em>, <em>test_dataset_size=5</em>, <em>cv_value=5</em>, <em>independent_features_selection=False</em>, <em>channels_to_select=20</em>, <em>use_groups=True</em>, <em>tune_hypers=False</em>, <em>classify_test=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.classify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.classify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Global classification method of the library. (inter-subjects)</p>
+<p>Reads the dataset, can apply independent features selection, can tune hyperparameters, fits, predicts, scores, and shows results.</p>
+<p>Parameters</p>
+<p>dataset : string; the path to the dataset</p>
+<p>test_dataset_size : int; the fraction of the dataset to be considered for testing</p>
+<p>pre_epoched : boolean; whether the dataset is already epoched or not</p>
+<p>tmin, tmax : time limits for the epochs</p>
+<p>bads : list of electrodes to be rejected</p>
+<p>picks : list of electrodes to be worked on</p>
+<p>filtering : tuple containing the higher and lower frequencies to filter the data</p>
+<p>tmin, tmax : tmin, tmax for delimiting the epochs in time</p>
+<p>ICA : Boolean, whether to apply Independent Component Analysis or not</p>
+<p>resample : boolean, whether to resample the data at 512 Hz or not</p>
+<p>baseline : the baseline to be applied to the data</p>
+<p>cv_value : int; the number of folds for cross validation. If None, the number of subjects will be used (Leave one out)</p>
+<p>independent_features_selection : boolean; whether to apply independent features selection or not</p>
+<p>channels_to_select : int or None; the number of channels to be selected or None if automatic number selection</p>
+<p>use_groups : boolean; whether to use groups for cross validation or not</p>
+<p>tune_hypers : boolean; whether to tune hyperparameters or not</p>
+<p>names : list; names of the categories</p>
+<p>classify_test : boolean; whether there should be a separate test dataset or not</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.classify_intraSubject">
+<code class="descname">classify_intraSubject</code><span class="sig-paren">(</span><em>dataset, divided_dataset=True, nb_subj=None, test_dataset_size=5, pre_epoched=True, tmin=-0.2, tmax=0.5, bads=None, picks=None, filtering=[None, None], ICA=False, resample=False, baseline=None, event_ids=[None, None], reference=None, cv_value=5, independent_features_selection=False, channels_to_select=20, tune_hypers=False, names=[0, 1], classify_test=False, use_all_pipelines=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.classify_intraSubject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.classify_intraSubject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Global classification method of the library. (intra-subject)</p>
+<p>Reads the dataset, can apply independent features selection, can tune hyperparameters, fits, predicts, scores, and shows results.</p>
+<p>Parameters</p>
+<p>dataset : string; the path to the dataset</p>
+<p>nb_subj : int; number of subjects to consider</p>
+<p>test_dataset_size : int; the fraction of the dataset to be considered for testing</p>
+<p>pre_epoched : boolean; whether or not the dataset is already epoched</p>
+<p>tmin, tmax : time limits for the epochs</p>
+<p>bads : list of electrodes to be rejected</p>
+<p>picks : list of electrodes to be worked on</p>
+<p>filtering : tuple containing the higher and lower frequencies to filter the data</p>
+<p>tmin, tmax : tmin, tmax for delimiting the epochs in time</p>
+<p>ICA : Boolean, whether or not to apply Independent Component Analysis</p>
+<p>resample : boolean, whether or not to resample the data at 512 Hz</p>
+<p>baseline : the baseline to be applied to the data</p>
+<p>cv_value : int; the number of folds for cross validation. If None, the number of subjects will be used (Leave one out)</p>
+<p>independent_features_selection : boolean; whether or not to apply independent features selection</p>
+<p>channels_to_select : int or None; the number of channels to be selected or None if automatic number selection</p>
+<p>tune_hypers : boolean; whether or not to tune hyperparameters</p>
+<p>names : list; names of the categories</p>
+<p>classify_test : boolean; whether or not there should be a separate test dataset</p>
+<p>use_all_pipelines : boolean; whether or not all the pipelines should be used for classification or only a subset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.classify_with_CNN">
+<code class="descname">classify_with_CNN</code><span class="sig-paren">(</span><em>dataset, nb_subj=None, divided_dataset=True, pre_epoched=True, tmin=0, tmax=0.5, bads=None, picks=None, filtering=[None, None], ICA=False, resample=False, baseline=None, event_ids=[None, None], reference=None, test_size=5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.classify_with_CNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.classify_with_CNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Global classification method of the library. (inter-subjects)</p>
+<p>Reads the dataset, can apply independent features selection, can tune hyperparameters, fits, predicts, scores, and shows results.</p>
+<p>Parameters</p>
+<p>dataset : string; the path to the dataset</p>
+<p>nb_subj : int; number of subjects to consider</p>
+<p>test_dataset_size : int; the fraction of the dataset to be considered for testing</p>
+<p>pre_epoched : boolean; whether or not the dataset is already epoched</p>
+<p>tmin, tmax : time limits for the epochs</p>
+<p>bads : list of electrodes to be rejected</p>
+<p>picks : list of electrodes to be worked on</p>
+<p>filtering : tuple containing the higher and lower frequencies to filter the data</p>
+<p>tmin, tmax : tmin, tmax for delimiting the epochs in time</p>
+<p>ICA : Boolean, whether or not to apply Independent Component Analysis</p>
+<p>resample : boolean, whether or not to resample the data at 512 Hz</p>
+<p>baseline : the baseline to be applied to the data</p>
+<p>cv_value : int; the number of folds for cross validation. If None, the number of subjects will be used (Leave one out)</p>
+<p>independent_features_selection : boolean; whether or not to apply independent features selection</p>
+<p>channels_to_select : int or None; the number of channels to be selected or None if automatic number selection</p>
+<p>use_groups : boolean; whether or not to use groups for cross validation</p>
+<p>tune_hypers : boolean; whether or not to tune hyperparameters</p>
+<p>names : list; names of the categories</p>
+<p>classify_test : boolean; whether or not there should be a separate test dataset</p>
+<p>use_all_pipelines : boolean; whether or not all the pipelines should be used for classification or only a subset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.count_subjects">
+<code class="descname">count_subjects</code><span class="sig-paren">(</span><em>directory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.count_subjects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.count_subjects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count the number of subjects in the dataset.</p>
+<p>Parameters</p>
+<p>directory : the path to the dataset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.create_folder">
+<code class="descname">create_folder</code><span class="sig-paren">(</span><em>k</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.create_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.create_folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the k-folds folder for the data.</p>
+<p>Parameters</p>
+<p>k : int</p>
+<blockquote>
+<div>number of folds</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.delete_pipelines">
+<code class="descname">delete_pipelines</code><span class="sig-paren">(</span><em>pipeline_names</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.delete_pipelines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.delete_pipelines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a pipeline by calling the method from the pipeline catalogue.
+Additionally, deletes all occurences of the pipeline.</p>
+<p>Parameters</p>
+<p>name :  string</p>
+<blockquote>
+<div>name of the pipeline</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.estimate_covariance_matrices">
+<code class="descname">estimate_covariance_matrices</code><span class="sig-paren">(</span><em>dataset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.estimate_covariance_matrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.estimate_covariance_matrices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the simple covariance matrices for the raw data.</p>
+<p>Result format = nb_subj  x  nb_epochs  x  nb_channels  x  nb_channels</p>
+<p>Parameters</p>
+<p>dataset : the dataset on which to estimate the covariance matrices.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.estimate_sources">
+<code class="descname">estimate_sources</code><span class="sig-paren">(</span><em>raw_dataset</em>, <em>info</em>, <em>tmin_noise</em>, <em>tmax_noise</em>, <em>trans=None</em>, <em>sourceSpaces=None</em>, <em>bemSolution=None</em>, <em>mixedSourceSpaces=None</em>, <em>loose=1</em>, <em>snr=3</em>, <em>fixed=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.estimate_sources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.estimate_sources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimates the sources for the dataset using a Sources_estimator object.</p>
+<p>Parameters</p>
+<p>raw_dataset : the dataset to be estimated</p>
+<p>info : info dictionary for the EEG recordings (see Epochs.info)</p>
+<p>tmin_noise, tmax_noise : tmin and tmax for delimiting the noise estimation</p>
+<p>trans=None : path to the eventual coregistration file</p>
+<p>sourceSpaces : path to the eventual source spaces file</p>
+<p>bemSolution : path to the eventual bem solution file</p>
+<p>mixedSourceSpaces : path to the eventual mixed source spaces file</p>
+<p>loose : between 0 and 1. “value that weights the source variances of the dipole components that are parallel (tangential) to the cortical surface”</p>
+<p>snr = signal to noise ratio value</p>
+<p>fixed : Boolean, whether or not to use fixed source orientations normal to the cortical mantle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.final_score">
+<code class="descname">final_score</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.final_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.final_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Final scoring function. For each pipeline, a score, confusion matrix, precision, recall, and ROC curve is created.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>x_train</em>, <em>y_train</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits all the pipeline to a provided dataset.</p>
+<p>Parameters</p>
+<p>x_train : the training samples</p>
+<p>y_train : the correct answers to the training samples</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.fit_transform">
+<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit to data, then transform it.</p>
+<p>Fits transformer to <cite>X</cite> and <cite>y</cite> with optional parameters <cite>fit_params</cite>
+and returns a transformed version of <cite>X</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>X</strong> (<em>array-like of shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_features</em><em>)</em>) – Input samples.</li>
+<li><strong>y</strong> (<em>array-like of shape</em><em> (</em><em>n_samples</em><em>,</em><em>) or </em><em>(</em><em>n_samples</em><em>, </em><em>n_outputs</em><em>)</em><em>,                 </em><em>default=None</em>) – Target values (None for unsupervised transformations).</li>
+<li><strong>**fit_params</strong> (<em>dict</em>) – Additional fit parameters.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>X_new</strong> – Transformed array.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray array of shape (n_samples, n_features_new)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.independent_features_selection">
+<code class="descname">independent_features_selection</code><span class="sig-paren">(</span><em>use_sources=False</em>, <em>channels_to_select=None</em>, <em>use_groups=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.independent_features_selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.independent_features_selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies independent channel or zone selection on the data, without the pipelines. Only the selected channels or zones will be
+kept on the final data.</p>
+<p>Parameters</p>
+<p>use_sources : boolean; whether or not to use sources for feature selection</p>
+<p>cv : int; number of folds for cross validation</p>
+<p>channels_to_select : int; if any, the desired number of features</p>
+<p>use_groups : boolean; whether or not to use groups when dividing the data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.modify_add_pipeline">
+<code class="descname">modify_add_pipeline</code><span class="sig-paren">(</span><em>name</em>, <em>pipeline</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.modify_add_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.modify_add_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies or adds a new pipeline to the catalogue.</p>
+<p>Parameters</p>
+<p>name :  string</p>
+<blockquote>
+<div>name of the pipeline</div></blockquote>
+<p>pipeline :  instance of pipeline</p>
+<blockquote>
+<div>the pipeline to be used</div></blockquote>
+<p>parameters :    see doc for pipeline catalogue</p>
+<blockquote>
+<div>the notation for the parameters to fit</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.modify_parameters">
+<code class="descname">modify_parameters</code><span class="sig-paren">(</span><em>name</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.modify_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.modify_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies a pipeline’s parameters by calling the method from the pipeline catalogue.</p>
+<p>Parameters</p>
+<p>name :  string</p>
+<blockquote>
+<div>name of the pipeline</div></blockquote>
+<p>parameters :    see doc for pipeline catalogue</p>
+<blockquote>
+<div>the notation for the parameters to fit</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.plot_ROC">
+<code class="descname">plot_ROC</code><span class="sig-paren">(</span><em>nb_lines</em>, <em>nb_columns</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.plot_ROC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.plot_ROC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the ROC curves for all the pipelines from the catalogue.</p>
+<p>Parameters</p>
+<p>nb_lines : the number of lines to be used for all the pipelines</p>
+<p>nb_columns : the number of columns to be used for all the pipelines</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.plot_ROC_">
+<code class="descname">plot_ROC_</code><span class="sig-paren">(</span><em>nb_columns</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.plot_ROC_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.plot_ROC_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.plot_confusion">
+<code class="descname">plot_confusion</code><span class="sig-paren">(</span><em>nb_lines</em>, <em>nb_columns</em>, <em>names</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.plot_confusion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.plot_confusion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the confusion matrices for all the pipelines from the catalogue.</p>
+<p>Parameters</p>
+<p>nb_lines : the number of lines to be used for all the pipelines</p>
+<p>nb_columns : the number of columns to be used for all the pipelines</p>
+<p>names : list; list containing the names of the labels for the categories.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.plot_confusion_">
+<code class="descname">plot_confusion_</code><span class="sig-paren">(</span><em>nb_columns</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.plot_confusion_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.plot_confusion_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>x_test</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predicts the values for a dataset.</p>
+<p>Parameters</p>
+<p>x_test : the test samples</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>x_test</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predicts with probabilities the values for a dataset.</p>
+<p>Parameters</p>
+<p>x_test : the test samples</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.predict_test_dataset">
+<code class="descname">predict_test_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.predict_test_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.predict_test_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predicts the left out test dataset, computes the score and shows the results.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.prepare_nonepoched_dataset">
+<code class="descname">prepare_nonepoched_dataset</code><span class="sig-paren">(</span><em>directory, nb_subj, tmin, tmax, bads=None, picks=None, filtering=[None, None], ICA=False, resample=False, baseline=None, event_ids=[None, None], reference=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.prepare_nonepoched_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.prepare_nonepoched_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare a   subjects x epochs x channels x times     dataset from raw files</p>
+<p>Parameters</p>
+<p>directory : the path to the directory containing the dataset</p>
+<p>nb_subj : the number of subjects to be considered</p>
+<p>tmin, tmax : tmin, tmax for delimiting the epochs in time</p>
+<p>bads : list of electrodes to be rejected</p>
+<p>picks : list of electrodes to be worked on</p>
+<p>filtering : tuple containing the higher and lower frequencies to filter the data</p>
+<p>tmin, tmax : tmin, tmax for delimiting the epochs in time</p>
+<p>ICA : Boolean, whether or not to apply Independent Component Analysis</p>
+<p>resample : boolean, whether or not to resample the data at 512 Hz</p>
+<p>baseline : the baseline to be applied to the data</p>
+<p>event_ids : The id of the event to consider</p>
+<p>reference : the name of the reference to be applied to the data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.prepare_nonepoched_dataset_oneFilePerSubj">
+<code class="descname">prepare_nonepoched_dataset_oneFilePerSubj</code><span class="sig-paren">(</span><em>directory, nb_subj, tmin, tmax, bads=None, picks=None, filtering=[None, None], ICA=False, resample=False, baseline=None, event_ids=[None, None]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.prepare_nonepoched_dataset_oneFilePerSubj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.prepare_nonepoched_dataset_oneFilePerSubj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare a   subjects x epochs x channels x times     dataset from raw files</p>
+<p>Parameters</p>
+<p>directory : the path to the directory containing the dataset</p>
+<p>nb_subj : the number of subjects to be considered</p>
+<p>tmin, tmax : tmin, tmax for delimiting the epochs in time</p>
+<p>bads : list of electrodes to be rejected</p>
+<p>picks : list of electrodes to be worked on</p>
+<p>filtering : tuple containing the higher and lower frequencies to filter the data</p>
+<p>tmin, tmax : tmin, tmax for delimiting the epochs in time</p>
+<p>ICA : Boolean, whether or not to apply Independent Component Analysis</p>
+<p>resample : boolean, whether or not to resample the data at 512 Hz</p>
+<p>baseline : the baseline to be applied to the data</p>
+<p>event_ids : The id of the event to consider</p>
+<p>reference : the name of the reference to be applied to the data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.read_all_files">
+<code class="descname">read_all_files</code><span class="sig-paren">(</span><em>directory, nb_subj=None, divided_dataset=True, tmin=0, tmax=0.5, bads=None, picks=None, filtering=[None, None], pre_epoched=True, ICA=False, resample=False, baseline=None, event_ids=[None, None], reference=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.read_all_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.read_all_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a   subjects x epochs x channels x times     dataset from epoched files.</p>
+<p>Parameters</p>
+<p>directory : the path to the directory containing the dataset</p>
+<p>nb_subj : the number of subjects to be considered</p>
+<p>divided_dataset : boolean; whether or not the dataset is divided by classes</p>
+<p>tmin, tmax : tmin, tmax for delimiting the epochs in time</p>
+<p>bads : list of electrodes to be rejected</p>
+<p>picks : list of electrodes to be worked on</p>
+<p>filtering : tuple containing the higher and lower frequencies to filter the data</p>
+<p>pre_epoched : boolean; whether or not the dataset has been pre-epoched</p>
+<p>tmin, tmax : tmin, tmax for delimiting the epochs in time</p>
+<p>ICA : Boolean, whether or not to apply Independent Component Analysis</p>
+<p>resample : boolean, whether or not to resample the data at 512 Hz</p>
+<p>baseline : the baseline to be applied to the data</p>
+<p>event_ids : The id of the event to consider</p>
+<p>reference : the name of the reference to be applied to the data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.read_one_file">
+<code class="descname">read_one_file</code><span class="sig-paren">(</span><em>file_path</em>, <em>file_name</em>, <em>destination</em>, <em>bads=None</em>, <em>picks=None</em>, <em>filtering=(1</em>, <em>45)</em>, <em>tmin=0</em>, <em>tmax=0.5</em>, <em>ICA=False</em>, <em>resample=False</em>, <em>baseline=None</em>, <em>event_ids=None</em>, <em>reference=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.read_one_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.read_one_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads one non pre-epoched (raw) set file and saves the result in a -epo.fif file.</p>
+<p>Parameters</p>
+<p>file_path : path to the file to be opened</p>
+<p>file_name : name of the file</p>
+<p>destination : path where the -epo.fif file will be saved</p>
+<p>bads : list of electrodes to be rejected</p>
+<p>picks : list of electrodes to be worked on</p>
+<p>filtering : tuple containing the higher and lower frequencies to filter the data</p>
+<p>tmin, tmax : tmin, tmax for delimiting the epochs in time</p>
+<p>ICA : Boolean, whether or not to apply Independent Component Analysis</p>
+<p>resample : boolean, whether or not to resample the data at 512 Hz</p>
+<p>baseline : the baseline to be applied to the data</p>
+<p>event_ids : The id of the event to consider</p>
+<p>reference : the name of the reference to be applied to the data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.read_preepoched_oneFilePerSubj">
+<code class="descname">read_preepoched_oneFilePerSubj</code><span class="sig-paren">(</span><em>directory, nb_subj, tmin, tmax, bads=None, picks=None, filtering=[None, None], ICA=False, resample=False, baseline=None, event_ids=[None, None], reference=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.read_preepoched_oneFilePerSubj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.read_preepoched_oneFilePerSubj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a   subjects x epochs x channels x times     dataset from epoched files.</p>
+<p>Parameters</p>
+<p>directory : the path to the directory containing the dataset</p>
+<p>nb_subj : the number of subjects to be considered</p>
+<p>tmin, tmax : tmin, tmax for delimiting the epochs in time</p>
+<p>bads : list of electrodes to be rejected</p>
+<p>picks : list of electrodes to be worked on</p>
+<p>filtering : tuple containing the higher and lower frequencies to filter the data</p>
+<p>tmin, tmax : tmin, tmax for delimiting the epochs in time</p>
+<p>ICA : Boolean, whether or not to apply Independent Component Analysis</p>
+<p>resample : boolean, whether or not to resample the data at 512 Hz</p>
+<p>baseline : the baseline to be applied to the data</p>
+<p>event_ids : The id of the event to consider</p>
+<p>reference : the name of the reference to be applied to the data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.restore">
+<code class="descname">restore</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.restore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.restore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restores the classifier by restoring the predictions, predictions probabilities, expected answers, scores,
+confusion matrices, precisions, recalls and roc info</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.save_program_log">
+<code class="descname">save_program_log</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.save_program_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.save_program_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the program log in a file.</p>
+<p>Parameters</p>
+<p>path : string; path to the place where the file will be saved.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.score">
+<code class="descname">score</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the accuracy on the given test data and labels.</p>
+<p>Parameters</p>
+<p>x : test samples</p>
+<p>y : correct answers for x</p>
+<p>weights : Sample weights</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.score_all_pipelines">
+<code class="descname">score_all_pipelines</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.score_all_pipelines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.score_all_pipelines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the accuracy on the given predictions and labels for all trained pipelines.</p>
+<p>Parameters</p>
+<p>x : test samples</p>
+<p>y : correct answers for x</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.score_func">
+<code class="descname">score_func</code><span class="sig-paren">(</span><em>estimator</em>, <em>x_test</em>, <em>y_test</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.score_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.score_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scoing function for the independent feature selection. The previously trained pipeline is used to predict the test dataset.
+At the end, the predicted data are compared to the correct answers, and the percentage of correctly classified data is considered the score.</p>
+<p>Parameters</p>
+<p>estimator : the estimator that predicts and scores</p>
+<p>x_test : the test dataset</p>
+<p>y_test : the correct answers to the dataset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.score_func_independent_feat_selection">
+<code class="descname">score_func_independent_feat_selection</code><span class="sig-paren">(</span><em>estimator</em>, <em>x_test</em>, <em>y_test</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.score_func_independent_feat_selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.score_func_independent_feat_selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scoing function for the independent feature selection. The previously trained pipeline is used to predict the test dataset.</p>
+<p>At the end, the predicted data are compared to the correct answers, and the percentage of correctly classified data is considered the score.</p>
+<p>Parameters</p>
+<p>estimator : the estimator that predicts and scores</p>
+<p>x_test : the test dataset</p>
+<p>y_test : the correct answers to the dataset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.show_results">
+<code class="descname">show_results</code><span class="sig-paren">(</span><em>nb_columns</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.show_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.show_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shows the ROC curves and the confusion matrices for all the pipelines.</p>
+<p>Parameters</p>
+<p>nb_columns : the number of columns to be used for all the pipelines</p>
+<p>names : list; list containing the names of the labels for the categories.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.classifier.ApplePyClassifier.tune_hyperparameters">
+<code class="descname">tune_hyperparameters</code><span class="sig-paren">(</span><em>cv</em>, <em>use_sources=False</em>, <em>use_groups=True</em>, <em>factor=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/classifier.html#ApplePyClassifier.tune_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.classifier.ApplePyClassifier.tune_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tune the hyperparameters for the different pipelines and replace the pipelines by their improved versions.</p>
+<p>Parameters</p>
+<p>cv : cross validation for tuning</p>
+<p>use_sources : boolean; whether or not to use the sources dataset</p>
+<p>use_groups : boolean; whether or not to use groups for the cross validation</p>
+<p>factor : int; the stair by which to augment the number of filters or electrodes</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.classification.applePy.cnn">
+<span id="src-classification-applepy-cnn-module"></span><h2>src.classification.applePy.cnn module<a class="headerlink" href="#module-src.classification.applePy.cnn" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.classification.applePy.cnn.CNN">
+<em class="property">class </em><code class="descclassname">src.classification.applePy.cnn.</code><code class="descname">CNN</code><a class="reference internal" href="_modules/src/classification/applePy/cnn.html#CNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.cnn.CNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="src.classification.applePy.cnn.CNN.compile">
+<code class="descname">compile</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/cnn.html#CNN.compile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.cnn.CNN.compile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.cnn.CNN.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>x_test</em>, <em>y_test</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/cnn.html#CNN.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.cnn.CNN.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.cnn.CNN.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>x_test</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/cnn.html#CNN.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.cnn.CNN.predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.cnn.CNN.show_results">
+<code class="descname">show_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/cnn.html#CNN.show_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.cnn.CNN.show_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.cnn.CNN.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>x_train</em>, <em>y_train</em>, <em>x_test</em>, <em>y_test</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/cnn.html#CNN.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.cnn.CNN.train" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.classification.applePy.pipeline_catalogue">
+<span id="src-classification-applepy-pipeline-catalogue-module"></span><h2>src.classification.applePy.pipeline_catalogue module<a class="headerlink" href="#module-src.classification.applePy.pipeline_catalogue" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.classification.applePy.pipeline_catalogue.Pipeline_catalogue">
+<em class="property">class </em><code class="descclassname">src.classification.applePy.pipeline_catalogue.</code><code class="descname">Pipeline_catalogue</code><span class="sig-paren">(</span><em>used_pipeline=None</em>, <em>channels_selected=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/pipeline_catalogue.html#Pipeline_catalogue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.pipeline_catalogue.Pipeline_catalogue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Pipeline catalogue is mainly composed of the catalogue and the parameters to fit.
+The catalogue contains 12 pre-made pipelines, and the parameters to fit contains, for each pipeline,
+the different parameters that should be tested in order to obtain better results.</p>
+<dl class="method">
+<dt id="src.classification.applePy.pipeline_catalogue.Pipeline_catalogue.change_logReg">
+<code class="descname">change_logReg</code><span class="sig-paren">(</span><em>new_classifier</em>, <em>channels_selected=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/pipeline_catalogue.html#Pipeline_catalogue.change_logReg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.pipeline_catalogue.Pipeline_catalogue.change_logReg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.pipeline_catalogue.Pipeline_catalogue.delete_pipeline">
+<code class="descname">delete_pipeline</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/pipeline_catalogue.html#Pipeline_catalogue.delete_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.pipeline_catalogue.Pipeline_catalogue.delete_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a pipeline and the pipeline’s parameters to fit.
+:param name: name of the pipeline
+:type name: string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.pipeline_catalogue.Pipeline_catalogue.modify_add_pipeline">
+<code class="descname">modify_add_pipeline</code><span class="sig-paren">(</span><em>name</em>, <em>pipeline</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/pipeline_catalogue.html#Pipeline_catalogue.modify_add_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.pipeline_catalogue.Pipeline_catalogue.modify_add_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows the user to add their own pipeline to the available catalogue, or to modify a pipeline (for example, using their own
+hyper-values for a pipeline, such as the number of electrodes to select, of CSP filters, of xDAWN filters, etc…).
+Code  : 0 = no need to tune</p>
+<blockquote>
+<div>1 = Grid Search
+2 = Randomized Search</div></blockquote>
+<p>if grid search : parameters = [1, [,,,]]
+if randomized search : parameters = [2, [,,,], nb_iter*]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) – name of the pipeline</li>
+<li><strong>pipeline</strong> (<em>instance of pipeline</em>) – the pipeline to be used</li>
+<li><strong>parameters</strong> (<em>see above</em>) – the notation for the parameters to fit</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.pipeline_catalogue.Pipeline_catalogue.modify_parameters">
+<code class="descname">modify_parameters</code><span class="sig-paren">(</span><em>name</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/pipeline_catalogue.html#Pipeline_catalogue.modify_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.pipeline_catalogue.Pipeline_catalogue.modify_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces the old parameters for a pipeline by new ones.
+:param name: name of the pipeline
+:type name: string
+:param parameters: the notation for the parameters to fit
+:type parameters: see modify_pipeline</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="src-classification-applepy-saver-module">
+<h2>src.classification.applePy.saver module<a class="headerlink" href="#src-classification-applepy-saver-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.classification.applePy.sources_estimator">
+<span id="src-classification-applepy-sources-estimator-module"></span><h2>src.classification.applePy.sources_estimator module<a class="headerlink" href="#module-src.classification.applePy.sources_estimator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.classification.applePy.sources_estimator.Sources_estimator">
+<em class="property">class </em><code class="descclassname">src.classification.applePy.sources_estimator.</code><code class="descname">Sources_estimator</code><span class="sig-paren">(</span><em>raw_dataset</em>, <em>info</em>, <em>tmin_noise</em>, <em>tmax_noise</em>, <em>trans=None</em>, <em>sourceSpaces=None</em>, <em>bemSolution=None</em>, <em>mixedSourceSpaces=None</em>, <em>coregistration=None</em>, <em>loose=1</em>, <em>snr=3</em>, <em>fixed=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/sources_estimator.html#Sources_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.sources_estimator.Sources_estimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="src.classification.applePy.sources_estimator.Sources_estimator.apply_common_average">
+<code class="descname">apply_common_average</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/sources_estimator.html#Sources_estimator.apply_common_average"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.sources_estimator.Sources_estimator.apply_common_average" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies a common average reference if not already applied.
+Raw_dataset format must be : subjects x conditions x epochsEEGLAB
+Raw_dataset must be an array.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.sources_estimator.Sources_estimator.compute_noise_covariances">
+<code class="descname">compute_noise_covariances</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/sources_estimator.html#Sources_estimator.compute_noise_covariances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.sources_estimator.Sources_estimator.compute_noise_covariances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the noise covariances for the raw data.
+Raw_dataset format must be : subjects x conditions x epochsEEGLAB
+The limits of the noise must be provided.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.sources_estimator.Sources_estimator.create_inverse_operator">
+<code class="descname">create_inverse_operator</code><span class="sig-paren">(</span><em>forwardSolution</em>, <em>noise_covariances</em>, <em>depth</em>, <em>fixed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/sources_estimator.html#Sources_estimator.create_inverse_operator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.sources_estimator.Sources_estimator.create_inverse_operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls the inverse operator method from mne with the chosen arguments. Returns the inverse operator.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="src.classification.applePy.sources_estimator.Sources_estimator.create_labels">
+<em class="property">static </em><code class="descname">create_labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/sources_estimator.html#Sources_estimator.create_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.sources_estimator.Sources_estimator.create_labels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.sources_estimator.Sources_estimator.estimate_sources">
+<code class="descname">estimate_sources</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/sources_estimator.html#Sources_estimator.estimate_sources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.sources_estimator.Sources_estimator.estimate_sources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call all the above methods in order to estimate the sources on the dataset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.sources_estimator.Sources_estimator.extract_labels_from_sources">
+<code class="descname">extract_labels_from_sources</code><span class="sig-paren">(</span><em>labelsParc</em>, <em>inverseOperator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/sources_estimator.html#Sources_estimator.extract_labels_from_sources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.sources_estimator.Sources_estimator.extract_labels_from_sources" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.sources_estimator.Sources_estimator.open_make_forward_solutions">
+<code class="descname">open_make_forward_solutions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/sources_estimator.html#Sources_estimator.open_make_forward_solutions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.sources_estimator.Sources_estimator.open_make_forward_solutions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the forward solution parts from the default files or the specified files.
+Then, creates the forward solution from the three previously opened parts.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.sources_estimator.Sources_estimator.save_sources">
+<code class="descname">save_sources</code><span class="sig-paren">(</span><em>inverse_operators</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/sources_estimator.html#Sources_estimator.save_sources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.sources_estimator.Sources_estimator.save_sources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the sources for all subjects and conditions. Default estimated snr is 3.
+Raw_dataset format must be : subjects x conditions x epochsEEGLAB</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.classification.applePy.tools">
+<span id="src-classification-applepy-tools-module"></span><h2>src.classification.applePy.tools module<a class="headerlink" href="#module-src.classification.applePy.tools" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.classification.applePy.tools.CospBoostingClassifier">
+<em class="property">class </em><code class="descclassname">src.classification.applePy.tools.</code><code class="descname">CospBoostingClassifier</code><span class="sig-paren">(</span><em>baseclf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#CospBoostingClassifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.CospBoostingClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></p>
+<p>Co-spectral matrix bagging.
+Source from Cédric Simar.</p>
+<dl class="method">
+<dt id="src.classification.applePy.tools.CospBoostingClassifier.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#CospBoostingClassifier.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.CospBoostingClassifier.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.tools.CospBoostingClassifier.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#CospBoostingClassifier.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.CospBoostingClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.tools.CospBoostingClassifier.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#CospBoostingClassifier.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.CospBoostingClassifier.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.classification.applePy.tools.DownSampler">
+<em class="property">class </em><code class="descclassname">src.classification.applePy.tools.</code><code class="descname">DownSampler</code><span class="sig-paren">(</span><em>factor=4</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#DownSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.DownSampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></p>
+<p>Downsample transformer.
+Source from Cédric Simar.</p>
+<dl class="method">
+<dt id="src.classification.applePy.tools.DownSampler.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#DownSampler.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.DownSampler.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.tools.DownSampler.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#DownSampler.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.DownSampler.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.classification.applePy.tools.EpochsVectorizer">
+<em class="property">class </em><code class="descclassname">src.classification.applePy.tools.</code><code class="descname">EpochsVectorizer</code><a class="reference internal" href="_modules/src/classification/applePy/tools.html#EpochsVectorizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.EpochsVectorizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></p>
+<p>Vectorize epochs.
+Source from Cédric Simar.</p>
+<dl class="method">
+<dt id="src.classification.applePy.tools.EpochsVectorizer.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#EpochsVectorizer.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.EpochsVectorizer.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.tools.EpochsVectorizer.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#EpochsVectorizer.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.EpochsVectorizer.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.classification.applePy.tools.PSDfiltering">
+<em class="property">class </em><code class="descclassname">src.classification.applePy.tools.</code><code class="descname">PSDfiltering</code><span class="sig-paren">(</span><em>frequencies=array([[ 1,  4],        [ 4,  8],        [ 8, 15],        [15, 20],        [30, 40]]), sampling_freq=512, overlap=0.25</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#PSDfiltering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.PSDfiltering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></p>
+<p>Power Spectral Density class.
+Code inspired from Cédric Simar.</p>
+<dl class="method">
+<dt id="src.classification.applePy.tools.PSDfiltering.compute_power_spectral_density">
+<code class="descname">compute_power_spectral_density</code><span class="sig-paren">(</span><em>windowed_signal</em>, <em>psd_freqs</em>, <em>sampling_freq</em>, <em>overlap</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#PSDfiltering.compute_power_spectral_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.PSDfiltering.compute_power_spectral_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the PSD of each 32 electrodes and form a binned spectrogram of 5 frequency bands.
+Return the log_10 on the 32 spectrogram.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.tools.PSDfiltering.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#PSDfiltering.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.PSDfiltering.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.classification.applePy.tools.PSDfiltering.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#PSDfiltering.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.PSDfiltering.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="src.classification.applePy.tools.source_estimation">
+<code class="descclassname">src.classification.applePy.tools.</code><code class="descname">source_estimation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/classification/applePy/tools.html#source_estimation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.classification.applePy.tools.source_estimation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="src-classification-applepy-transformer-module">
+<h2>src.classification.applePy.transformer module<a class="headerlink" href="#src-classification-applepy-transformer-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.classification.applePy">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.classification.applePy" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">src.classification.applePy package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.classification.applePy.channel_selection">src.classification.applePy.channel_selection module</a></li>
+<li><a class="reference internal" href="#module-src.classification.applePy.channel_selection_without_covariances">src.classification.applePy.channel_selection_without_covariances module</a></li>
+<li><a class="reference internal" href="#module-src.classification.applePy.classifier">src.classification.applePy.classifier module</a></li>
+<li><a class="reference internal" href="#module-src.classification.applePy.cnn">src.classification.applePy.cnn module</a></li>
+<li><a class="reference internal" href="#module-src.classification.applePy.pipeline_catalogue">src.classification.applePy.pipeline_catalogue module</a></li>
+<li><a class="reference internal" href="#src-classification-applepy-saver-module">src.classification.applePy.saver module</a></li>
+<li><a class="reference internal" href="#module-src.classification.applePy.sources_estimator">src.classification.applePy.sources_estimator module</a></li>
+<li><a class="reference internal" href="#module-src.classification.applePy.tools">src.classification.applePy.tools module</a></li>
+<li><a class="reference internal" href="#src-classification-applepy-transformer-module">src.classification.applePy.transformer module</a></li>
+<li><a class="reference internal" href="#module-src.classification.applePy">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="src.classification.html"
+                        title="previous chapter">src.classification package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="src.classification.classify.html"
+                        title="next chapter">src.classification.classify package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.classification.applePy.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.classification.classify.html" title="src.classification.classify package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.classification.html" title="src.classification package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.classification.html" >src.classification package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

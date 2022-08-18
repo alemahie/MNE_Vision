@@ -1,0 +1,162 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.plots.power_spectral_density.power_spectral_density_controller &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.plots.power_spectral_density.power_spectral_density_controller</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Power spectral density controller</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">plots.power_spectral_density.power_spectral_density_listener</span> <span class="kn">import</span> <span class="n">powerSpectralDensityListener</span>
+<span class="kn">from</span> <span class="nn">plots.power_spectral_density.power_spectral_density_view</span> <span class="kn">import</span> <span class="n">powerSpectralDensityView</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<div class="viewcode-block" id="powerSpectralDensityController"><a class="viewcode-back" href="../../../../src.plots.power_spectral_density.html#src.plots.power_spectral_density.power_spectral_density_controller.powerSpectralDensityController">[docs]</a><span class="k">class</span> <span class="nc">powerSpectralDensityController</span><span class="p">(</span><span class="n">powerSpectralDensityListener</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minimum_time</span><span class="p">,</span> <span class="n">maximum_time</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Controller for computing the power spectral density on the dataset.</span>
+<span class="sd">        Create a new window for specifying some parameters.</span>
+<span class="sd">        :param minimum_time: Minimum time of the epochs from which the power spectral density can be computed.</span>
+<span class="sd">        :type minimum_time: float</span>
+<span class="sd">        :param maximum_time: Maximum time of the epochs from which the power spectral density can be computed.</span>
+<span class="sd">        :type maximum_time: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power_spectral_density_view</span> <span class="o">=</span> <span class="n">powerSpectralDensityView</span><span class="p">(</span><span class="n">minimum_time</span><span class="p">,</span> <span class="n">maximum_time</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power_spectral_density_view</span><span class="o">.</span><span class="n">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">power_spectral_density_view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<div class="viewcode-block" id="powerSpectralDensityController.cancel_button_clicked"><a class="viewcode-back" href="../../../../src.plots.power_spectral_density.html#src.plots.power_spectral_density.power_spectral_density_controller.powerSpectralDensityController.cancel_button_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">cancel_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power_spectral_density_view</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="powerSpectralDensityController.confirm_button_clicked"><a class="viewcode-back" href="../../../../src.plots.power_spectral_density.html#src.plots.power_spectral_density.power_spectral_density_controller.powerSpectralDensityController.confirm_button_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="p">,</span> <span class="n">minimum_time</span><span class="p">,</span> <span class="n">maximum_time</span><span class="p">,</span> <span class="n">topo_time_points</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the window and send the information to the main controller.</span>
+<span class="sd">        :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.</span>
+<span class="sd">        :type minimum_frequency: float</span>
+<span class="sd">        :param maximum_frequency: Maximum frequency from which the power spectral density will be computed.</span>
+<span class="sd">        :type maximum_frequency: float</span>
+<span class="sd">        :param minimum_time: Minimum time of the epochs from which the power spectral density will be computed.</span>
+<span class="sd">        :type minimum_time: float</span>
+<span class="sd">        :param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.</span>
+<span class="sd">        :type maximum_time: float</span>
+<span class="sd">        :param topo_time_points: The time points for the topomaps.</span>
+<span class="sd">        :type topo_time_points: list of float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span><span class="o">.</span><span class="n">plot_spectra_maps_information</span><span class="p">(</span><span class="n">minimum_frequency</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="p">,</span> <span class="n">minimum_time</span><span class="p">,</span> <span class="n">maximum_time</span><span class="p">,</span>
+                                                         <span class="n">topo_time_points</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power_spectral_density_view</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="powerSpectralDensityController.plot_psd"><a class="viewcode-back" href="../../../../src.plots.power_spectral_density.html#src.plots.power_spectral_density.power_spectral_density_controller.powerSpectralDensityController.plot_psd">[docs]</a>    <span class="k">def</span> <span class="nf">plot_psd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psd_fig</span><span class="p">,</span> <span class="n">topo_fig</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send the information to the view for plotting the power spectral density computed.</span>
+<span class="sd">        :param psd_fig: The figure of the actual power spectral density&#39;s data computed</span>
+<span class="sd">        :type psd_fig: matplotlib.Figure</span>
+<span class="sd">        :param topo_fig: The figure of the topographies of the actual power spectral density&#39;s data computed</span>
+<span class="sd">        :type topo_fig: matplotlib.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power_spectral_density_view</span><span class="o">.</span><span class="n">plot_psd</span><span class="p">(</span><span class="n">psd_fig</span><span class="p">,</span> <span class="n">topo_fig</span><span class="p">)</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Setters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="powerSpectralDensityController.set_listener"><a class="viewcode-back" href="../../../../src.plots.power_spectral_density.html#src.plots.power_spectral_density.power_spectral_density_controller.powerSpectralDensityController.set_listener">[docs]</a>    <span class="k">def</span> <span class="nf">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the main listener so that the controller is able to communicate with the main controller.</span>
+<span class="sd">        :param listener: main listener</span>
+<span class="sd">        :type listener: mainController</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span> <span class="o">=</span> <span class="n">listener</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

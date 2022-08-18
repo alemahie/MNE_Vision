@@ -1,0 +1,258 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.classification.applePy.sources_estimator &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.classification.applePy.sources_estimator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">mne</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="Sources_estimator"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.sources_estimator.Sources_estimator">[docs]</a><span class="k">class</span> <span class="nc">Sources_estimator</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_dataset</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">tmin_noise</span><span class="p">,</span> <span class="n">tmax_noise</span><span class="p">,</span> <span class="n">trans</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sourceSpaces</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bemSolution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">mixedSourceSpaces</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coregistration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">snr</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_dataset</span> <span class="o">=</span> <span class="n">raw_dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmin_noise</span> <span class="o">=</span> <span class="n">tmin_noise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmax_noise</span> <span class="o">=</span> <span class="n">tmax_noise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">=</span> <span class="n">trans</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSpaces</span> <span class="o">=</span> <span class="n">sourceSpaces</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bemSolution</span> <span class="o">=</span> <span class="n">bemSolution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mixedSourceSpaces</span> <span class="o">=</span> <span class="n">mixedSourceSpaces</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coregistration</span> <span class="o">=</span> <span class="n">coregistration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loose</span> <span class="o">=</span> <span class="n">loose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snr</span> <span class="o">=</span> <span class="n">snr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed</span> <span class="o">=</span> <span class="n">fixed</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sources_log</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;sources&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;coregistration&quot;</span><span class="p">,</span> <span class="n">coregistration</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;loose&quot;</span><span class="p">,</span> <span class="n">loose</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;snr&quot;</span><span class="p">,</span> <span class="n">snr</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s1">&#39;fixed&#39;</span><span class="p">,</span> <span class="n">fixed</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="Sources_estimator.apply_common_average"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.sources_estimator.Sources_estimator.apply_common_average">[docs]</a>    <span class="k">def</span> <span class="nf">apply_common_average</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies a common average reference if not already applied.</span>
+<span class="sd">        Raw_dataset format must be : subjects x conditions x epochsEEGLAB</span>
+<span class="sd">        Raw_dataset must be an array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">person_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">condition_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_dataset</span><span class="p">[</span><span class="n">person_idx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">raw_dataset</span><span class="p">[</span><span class="n">person_idx</span><span class="p">][</span><span class="n">condition_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_eeg_reference</span><span class="p">(</span><span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">raw_dataset</span><span class="p">[</span><span class="n">person_idx</span><span class="p">][</span><span class="n">condition_idx</span><span class="p">]</span><span class="o">.</span><span class="n">apply_proj</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Sources_estimator.open_make_forward_solutions"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.sources_estimator.Sources_estimator.open_make_forward_solutions">[docs]</a>    <span class="k">def</span> <span class="nf">open_make_forward_solutions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Opens the forward solution parts from the default files or the specified files.</span>
+<span class="sd">        Then, creates the forward solution from the three previously opened parts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSpaces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sources_files</span><span class="p">,</span> <span class="s1">&#39;fsaverage-oct6-src.fif&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sources_log</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;source spaces&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sourceSpaces</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_source_spaces</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sources_log</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;source spaces&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSpaces</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sourceSpaces</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_source_spaces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceSpaces</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid file &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSpaces</span> <span class="o">+</span> <span class="s2">&quot;. Default will be used&quot;</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sources_files</span><span class="p">,</span> <span class="s1">&#39;fsaverage-oct6-src.fif&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sources_log</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;source spaces&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sourceSpaces</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_source_spaces</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bemSolution</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sources_files</span><span class="p">,</span> <span class="s1">&#39;fsaverage-bem-sol.fif&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sources_log</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;bem solution&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bemSolution</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_bem_solution</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sources_log</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;bem solution&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bemSolution</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bemSolution</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_bem_solution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bemSolution</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid file &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSpaces</span> <span class="o">+</span> <span class="s2">&quot;. Default will be used&quot;</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sources_files</span><span class="p">,</span> <span class="s1">&#39;fsaverage-bem-sol.fif&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sources_log</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;bem solution&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bemSolution</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_bem_solution</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixedSourceSpaces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sources_files</span><span class="p">,</span> <span class="s1">&#39;fsaverage-oct6-mixed-src.fif&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sources_log</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;mixed source spaces&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mixedSourceSpaces</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_source_spaces</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sources_log</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;mixed source spaces&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixedSourceSpaces</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mixedSourceSpaces</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_source_spaces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mixedSourceSpaces</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid file &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSpaces</span> <span class="o">+</span> <span class="s2">&quot;. Default will be used&quot;</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sources_files</span><span class="p">,</span> <span class="s1">&#39;fsaverage-oct6-mixed-src.fif&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sources_log</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;mixed source spaces&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mixedSourceSpaces</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_source_spaces</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coregistration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">coregistration</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coregistration</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid file &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSpaces</span> <span class="o">+</span> <span class="s2">&quot;. None will be used.&quot;</span><span class="p">)</span>
+        <span class="n">forwardSolution</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">make_forward_solution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coregistration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixedSourceSpaces</span><span class="p">,</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">bemSolution</span><span class="p">,</span> <span class="n">mindist</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">forwardSolution</span></div>
+
+<div class="viewcode-block" id="Sources_estimator.compute_noise_covariances"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.sources_estimator.Sources_estimator.compute_noise_covariances">[docs]</a>    <span class="k">def</span> <span class="nf">compute_noise_covariances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the noise covariances for the raw data.</span>
+<span class="sd">        Raw_dataset format must be : subjects x conditions x epochsEEGLAB</span>
+<span class="sd">        The limits of the noise must be provided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">noise_covariances</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="n">sbj</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">sbj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_dataset</span><span class="p">]</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="n">temp</span><span class="p">:</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mne</span><span class="o">.</span><span class="n">concatenate_epochs</span><span class="p">(</span><span class="n">subject</span><span class="p">))</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+            <span class="n">noise_covariances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mne</span><span class="o">.</span><span class="n">compute_covariance</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmin_noise</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmax_noise</span><span class="p">))</span>
+        <span class="n">noise_covariances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">noise_covariances</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">noise_covariances</span></div>
+
+<div class="viewcode-block" id="Sources_estimator.create_inverse_operator"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.sources_estimator.Sources_estimator.create_inverse_operator">[docs]</a>    <span class="k">def</span> <span class="nf">create_inverse_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forwardSolution</span><span class="p">,</span> <span class="n">noise_covariances</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">fixed</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls the inverse operator method from mne with the chosen arguments. Returns the inverse operator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">inverse_operators</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">subject_covariance</span> <span class="ow">in</span> <span class="n">noise_covariances</span><span class="p">:</span>
+            <span class="n">inverseOperator</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">minimum_norm</span><span class="o">.</span><span class="n">make_inverse_operator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">forwardSolution</span><span class="p">,</span> <span class="n">subject_covariance</span><span class="p">,</span>
+                                                                     <span class="bp">self</span><span class="o">.</span><span class="n">loose</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">fixed</span><span class="p">)</span>
+            <span class="n">inverse_operators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inverseOperator</span><span class="p">)</span>
+        <span class="n">inverse_operators</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">inverse_operators</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inverse_operators</span></div>
+
+<div class="viewcode-block" id="Sources_estimator.save_sources"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.sources_estimator.Sources_estimator.save_sources">[docs]</a>    <span class="k">def</span> <span class="nf">save_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inverse_operators</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the sources for all subjects and conditions. Default estimated snr is 3.</span>
+<span class="sd">        Raw_dataset format must be : subjects x conditions x epochsEEGLAB</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lambda2</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr</span> <span class="o">**</span> <span class="mi">2</span>
+
+        <span class="k">for</span> <span class="n">person_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">condition_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_dataset</span><span class="p">[</span><span class="n">person_idx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">computed_source</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">minimum_norm</span><span class="o">.</span><span class="n">apply_inverse_epochs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_dataset</span><span class="p">[</span><span class="n">person_idx</span><span class="p">][</span><span class="n">condition_idx</span><span class="p">],</span>
+                                                                        <span class="n">inverse_operators</span><span class="p">[</span><span class="n">person_idx</span><span class="p">],</span> <span class="n">lambda2</span><span class="o">=</span><span class="n">lambda2</span><span class="p">,</span>
+                                                                        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;sLORETA&quot;</span><span class="p">,</span> <span class="n">pick_ori</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+                <span class="c1"># np.save(&quot;subject&quot;+str(person_idx)+&quot;_&quot;+str(condition_idx), computed_source)</span>
+
+<div class="viewcode-block" id="Sources_estimator.create_labels"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.sources_estimator.Sources_estimator.create_labels">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_labels</span><span class="p">():</span>
+        <span class="n">labelsParc</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_labels_from_annot</span><span class="p">(</span><span class="s1">&#39;fsaverage&#39;</span><span class="p">,</span> <span class="n">parc</span><span class="o">=</span><span class="s1">&#39;aparc&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">labelsParc</span></div>
+
+<div class="viewcode-block" id="Sources_estimator.extract_labels_from_sources"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.sources_estimator.Sources_estimator.extract_labels_from_sources">[docs]</a>    <span class="k">def</span> <span class="nf">extract_labels_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labelsParc</span><span class="p">,</span> <span class="n">inverseOperator</span><span class="p">):</span>
+        <span class="n">labeled_dataset</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="k">for</span> <span class="n">person_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">condition_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_dataset</span><span class="p">[</span><span class="n">person_idx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">sources_person</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;subject&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">person_idx</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">condition_idx</span><span class="p">))</span>
+                <span class="n">extracted</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">extract_label_time_course</span><span class="p">(</span><span class="n">sources_person</span><span class="p">,</span> <span class="n">labelsParc</span><span class="p">,</span> <span class="n">inverseOperator</span><span class="p">[</span><span class="s2">&quot;src&quot;</span><span class="p">],</span>
+                                                          <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">allow_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;subject&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">person_idx</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">condition_idx</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_labels.npy&quot;</span><span class="p">,</span> <span class="n">extracted</span><span class="p">)</span>
+                <span class="n">labeled_dataset</span><span class="p">[</span><span class="n">person_idx</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">extracted</span><span class="p">)</span>
+            <span class="n">labeled_dataset</span><span class="p">[</span><span class="n">person_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">labeled_dataset</span><span class="p">[</span><span class="n">person_idx</span><span class="p">])</span>
+        <span class="n">labeled_dataset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">labeled_dataset</span><span class="p">)</span>
+
+        <span class="n">labelsAseg</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">get_volume_labels_from_src</span><span class="p">(</span><span class="n">inverseOperator</span><span class="p">[</span><span class="s1">&#39;src&#39;</span><span class="p">],</span> <span class="s1">&#39;fsaverage&#39;</span><span class="p">,</span>
+                                                    <span class="s1">&#39;/usr/local/freesurfer/subjects&#39;</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">labelsParc</span> <span class="o">+</span> <span class="n">labelsAseg</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;labels.npy&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">labels</span><span class="p">,</span> <span class="n">labeled_dataset</span></div>
+
+<div class="viewcode-block" id="Sources_estimator.estimate_sources"><a class="viewcode-back" href="../../../../src.classification.applePy.html#src.classification.applePy.sources_estimator.Sources_estimator.estimate_sources">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call all the above methods in order to estimate the sources on the dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_common_average</span><span class="p">()</span>
+        <span class="n">forward_solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_make_forward_solutions</span><span class="p">()</span>
+        <span class="n">noise_covariances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_noise_covariances</span><span class="p">()</span>
+        <span class="n">inverse_operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_inverse_operator</span><span class="p">(</span><span class="n">forward_solution</span><span class="p">,</span> <span class="n">noise_covariances</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_sources</span><span class="p">(</span><span class="n">inverse_operator</span><span class="p">)</span>
+        <span class="n">labelsParc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_labels</span><span class="p">()</span>
+        <span class="n">labels</span><span class="p">,</span> <span class="n">labeled_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_labels_from_sources</span><span class="p">(</span><span class="n">labelsParc</span><span class="p">,</span> <span class="n">inverse_operator</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sources estimated successfully&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">labels</span><span class="p">,</span> <span class="n">labeled_dataset</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,267 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.runnables.plots_runnable &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.runnables.plots_runnable</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Plots runnable</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">QRunnable</span><span class="p">,</span> <span class="n">pyqtSignal</span><span class="p">,</span> <span class="n">QObject</span>
+
+<span class="kn">from</span> <span class="nn">mne.time_frequency</span> <span class="kn">import</span> <span class="n">tfr_morlet</span><span class="p">,</span> <span class="n">tfr_multitaper</span><span class="p">,</span> <span class="n">tfr_stockwell</span>
+
+<span class="kn">from</span> <span class="nn">utils.view.error_window</span> <span class="kn">import</span> <span class="n">errorWindow</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<span class="c1"># Power Spectral Density</span>
+<div class="viewcode-block" id="powerSpectralDensityWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.plots_runnable.powerSpectralDensityWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">powerSpectralDensityWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the power spectral density runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="powerSpectralDensityRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.plots_runnable.powerSpectralDensityRunnable">[docs]</a><span class="k">class</span> <span class="nc">powerSpectralDensityRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="p">,</span> <span class="n">minimum_time</span><span class="p">,</span> <span class="n">maximum_time</span><span class="p">,</span> <span class="n">topo_time_points</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for the computation of the power spectral density of the given data.</span>
+<span class="sd">        :param file_data: MNE data of the dataset.</span>
+<span class="sd">        :type file_data: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.</span>
+<span class="sd">        :type minimum_frequency: float</span>
+<span class="sd">        :param maximum_frequency: Maximum frequency from which the power spectral density will be computed.</span>
+<span class="sd">        :type maximum_frequency: float</span>
+<span class="sd">        :param minimum_time: Minimum time of the epochs from which the power spectral density will be computed.</span>
+<span class="sd">        :type minimum_time: float</span>
+<span class="sd">        :param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.</span>
+<span class="sd">        :type maximum_time: float</span>
+<span class="sd">        :param topo_time_points: The time points for the topomaps.</span>
+<span class="sd">        :type topo_time_points: list of float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">powerSpectralDensityWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">file_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fmin</span> <span class="o">=</span> <span class="n">minimum_frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fmax</span> <span class="o">=</span> <span class="n">maximum_frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmin</span> <span class="o">=</span> <span class="n">minimum_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmax</span> <span class="o">=</span> <span class="n">maximum_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topo_time_points</span> <span class="o">=</span> <span class="n">topo_time_points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig_psd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig_topo</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="powerSpectralDensityRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.plots_runnable.powerSpectralDensityRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the computation of the power spectral density on the given data.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig_psd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">plot_psd</span><span class="p">(</span><span class="n">fmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fmax</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmax</span><span class="p">,</span>
+                                                   <span class="n">average</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">bands</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topo_time_points</span><span class="p">:</span>
+                <span class="n">bands</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">time</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; Hz&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig_topo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">plot_psd_topomap</span><span class="p">(</span><span class="n">bands</span><span class="o">=</span><span class="n">bands</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error has occurred during the computation of the PSD&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="powerSpectralDensityRunnable.get_psd_fig"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.plots_runnable.powerSpectralDensityRunnable.get_psd_fig">[docs]</a>    <span class="k">def</span> <span class="nf">get_psd_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the power spectral density&#39;s figure</span>
+<span class="sd">        :return: The figure of the actual power spectral density&#39;s data computed</span>
+<span class="sd">        :rtype: matplotlib.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig_psd</span></div>
+
+<div class="viewcode-block" id="powerSpectralDensityRunnable.get_topo_fig"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.plots_runnable.powerSpectralDensityRunnable.get_topo_fig">[docs]</a>    <span class="k">def</span> <span class="nf">get_topo_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the power spectral density&#39;s figure fo the topographies</span>
+<span class="sd">        :return: The figure of the topographies of the actual power spectral density&#39;s data computed</span>
+<span class="sd">        :rtype: matplotlib.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig_topo</span></div></div>
+
+
+<span class="c1"># Time Frequency</span>
+<div class="viewcode-block" id="timeFrequencyWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.plots_runnable.timeFrequencyWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">timeFrequencyWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the time-frequency runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="timeFrequencyRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.plots_runnable.timeFrequencyRunnable">[docs]</a><span class="k">class</span> <span class="nc">timeFrequencyRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">method_tfr</span><span class="p">,</span> <span class="n">channel_selected</span><span class="p">,</span> <span class="n">min_frequency</span><span class="p">,</span> <span class="n">max_frequency</span><span class="p">,</span> <span class="n">n_cycles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for the computation of the time-frequency analysis of the given data.</span>
+<span class="sd">        :param file_data: MNE data of the dataset.</span>
+<span class="sd">        :type file_data: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        :param method_tfr: Method used for computing the time-frequency analysis.</span>
+<span class="sd">        :type method_tfr: str</span>
+<span class="sd">        :param channel_selected: Channel on which the time-frequency analysis will be computed.</span>
+<span class="sd">        :type channel_selected: str</span>
+<span class="sd">        :param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.</span>
+<span class="sd">        :type min_frequency: float</span>
+<span class="sd">        :param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.</span>
+<span class="sd">        :type max_frequency: float</span>
+<span class="sd">        :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.</span>
+<span class="sd">        :type n_cycles: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">timeFrequencyWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">file_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_tfr</span> <span class="o">=</span> <span class="n">method_tfr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span> <span class="o">=</span> <span class="n">channel_selected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_frequency</span> <span class="o">=</span> <span class="n">min_frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_frequency</span> <span class="o">=</span> <span class="n">max_frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_cycles</span> <span class="o">=</span> <span class="n">n_cycles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">itc</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="timeFrequencyRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.plots_runnable.timeFrequencyRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the computation of the time-frequency analysis on the given data.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        If to extreme parameters are given and the computation fails, an error message is displayed describing the error.</span>
+<span class="sd">        Notifies the main model when an error occurs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_frequency</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_frequency</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method_tfr</span> <span class="o">==</span> <span class="s2">&quot;Morlet&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">itc</span> <span class="o">=</span> <span class="n">tfr_morlet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cycles</span><span class="p">,</span>
+                                                  <span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method_tfr</span> <span class="o">==</span> <span class="s2">&quot;Multitaper&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">itc</span> <span class="o">=</span> <span class="n">tfr_multitaper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cycles</span><span class="p">,</span>
+                                                      <span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method_tfr</span> <span class="o">==</span> <span class="s2">&quot;Stockwell&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">itc</span> <span class="o">=</span> <span class="n">tfr_stockwell</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cycles</span><span class="p">,</span>
+                                                     <span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error as occurred during the computation of the time frequency analysis.&quot;</span>
+            <span class="n">detailed_message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="p">)</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="timeFrequencyRunnable.get_channel_selected"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.plots_runnable.timeFrequencyRunnable.get_channel_selected">[docs]</a>    <span class="k">def</span> <span class="nf">get_channel_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the channel selected for the computation.</span>
+<span class="sd">        :return: The channel selected.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span></div>
+
+<div class="viewcode-block" id="timeFrequencyRunnable.get_power"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.plots_runnable.timeFrequencyRunnable.get_power">[docs]</a>    <span class="k">def</span> <span class="nf">get_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the &quot;power&quot; data of the time-frequency analysis computation.</span>
+<span class="sd">        :return: &quot;power&quot; data of the time-frequency analysis computation.</span>
+<span class="sd">        :rtype: MNE.AverageTFR</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span></div>
+
+<div class="viewcode-block" id="timeFrequencyRunnable.get_itc"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.plots_runnable.timeFrequencyRunnable.get_itc">[docs]</a>    <span class="k">def</span> <span class="nf">get_itc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the &quot;itc&quot; data of the time-frequency analysis computation.</span>
+<span class="sd">        :return: &quot;itc&quot; data of the time-frequency analysis computation.</span>
+<span class="sd">        :rtype: MNE.AverageTFR</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">itc</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

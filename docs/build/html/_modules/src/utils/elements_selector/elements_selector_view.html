@@ -1,0 +1,245 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.utils.elements_selector.elements_selector_view &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.utils.elements_selector.elements_selector_view</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Multiple selector View</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QHBoxLayout</span><span class="p">,</span> <span class="n">QPushButton</span><span class="p">,</span> <span class="n">QScrollArea</span><span class="p">,</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QCheckBox</span><span class="p">,</span> <span class="n">QButtonGroup</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<div class="viewcode-block" id="multipleSelectorView"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_view.multipleSelectorView">[docs]</a><span class="k">class</span> <span class="nc">multipleSelectorView</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_elements_names</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">box_checked</span><span class="p">,</span> <span class="n">unique_box</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Window displaying the multiple elements from which we can select some elements.</span>
+<span class="sd">        :param all_elements_names: All the elements&#39; names</span>
+<span class="sd">        :type all_elements_names: list of str</span>
+<span class="sd">        :param title: Title for the multiple selector window.</span>
+<span class="sd">        :type title: str</span>
+<span class="sd">        :param box_checked: All the elements are selected by default.</span>
+<span class="sd">        :type box_checked: bool</span>
+<span class="sd">        :param unique_box: Can only check a single element from all the elements.</span>
+<span class="sd">        :type unique_box: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiple_selector_listener</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unique_box</span> <span class="o">=</span> <span class="n">unique_box</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_unselect_widget</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_unselect_hbox_layout</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_all_elements</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unselect_all_elements</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;Selection&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="p">)</span>
+
+        <span class="c1"># Elements</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements_vbox_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements_button</span> <span class="o">=</span> <span class="n">QButtonGroup</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">unique_box</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_select_unselect_buttons</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_check_boxes</span><span class="p">(</span><span class="n">all_elements_names</span><span class="p">,</span> <span class="n">box_checked</span><span class="p">,</span> <span class="n">unique_box</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements_vbox_layout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span> <span class="o">=</span> <span class="n">QScrollArea</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">setWidgetResizable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">setWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements_widget</span><span class="p">)</span>
+
+        <span class="c1"># Cancel &amp; Confirm buttons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;&amp;Cancel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confirm</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;&amp;Confirm&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confirm</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confirm_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confirm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_widget</span><span class="p">)</span>
+
+<div class="viewcode-block" id="multipleSelectorView.create_select_unselect_buttons"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_view.multipleSelectorView.create_select_unselect_buttons">[docs]</a>    <span class="k">def</span> <span class="nf">create_select_unselect_buttons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_unselect_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_unselect_hbox_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_all_elements</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;&amp;Select All&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_all_elements</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">select_all_elements_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unselect_all_elements</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;&amp;Unselect All&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unselect_all_elements</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unselect_all_elements_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_unselect_hbox_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">select_all_elements</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_unselect_hbox_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unselect_all_elements</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_unselect_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">select_unselect_hbox_layout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements_vbox_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">select_unselect_widget</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="multipleSelectorView.create_check_boxes"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_view.multipleSelectorView.create_check_boxes">[docs]</a>    <span class="k">def</span> <span class="nf">create_check_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_elements_names</span><span class="p">,</span> <span class="n">box_checked</span><span class="p">,</span> <span class="n">unique_box</span><span class="p">):</span>
+        <span class="n">unique_box_not_checked</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">unique_box</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elements_button</span><span class="o">.</span><span class="n">setExclusive</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">element</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_elements_names</span><span class="p">):</span>
+            <span class="n">check_box</span> <span class="o">=</span> <span class="n">QCheckBox</span><span class="p">()</span>
+            <span class="n">check_box</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">box_checked</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">unique_box</span><span class="p">:</span>
+                <span class="n">check_box</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">box_checked</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">unique_box_not_checked</span><span class="p">:</span>
+                <span class="n">check_box</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">unique_box_not_checked</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elements_vbox_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">check_box</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elements_button</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="n">check_box</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Triggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="multipleSelectorView.cancel_trigger"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_view.multipleSelectorView.cancel_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">cancel_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send the information to the controller that the computation is cancelled.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiple_selector_listener</span><span class="o">.</span><span class="n">cancel_button_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="multipleSelectorView.confirm_trigger"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_view.multipleSelectorView.confirm_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the parameters and send the information to the controller.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">elements_selected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_elements_selected</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiple_selector_listener</span><span class="o">.</span><span class="n">confirm_button_clicked</span><span class="p">(</span><span class="n">elements_selected</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="multipleSelectorView.select_all_elements_trigger"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_view.multipleSelectorView.select_all_elements_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">select_all_elements_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select all the elements of the window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements_vbox_layout</span><span class="o">.</span><span class="n">count</span><span class="p">()):</span>
+            <span class="n">check_box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements_vbox_layout</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+            <span class="n">check_box</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="multipleSelectorView.unselect_all_elements_trigger"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_view.multipleSelectorView.unselect_all_elements_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">unselect_all_elements_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Unselect all the elements of the window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements_vbox_layout</span><span class="o">.</span><span class="n">count</span><span class="p">()):</span>
+            <span class="n">check_box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements_vbox_layout</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+            <span class="n">check_box</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Setters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="multipleSelectorView.set_listener"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_view.multipleSelectorView.set_listener">[docs]</a>    <span class="k">def</span> <span class="nf">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the listener to the controller.</span>
+<span class="sd">        :param listener: Listener to the controller.</span>
+<span class="sd">        :type listener: elementsSelectorController</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiple_selector_listener</span> <span class="o">=</span> <span class="n">listener</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Getters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="multipleSelectorView.get_all_elements_selected"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_view.multipleSelectorView.get_all_elements_selected">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_elements_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the elements selected by the user in the multiple elements&#39; selector.</span>
+<span class="sd">        :return: Elements selected in the multiple elements&#39; selector.</span>
+<span class="sd">        :rtype: str/list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_elements</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">start_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">unique_box</span><span class="p">:</span>
+            <span class="n">start_idx</span> <span class="o">=</span> <span class="mi">1</span>       <span class="c1"># Because we have the select and unselect buttons.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements_vbox_layout</span><span class="o">.</span><span class="n">count</span><span class="p">()):</span>
+            <span class="n">check_box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements_vbox_layout</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">check_box</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+                <span class="n">all_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">check_box</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">all_elements</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

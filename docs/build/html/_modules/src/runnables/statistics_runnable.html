@@ -1,0 +1,1066 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.runnables.statistics_runnable &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.runnables.statistics_runnable</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Statistics runnable</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">welch</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">QRunnable</span><span class="p">,</span> <span class="n">pyqtSignal</span><span class="p">,</span> <span class="n">QObject</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">from</span> <span class="nn">mne</span> <span class="kn">import</span> <span class="n">make_forward_solution</span><span class="p">,</span> <span class="n">write_forward_solution</span><span class="p">,</span> <span class="n">compute_covariance</span><span class="p">,</span> <span class="n">setup_source_space</span><span class="p">,</span> \
+    <span class="n">write_source_spaces</span><span class="p">,</span> <span class="n">make_bem_model</span><span class="p">,</span> <span class="n">make_bem_solution</span><span class="p">,</span> <span class="n">write_bem_solution</span><span class="p">,</span> <span class="n">read_forward_solution</span><span class="p">,</span> <span class="n">read_cov</span>
+<span class="kn">from</span> <span class="nn">mne.minimum_norm</span> <span class="kn">import</span> <span class="n">read_inverse_operator</span><span class="p">,</span> <span class="n">make_inverse_operator</span><span class="p">,</span> <span class="n">apply_inverse</span><span class="p">,</span> <span class="n">write_inverse_operator</span>
+<span class="kn">from</span> <span class="nn">mne.stats</span> <span class="kn">import</span> <span class="n">ttest_ind_no_p</span>
+<span class="kn">from</span> <span class="nn">mne.time_frequency</span> <span class="kn">import</span> <span class="n">psd_welch</span><span class="p">,</span> <span class="n">tfr_morlet</span><span class="p">,</span> <span class="n">tfr_multitaper</span><span class="p">,</span> <span class="n">tfr_stockwell</span>
+<span class="kn">from</span> <span class="nn">mne.viz</span> <span class="kn">import</span> <span class="n">plot_snr_estimate</span>
+
+<span class="kn">from</span> <span class="nn">mne_connectivity</span> <span class="kn">import</span> <span class="n">envelope_correlation</span><span class="p">,</span> <span class="n">spectral_connectivity_epochs</span><span class="p">,</span> <span class="n">phase_slope_index</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">ttest_ind</span>
+
+<span class="kn">from</span> <span class="nn">utils.view.error_window</span> <span class="kn">import</span> <span class="n">errorWindow</span>
+<span class="kn">from</span> <span class="nn">utils.file_path_search</span> <span class="kn">import</span> <span class="n">get_project_freesurfer_path</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<span class="c1"># SNR</span>
+<div class="viewcode-block" id="statisticsSnrSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrSignals">[docs]</a><span class="k">class</span> <span class="nc">statisticsSnrSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the source estimation runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="statisticsSnrRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable">[docs]</a><span class="k">class</span> <span class="nc">statisticsSnrRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">snr_methods</span><span class="p">,</span> <span class="n">source_method</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">read_files</span><span class="p">,</span> <span class="n">write_files</span><span class="p">,</span> <span class="n">picks</span><span class="p">,</span> <span class="n">stats_first_variable</span><span class="p">,</span>
+                 <span class="n">stats_second_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for the computation of the SNR and the statistics of the given data.</span>
+<span class="sd">        :param file_data: MNE data of the dataset.</span>
+<span class="sd">        :type file_data: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        :param snr_methods:</span>
+<span class="sd">        :type snr_methods:</span>
+<span class="sd">        :param source_method: The method used to compute the source estimation</span>
+<span class="sd">        :type source_method: str</span>
+<span class="sd">        :param file_path: The path to the file</span>
+<span class="sd">        :type file_path: str</span>
+<span class="sd">        :param write_files: Boolean telling if the data computed must be saved into files.</span>
+<span class="sd">        :type write_files: bool</span>
+<span class="sd">        :param read_files: Boolean telling if the data used for the computation can be read from computer files.</span>
+<span class="sd">        :type read_files: bool</span>
+<span class="sd">        :param picks: The channels to take into account in the computation.</span>
+<span class="sd">        :type picks: list of str</span>
+<span class="sd">        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)</span>
+<span class="sd">        :type stats_first_variable: str</span>
+<span class="sd">        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)</span>
+<span class="sd">        :type stats_second_variable: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">statisticsSnrSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">file_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snr_methods</span> <span class="o">=</span> <span class="n">snr_methods</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_method</span> <span class="o">=</span> <span class="n">source_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_path</span> <span class="o">=</span> <span class="n">file_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_files</span> <span class="o">=</span> <span class="n">read_files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_files</span> <span class="o">=</span> <span class="n">write_files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">picks</span> <span class="o">=</span> <span class="n">picks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats_first_variable</span> <span class="o">=</span> <span class="n">stats_first_variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats_second_variable</span> <span class="o">=</span> <span class="n">stats_second_variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subject</span> <span class="o">=</span> <span class="s2">&quot;fsaverage&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subjects_dir</span> <span class="o">=</span> <span class="n">get_project_freesurfer_path</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">first_SNRs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">second_SNRs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the computation of the SNR</span>
+<span class="sd">        Notifies the main model when the computation is finished.</span>
+<span class="sd">        Notifies the main model when an error occurs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># First independent variable</span>
+            <span class="n">file_data_save</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mask_from_variable_to_keep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats_first_variable</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compute_all_SNRs</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">first_SNRs</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span><span class="p">)</span>
+            <span class="c1"># Second independent variable</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">file_data_save</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mask_from_variable_to_keep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats_second_variable</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compute_all_SNRs</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">second_SNRs</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span><span class="p">)</span>
+            <span class="c1"># Statistics</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first_SNRs</span><span class="p">)):</span>
+                <span class="n">t_values</span><span class="p">,</span> <span class="n">p_values</span> <span class="o">=</span> <span class="n">ttest_ind</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first_SNRs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">second_SNRs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">t_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_values</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error as occurred during the computation of the SNR.&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.compute_all_SNRs"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.compute_all_SNRs">[docs]</a>    <span class="k">def</span> <span class="nf">compute_all_SNRs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch all the SNR methods selected by the user.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;Mean-Std&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_methods</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNR_mean_std</span><span class="p">())</span>
+        <span class="k">if</span> <span class="s2">&quot;Sample Correlation Coefficient&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_methods</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNR_sample_correlation_coefficient</span><span class="p">())</span>
+        <span class="k">if</span> <span class="s2">&quot;Maximum Likelihood&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_methods</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNR_maximum_likelihood_estimate</span><span class="p">())</span>
+        <span class="k">if</span> <span class="s2">&quot;Amplitude&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_methods</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNR_amplitude</span><span class="p">())</span>
+        <span class="k">if</span> <span class="s2">&quot;Plus-Minus Averaging&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_methods</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNR_plus_minus_averaging</span><span class="p">())</span>
+        <span class="k">if</span> <span class="s2">&quot;Response Repetition&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_methods</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNR_response_repetition</span><span class="p">())</span>
+        <span class="k">if</span> <span class="s2">&quot;MNE Source&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_methods</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNR_mne_source</span><span class="p">())</span>
+        <span class="k">if</span> <span class="s2">&quot;MNE Frequency&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_methods</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNR_mne_frequency</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pretty_print_SNRs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNRs</span><span class="p">)</span></div>
+
+    <span class="c1"># Mean Std</span>
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_mean_std_computation"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_mean_std_computation">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">SNR_mean_std_computation</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function comes from an old release of SciPy (version 0.14.0, currently version 1.7.1).</span>
+<span class="sd">        It is not implemented anymore in Scipy.</span>
+<span class="sd">        Link : https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.signaltonoise.html</span>
+<span class="sd">        ---</span>
+<span class="sd">        The signal-to-noise ratio of the input data.</span>
+<span class="sd">        Returns the signal-to-noise ratio of &#39;a&#39;, here defined as the mean</span>
+<span class="sd">        divided by the standard deviation.</span>
+<span class="sd">        :param a: An ndarray object containing the sample data.</span>
+<span class="sd">        :type a: ndarray</span>
+<span class="sd">        :param axis: If axis is equal to None, the array is first ravel&#39;d. If axis is an integer, this is the axis over</span>
+<span class="sd">        which to operate. Default is 0.</span>
+<span class="sd">        :type axis: int or None, optional</span>
+<span class="sd">        :param ddof: Degrees of freedom correction for standard deviation. Default is 0.</span>
+<span class="sd">        :type ddof: int, optional</span>
+<span class="sd">        :return: s2n, The mean to standard deviation ratio(s) along `axis`, or 0 where the standard deviation is 0.</span>
+<span class="sd">        :rtype: ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="n">ddof</span><span class="p">)</span>
+        <span class="c1"># ~ SNRs = np.where(sd == 0, 0, m/sd)</span>
+        <span class="n">SNRs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sd</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">((</span><span class="n">m</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sd</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">SNRs</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_mean_std"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_mean_std">[docs]</a>    <span class="k">def</span> <span class="nf">SNR_mean_std</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Take the data from the Epoch file, average it and give the data to the computation.</span>
+<span class="sd">        :param axis: If axis is equal to None, the array is first ravel&#39;d. If axis is an integer, this is the axis over</span>
+<span class="sd">        which to operate. Default is 0.</span>
+<span class="sd">        :type axis: int or None, optional</span>
+<span class="sd">        :param ddof: Degrees of freedom correction for standard deviation. Default is 0.</span>
+<span class="sd">        :type ddof: int, optional</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">average</span><span class="p">()</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">picks</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">SNR_mean_std_computation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="n">ddof</span><span class="p">)</span></div>
+
+    <span class="c1"># Correlation Coefficient</span>
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_sample_correlation_coefficient_computation"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_sample_correlation_coefficient_computation">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">SNR_sample_correlation_coefficient_computation</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Paper : Signal to noise ratio and response variability measurements in single trial evoked potentials.</span>
+<span class="sd">        Link : https://doi.org/10.1016/0013-4694(78)90267-5</span>
+<span class="sd">        ---</span>
+<span class="sd">        The signal-to-noise ratio of the input data based on the sample correlation between successive trials.</span>
+<span class="sd">        Returns the signal-to-noise ratio of &#39;a&#39; and &#39;b&#39;</span>
+<span class="sd">        :param a: An ndarray object containing the sample data.</span>
+<span class="sd">        :type a: ndarray</span>
+<span class="sd">        :param b: An ndarray object containing the sample data.</span>
+<span class="sd">        :type b: ndarray</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">A</span><span class="p">)</span>
+        <span class="n">SNR_estimate</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r</span><span class="p">))</span> <span class="o">+</span> <span class="n">B</span>
+        <span class="k">return</span> <span class="n">SNR_estimate</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_sample_correlation_coefficient"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_sample_correlation_coefficient">[docs]</a>    <span class="k">def</span> <span class="nf">SNR_sample_correlation_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the average of the SNR of epochs.</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">picks</span><span class="p">)</span>
+        <span class="n">data_shape</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">SNRs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">data_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>  <span class="c1"># Each channel</span>
+            <span class="n">snr</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">data_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># Pairs of trials</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">data_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>  <span class="c1"># Avoid taking an element with no pair (end of the array).</span>
+                    <span class="n">snr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNR_sample_correlation_coefficient_computation</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]))</span>
+            <span class="n">SNRs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">snr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">SNRs</span></div>
+
+    <span class="c1"># Maximum Likelihood</span>
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_maximum_likelihood_estimate_computation"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_maximum_likelihood_estimate_computation">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">SNR_maximum_likelihood_estimate_computation</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Paper : Signal to noise ratio and response variability measurements in single trial evoked potentials</span>
+<span class="sd">        Link : https://doi.org/10.1016/0013-4694(78)90267-5</span>
+<span class="sd">        ---</span>
+<span class="sd">        The signal-to-noise ratio of the input data based on the maximum likelihood estimate between successive trials</span>
+<span class="sd">        Returns the signal-to-noise ratio of &#39;a&#39; and &#39;b&#39;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        :param a: An ndarray object containing the sample data.</span>
+<span class="sd">        :type a: ndarray</span>
+<span class="sd">        :param b: An ndarray object containing the sample data.</span>
+<span class="sd">        :type b: ndarray</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sum_of_squared_difference</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">SNR_estimate</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">sum_of_squared_difference</span>
+        <span class="k">return</span> <span class="n">SNR_estimate</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_maximum_likelihood_estimate"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_maximum_likelihood_estimate">[docs]</a>    <span class="k">def</span> <span class="nf">SNR_maximum_likelihood_estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Take the data from the Epoch file, average it and give the data to the computation.</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">picks</span><span class="p">)</span>
+        <span class="n">data_shape</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">SNRs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">data_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>  <span class="c1"># Each channel</span>
+            <span class="n">snr</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">data_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># Pairs of trials</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">data_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>  <span class="c1"># Avoid taking an element with no pair (end of the array).</span>
+                    <span class="n">snr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SNR_maximum_likelihood_estimate_computation</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]))</span>
+            <span class="n">SNRs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">snr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">SNRs</span></div>
+
+    <span class="c1"># Amplitude</span>
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_amplitude_computation"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_amplitude_computation">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">SNR_amplitude_computation</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Link : https://www.sciencedirect.com/science/article/pii/S105381190901297X#</span>
+<span class="sd">        :param a: An ndarray object containing the sample data.</span>
+<span class="sd">        :type a: ndarray</span>
+<span class="sd">        :param axis: If axis is equal to None, the array is first ravel&#39;d. If axis is an integer, this is the axis over</span>
+<span class="sd">        which to operate. Default is 0.</span>
+<span class="sd">        :type axis: int or None, optional</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data_shape</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+        <span class="n">SNRs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">data_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>  <span class="c1"># Each channel</span>
+            <span class="n">signal_amplitude</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>  <span class="c1"># Each time stamp</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">mean</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">signal_amplitude</span><span class="p">:</span>
+                    <span class="n">signal_amplitude</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+            <span class="c1"># ~ SNRs[i] = signal_amplitude/noise</span>
+            <span class="n">SNRs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">((</span><span class="n">signal_amplitude</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">noise</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">SNRs</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_amplitude"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">SNR_amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Take the data from the Epoch file, average it and give the data to the computation.</span>
+<span class="sd">        :param axis: If axis is equal to None, the array is first ravel&#39;d. If axis is an integer, this is the axis over</span>
+<span class="sd">        which to operate. Default is 0.</span>
+<span class="sd">        :type axis: int or None, optional</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">evoked</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">picks</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">evoked</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">SNR_amplitude_computation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span></div>
+
+    <span class="c1"># Plus Minus Averaging</span>
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_plus_minus_averaging_computation"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_plus_minus_averaging_computation">[docs]</a>    <span class="k">def</span> <span class="nf">SNR_plus_minus_averaging_computation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Links : https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/iet-spr.2016.0528</span>
+<span class="sd">                https://link.springer.com/content/pdf/10.1007/BF02522949.pdf</span>
+<span class="sd">        :param data: An ndarray object containing the sample data.</span>
+<span class="sd">        :type data: ndarray</span>
+<span class="sd">        :param axis: If axis is equal to None, the array is first ravel&#39;d. If axis is an integer, this is the axis over</span>
+<span class="sd">        which to operate. Default is 0.</span>
+<span class="sd">        :type axis: int or None, optional</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data_shape</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">signal_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+        <span class="n">noise</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">signal_mean</span>
+        <span class="n">noise_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">noise</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+
+        <span class="n">special_average</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">data_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">special_average</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">special_average</span> <span class="o">-=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">special_average</span> <span class="o">/=</span> <span class="n">data_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">signal_final</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_squared</span><span class="p">(</span><span class="n">signal_mean</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_squared</span><span class="p">(</span><span class="n">special_average</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">noise_final</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_squared</span><span class="p">(</span><span class="n">noise_mean</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_squared</span><span class="p">(</span><span class="n">special_average</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">SNR</span> <span class="o">=</span> <span class="n">signal_final</span> <span class="o">/</span> <span class="n">noise_final</span>
+        <span class="c1"># ~ SNR = 10*np.log10((signal_final**2)/(noise_final**2))</span>
+        <span class="k">return</span> <span class="n">SNR</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_plus_minus_averaging"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_plus_minus_averaging">[docs]</a>    <span class="k">def</span> <span class="nf">SNR_plus_minus_averaging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Take the data from the Epoch file give it to the computation.</span>
+<span class="sd">        :param axis: If axis is equal to None, the array is first ravel&#39;d. If axis is an integer, this is the axis over</span>
+<span class="sd">        which to operate. Default is 0.</span>
+<span class="sd">        :type axis: int or None, optional</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">picks</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">SNR_plus_minus_averaging_computation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span></div>
+
+    <span class="c1"># Response Repetitions</span>
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_response_repetition_computation"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_response_repetition_computation">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">SNR_response_repetition_computation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Link : https://github.com/nipy/nitime/blob/master/nitime/analysis/snr.py</span>
+<span class="sd">        :param data: An ndarray object containing the sample data.</span>
+<span class="sd">        :type data: ndarray</span>
+<span class="sd">        :param axis: If axis is equal to None, the array is first ravel&#39;d. If axis is an integer, this is the axis over</span>
+<span class="sd">        which to operate. Default is 0.</span>
+<span class="sd">        :type axis: int or None, optional</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">signal_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+        <span class="n">noise</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">signal_mean</span>
+
+        <span class="n">frequencies</span><span class="p">,</span> <span class="n">signal_mean_psd</span> <span class="o">=</span> <span class="n">welch</span><span class="p">(</span><span class="n">signal_mean</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nperseg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                             <span class="n">window</span><span class="o">=</span><span class="s1">&#39;boxcar&#39;</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;spectrum&#39;</span><span class="p">)</span>
+
+        <span class="n">all_noise_psd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">noise</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">noise</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">signal_mean_psd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">noise</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">noise_psd</span> <span class="o">=</span> <span class="n">welch</span><span class="p">(</span><span class="n">noise</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nperseg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">window</span><span class="o">=</span><span class="s1">&#39;boxcar&#39;</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;spectrum&#39;</span><span class="p">)</span>
+            <span class="n">all_noise_psd</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">noise_psd</span>
+
+        <span class="n">signal_psd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">signal_mean_psd</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">noise_psd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">all_noise_psd</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">SNRs</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">signal_psd</span> <span class="o">/</span> <span class="n">noise_psd</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">SNRs</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_response_repetition"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_response_repetition">[docs]</a>    <span class="k">def</span> <span class="nf">SNR_response_repetition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Take the data from the Epoch file give it to the computation.</span>
+<span class="sd">        :param axis: If axis is equal to None, the array is first ravel&#39;d. If axis is an integer, this is the axis over</span>
+<span class="sd">        which to operate. Default is 0.</span>
+<span class="sd">        :type axis: int or None, optional</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">picks</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">SNR_response_repetition_computation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span></div>
+
+    <span class="c1"># MNE Frequency</span>
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_mne_frequency_computation"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_mne_frequency_computation">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">SNR_mne_frequency_computation</span><span class="p">(</span><span class="n">psd</span><span class="p">,</span> <span class="n">noise_n_neighbor_freqs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">noise_skip_neighbor_freqs</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Link : https://mne.tools/stable/auto_tutorials/time-freq/50_ssvep.html#sphx-glr-auto-tutorials-time-freq-50-ssvep-py</span>
+<span class="sd">        -----</span>
+<span class="sd">        Compute SNR spectrum from PSD spectrum using convolution.</span>
+<span class="sd">        ----------</span>
+<span class="sd">        :param psd: Data object containing PSD values. Works with arrays as produced by</span>
+<span class="sd">                MNE&#39;s PSD functions or channel/trial subsets.</span>
+<span class="sd">        :type psd: ndarray, shape ([n_trials, n_channels,] n_frequency_bins)</span>
+<span class="sd">        :param noise_n_neighbor_freqs: Number of neighboring frequencies used to compute noise level.</span>
+<span class="sd">                increment by one to add one frequency bin ON BOTH SIDES</span>
+<span class="sd">        :type noise_n_neighbor_freqs: int</span>
+<span class="sd">        :param noise_skip_neighbor_freqs: set this &gt;=1 if you want to exclude the immediately neighboring</span>
+<span class="sd">                frequency bins in noise level calculation</span>
+<span class="sd">        :type noise_skip_neighbor_freqs: int</span>
+<span class="sd">        :return: Array containing SNR for all epochs, channels, frequency bins.</span>
+<span class="sd">                NaN for frequencies on the edges, that do not have enough neighbors on</span>
+<span class="sd">                one side to calculate SNR.</span>
+<span class="sd">        :rtype: ndarray, shape ([n_trials, n_channels,] n_frequency_bins)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Construct a kernel that calculates the mean of the neighboring</span>
+        <span class="c1"># frequencies</span>
+        <span class="n">averaging_kernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">noise_n_neighbor_freqs</span><span class="p">),</span>
+                                           <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">noise_skip_neighbor_freqs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                                           <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">noise_n_neighbor_freqs</span><span class="p">)))</span>
+        <span class="n">averaging_kernel</span> <span class="o">/=</span> <span class="n">averaging_kernel</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="c1"># Calculate the mean of the neighboring frequencies by convolving with the</span>
+        <span class="c1"># averaging kernel.</span>
+        <span class="n">mean_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">PSD_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">PSD_</span><span class="p">,</span> <span class="n">averaging_kernel</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;valid&#39;</span><span class="p">),</span>
+            <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">arr</span><span class="o">=</span><span class="n">psd</span>
+        <span class="p">)</span>
+
+        <span class="c1"># The mean is not defined on the edges so we will pad it with nas. The</span>
+        <span class="c1"># padding needs to be done for the last dimension only so we set it to</span>
+        <span class="c1"># (0, 0) for the other ones.</span>
+        <span class="n">edge_width</span> <span class="o">=</span> <span class="n">noise_n_neighbor_freqs</span> <span class="o">+</span> <span class="n">noise_skip_neighbor_freqs</span>
+        <span class="n">pad_width</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">*</span> <span class="p">(</span><span class="n">mean_noise</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">[(</span><span class="n">edge_width</span><span class="p">,</span> <span class="n">edge_width</span><span class="p">)]</span>
+        <span class="n">mean_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">mean_noise</span><span class="p">,</span> <span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">psd</span> <span class="o">/</span> <span class="n">mean_noise</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_mne_frequency"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_mne_frequency">[docs]</a>    <span class="k">def</span> <span class="nf">SNR_mne_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the power spectral density to give it to the SNR computation.</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fmin</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="n">fmax</span> <span class="o">=</span> <span class="mf">50.</span>
+        <span class="n">sfreq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;sfreq&#39;</span><span class="p">]</span>
+        <span class="n">tmin</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">tmax</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">PSDs</span><span class="p">,</span> <span class="n">freqs</span> <span class="o">=</span> <span class="n">psd_welch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">sfreq</span> <span class="o">*</span> <span class="p">(</span><span class="n">tmax</span> <span class="o">-</span> <span class="n">tmin</span><span class="p">)),</span> <span class="n">n_overlap</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_per_seg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">tmin</span><span class="o">=</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="n">fmax</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;boxcar&#39;</span><span class="p">,</span>
+                                <span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">picks</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">SNRs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SNR_mne_frequency_computation</span><span class="p">(</span><span class="n">PSDs</span><span class="p">)</span>
+
+        <span class="n">plot</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_SNR_mne_frequency</span><span class="p">(</span><span class="n">PSDs</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">SNRs</span><span class="p">,</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">)</span>
+
+        <span class="n">SNRs_without_NaN</span> <span class="o">=</span> <span class="n">SNRs</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">SNRs_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">SNRs_without_NaN</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">SNRs_mean</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.plot_SNR_mne_frequency"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.plot_SNR_mne_frequency">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">plot_SNR_mne_frequency</span><span class="p">(</span><span class="n">PSDs</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">SNRs</span><span class="p">,</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+        <span class="n">freq_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1.</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                           <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span> <span class="o">==</span> <span class="n">fmax</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">PSDs_plot</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">PSDs</span><span class="p">)</span>
+        <span class="n">PSDs_mean</span> <span class="o">=</span> <span class="n">PSDs_plot</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[</span><span class="n">freq_range</span><span class="p">]</span>
+        <span class="n">PSDs_std</span> <span class="o">=</span> <span class="n">PSDs_plot</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[</span><span class="n">freq_range</span><span class="p">]</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freqs</span><span class="p">[</span><span class="n">freq_range</span><span class="p">],</span> <span class="n">PSDs_mean</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+            <span class="n">freqs</span><span class="p">[</span><span class="n">freq_range</span><span class="p">],</span> <span class="n">PSDs_mean</span> <span class="o">-</span> <span class="n">PSDs_std</span><span class="p">,</span> <span class="n">PSDs_mean</span> <span class="o">+</span> <span class="n">PSDs_std</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.2</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;PSD spectrum&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Power Spectral Density [dB]&#39;</span><span class="p">)</span>
+
+        <span class="c1"># SNR spectrum</span>
+        <span class="n">SNR_mean</span> <span class="o">=</span> <span class="n">SNRs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[</span><span class="n">freq_range</span><span class="p">]</span>
+        <span class="n">SNR_std</span> <span class="o">=</span> <span class="n">SNRs</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[</span><span class="n">freq_range</span><span class="p">]</span>
+
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freqs</span><span class="p">[</span><span class="n">freq_range</span><span class="p">],</span> <span class="n">SNR_mean</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+            <span class="n">freqs</span><span class="p">[</span><span class="n">freq_range</span><span class="p">],</span> <span class="n">SNR_mean</span> <span class="o">-</span> <span class="n">SNR_std</span><span class="p">,</span> <span class="n">SNR_mean</span> <span class="o">+</span> <span class="n">SNR_std</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.2</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">&quot;SNR spectrum&quot;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Frequency [Hz]&#39;</span><span class="p">,</span>
+            <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;SNR&#39;</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">])</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Press enter to continue.&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># MNE source</span>
+<div class="viewcode-block" id="statisticsSnrRunnable.SNR_mne_source"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.SNR_mne_source">[docs]</a>    <span class="k">def</span> <span class="nf">SNR_mne_source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Link : https://mne.tools/stable/auto_examples/inverse/source_space_snr.html</span>
+<span class="sd">        Compute the source estimate to estimated the SNR from it.</span>
+<span class="sd">        :return: SNR_estimate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">apply_baseline</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">set_eeg_reference</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">evoked</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">average</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_files</span><span class="p">:</span>
+            <span class="n">inv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_inverse</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># Read it</span>
+            <span class="n">inv</span> <span class="o">=</span> <span class="n">read_inverse_operator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span> <span class="o">+</span> <span class="s2">&quot;-inv.fif&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">plot</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="n">plot_snr_estimate</span><span class="p">(</span><span class="n">evoked</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_estimate_SNR</span><span class="p">(</span><span class="n">evoked</span><span class="p">,</span> <span class="n">inv</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.compute_estimate_SNR"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.compute_estimate_SNR">[docs]</a>    <span class="k">def</span> <span class="nf">compute_estimate_SNR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evoked</span><span class="p">,</span> <span class="n">inv</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compute estimate SNR&quot;</span><span class="p">)</span>
+
+        <span class="n">fwd</span> <span class="o">=</span> <span class="n">read_forward_solution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span> <span class="o">+</span> <span class="s2">&quot;-fwd.fif&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">noise_cov</span> <span class="o">=</span> <span class="n">read_cov</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span> <span class="o">+</span> <span class="s2">&quot;-cov.fif&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">snr</span> <span class="o">=</span> <span class="mf">3.0</span>
+        <span class="n">lambda2</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">snr</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">stc</span> <span class="o">=</span> <span class="n">apply_inverse</span><span class="p">(</span><span class="n">evoked</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="n">lambda2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">source_method</span><span class="p">,</span> <span class="n">pick_ori</span><span class="o">=</span><span class="s2">&quot;normal&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">snr_stc</span> <span class="o">=</span> <span class="n">stc</span><span class="o">.</span><span class="n">estimate_snr</span><span class="p">(</span><span class="n">evoked</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">fwd</span><span class="p">,</span> <span class="n">noise_cov</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">SNR_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">snr_stc</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">SNR_mean</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.create_inverse"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.create_inverse">[docs]</a>    <span class="k">def</span> <span class="nf">create_inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">noise_cov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_noise_covariance</span><span class="p">()</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_source_space</span><span class="p">()</span>
+        <span class="n">bem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_bem_solution</span><span class="p">()</span>
+        <span class="n">fwd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_forward_solution</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">bem</span><span class="p">)</span>
+        <span class="n">inv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_inverse_operator</span><span class="p">(</span><span class="n">fwd</span><span class="p">,</span> <span class="n">noise_cov</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inv</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.compute_noise_covariance"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.compute_noise_covariance">[docs]</a>    <span class="k">def</span> <span class="nf">compute_noise_covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compute noise covariance&quot;</span><span class="p">)</span>
+        <span class="n">noise_cov</span> <span class="o">=</span> <span class="n">compute_covariance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;shrunk&#39;</span><span class="p">,</span> <span class="s1">&#39;empirical&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_files</span><span class="p">:</span>
+            <span class="n">noise_cov</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span> <span class="o">+</span> <span class="s2">&quot;-cov.fif&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">noise_cov</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.compute_source_space"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.compute_source_space">[docs]</a>    <span class="k">def</span> <span class="nf">compute_source_space</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compute source space&quot;</span><span class="p">)</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">setup_source_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subject</span><span class="p">,</span> <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;oct6&#39;</span><span class="p">,</span> <span class="n">add_dist</span><span class="o">=</span><span class="s1">&#39;patch&#39;</span><span class="p">,</span> <span class="n">subjects_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects_dir</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_files</span><span class="p">:</span>
+            <span class="n">write_source_spaces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span> <span class="o">+</span> <span class="s2">&quot;-src.fif&quot;</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">src</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.compute_bem_solution"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.compute_bem_solution">[docs]</a>    <span class="k">def</span> <span class="nf">compute_bem_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compute bem solution&quot;</span><span class="p">)</span>
+        <span class="n">conductivity</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.006</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>  <span class="c1"># for three layers</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">make_bem_model</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subject</span><span class="p">,</span> <span class="n">ico</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">conductivity</span><span class="o">=</span><span class="n">conductivity</span><span class="p">,</span> <span class="n">subjects_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects_dir</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">bem</span> <span class="o">=</span> <span class="n">make_bem_solution</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_files</span><span class="p">:</span>
+            <span class="n">write_bem_solution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span> <span class="o">+</span> <span class="s2">&quot;-bem-sol.fif&quot;</span><span class="p">,</span> <span class="n">bem</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">bem</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.compute_forward_solution"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.compute_forward_solution">[docs]</a>    <span class="k">def</span> <span class="nf">compute_forward_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">bem</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compute forward solution&quot;</span><span class="p">)</span>
+        <span class="n">fwd</span> <span class="o">=</span> <span class="n">make_forward_solution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">trans</span><span class="o">=</span><span class="s1">&#39;fsaverage&#39;</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="n">bem</span><span class="o">=</span><span class="n">bem</span><span class="p">,</span> <span class="n">meg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">eeg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mindist</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_files</span><span class="p">:</span>
+            <span class="n">write_forward_solution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span> <span class="o">+</span> <span class="s2">&quot;-fwd.fif&quot;</span><span class="p">,</span> <span class="n">fwd</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fwd</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.compute_inverse_operator"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.compute_inverse_operator">[docs]</a>    <span class="k">def</span> <span class="nf">compute_inverse_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fwd</span><span class="p">,</span> <span class="n">noise_cov</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compute inverse operator&quot;</span><span class="p">)</span>
+        <span class="n">inverse_operator</span> <span class="o">=</span> <span class="n">make_inverse_operator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">fwd</span><span class="p">,</span> <span class="n">noise_cov</span><span class="p">,</span> <span class="n">loose</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_files</span><span class="p">:</span>
+            <span class="n">write_inverse_operator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span> <span class="o">+</span> <span class="s2">&quot;-inv.fif&quot;</span><span class="p">,</span> <span class="n">inverse_operator</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inverse_operator</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Utils</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="statisticsSnrRunnable.mean_squared"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.mean_squared">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">mean_squared</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.root_mean_squared"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.root_mean_squared">[docs]</a>    <span class="k">def</span> <span class="nf">root_mean_squared</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mean_squared</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.create_mask_from_variable_to_keep"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.create_mask_from_variable_to_keep">[docs]</a>    <span class="k">def</span> <span class="nf">create_mask_from_variable_to_keep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stats_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a mask to know which trial to keep and which one to remove for the computation.</span>
+<span class="sd">        :return mask: Mask of trials to remove. True means remove, and False means keep.</span>
+<span class="sd">        :rtype mask: list of boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">events</span><span class="p">))]</span>
+        <span class="n">event_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">event_id</span>
+        <span class="n">event_id_to_keep</span> <span class="o">=</span> <span class="n">event_ids</span><span class="p">[</span><span class="n">stats_variable</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">event</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">events</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">event_id_to_keep</span><span class="p">:</span>        <span class="c1"># 2 is the event id in the events</span>
+                <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">mask</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.pretty_print_SNRs"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.pretty_print_SNRs">[docs]</a>    <span class="k">def</span> <span class="nf">pretty_print_SNRs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SNRs</span><span class="p">,</span> <span class="n">all_methods</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">all_methods</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=====</span><span class="se">\n</span><span class="s2">All methods complete SNRs :</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">SNRs</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">snr_methods</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; SNRs : &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">SNRs</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">means</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=====</span><span class="se">\n</span><span class="s2">All methods means :</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">SNRs</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">snr_methods</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; : &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">SNRs</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=====&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.get_first_SNRs"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.get_first_SNRs">[docs]</a>    <span class="k">def</span> <span class="nf">get_first_SNRs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the SNRs computed over the first independent variable.</span>
+<span class="sd">        :return: The SNRs computed over the first independent variable.</span>
+<span class="sd">        :rtype: list of, list of float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_SNRs</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.get_second_SNRs"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.get_second_SNRs">[docs]</a>    <span class="k">def</span> <span class="nf">get_second_SNRs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the SNRs computed over the second independent variable.</span>
+<span class="sd">        :return: The SNRs computed over the second independent variable.</span>
+<span class="sd">        :rtype: list of, list of float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">second_SNRs</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.get_t_values"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.get_t_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_t_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the T-values computed over the SNRs of the two independent variables.</span>
+<span class="sd">        :return: T-values computed over the SNRs of the two independent variables.</span>
+<span class="sd">        :rtype: list of float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_values</span></div>
+
+<div class="viewcode-block" id="statisticsSnrRunnable.get_SNR_methods"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsSnrRunnable.get_SNR_methods">[docs]</a>    <span class="k">def</span> <span class="nf">get_SNR_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the SNR methods used for the computation.</span>
+<span class="sd">        :return: SNR methods</span>
+<span class="sd">        :rtype: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_methods</span></div></div>
+
+
+<span class="c1"># Time Frequency</span>
+<div class="viewcode-block" id="statisticsErspItcWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsErspItcWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">statisticsErspItcWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the time-frequency runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="statisticsErspItcRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsErspItcRunnable">[docs]</a><span class="k">class</span> <span class="nc">statisticsErspItcRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">method_tfr</span><span class="p">,</span> <span class="n">channel_selected</span><span class="p">,</span> <span class="n">min_frequency</span><span class="p">,</span> <span class="n">max_frequency</span><span class="p">,</span> <span class="n">n_cycles</span><span class="p">,</span> <span class="n">stats_first_variable</span><span class="p">,</span>
+                 <span class="n">stats_second_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for the computation of the time-frequency analysis of the given data.</span>
+<span class="sd">        :param file_data: MNE data of the dataset.</span>
+<span class="sd">        :type file_data: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        :param method_tfr: Method used for computing the time-frequency analysis.</span>
+<span class="sd">        :type method_tfr: str</span>
+<span class="sd">        :param channel_selected: Channel on which the time-frequency analysis will be computed.</span>
+<span class="sd">        :type channel_selected: str</span>
+<span class="sd">        :param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.</span>
+<span class="sd">        :type min_frequency: float</span>
+<span class="sd">        :param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.</span>
+<span class="sd">        :type max_frequency: float</span>
+<span class="sd">        :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.</span>
+<span class="sd">        :type n_cycles: int</span>
+<span class="sd">        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)</span>
+<span class="sd">        :type stats_first_variable: str</span>
+<span class="sd">        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)</span>
+<span class="sd">        :type stats_second_variable: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">statisticsErspItcWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">file_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_tfr</span> <span class="o">=</span> <span class="n">method_tfr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span> <span class="o">=</span> <span class="n">channel_selected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_frequency</span> <span class="o">=</span> <span class="n">min_frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_frequency</span> <span class="o">=</span> <span class="n">max_frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_cycles</span> <span class="o">=</span> <span class="n">n_cycles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats_first_variable</span> <span class="o">=</span> <span class="n">stats_first_variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats_second_variable</span> <span class="o">=</span> <span class="n">stats_second_variable</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">power_one</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power_two</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">itc_one</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">itc_two</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="statisticsErspItcRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsErspItcRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the computation of the time-frequency analysis on the given data.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        If to extreme parameters are given and the computation fails, an error message is displayed describing the error.</span>
+<span class="sd">        Notifies the main model when an error occurs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">file_data_one</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mask_from_variable_to_keep</span><span class="p">(</span><span class="n">file_data_one</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_first_variable</span><span class="p">)</span>
+            <span class="n">file_data_one</span> <span class="o">=</span> <span class="n">file_data_one</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+
+            <span class="n">file_data_two</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mask_from_variable_to_keep</span><span class="p">(</span><span class="n">file_data_two</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_second_variable</span><span class="p">)</span>
+            <span class="n">file_data_two</span> <span class="o">=</span> <span class="n">file_data_two</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+
+            <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_frequency</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_frequency</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method_tfr</span> <span class="o">==</span> <span class="s2">&quot;Morlet&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">power_one</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">itc_one</span> <span class="o">=</span> <span class="n">tfr_morlet</span><span class="p">(</span><span class="n">file_data_one</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cycles</span><span class="p">,</span>
+                                                          <span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">power_two</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">itc_two</span> <span class="o">=</span> <span class="n">tfr_morlet</span><span class="p">(</span><span class="n">file_data_two</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cycles</span><span class="p">,</span>
+                                                          <span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method_tfr</span> <span class="o">==</span> <span class="s2">&quot;Multitaper&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">power_one</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">itc_one</span> <span class="o">=</span> <span class="n">tfr_multitaper</span><span class="p">(</span><span class="n">file_data_one</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cycles</span><span class="p">,</span>
+                                                              <span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">power_two</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">itc_two</span> <span class="o">=</span> <span class="n">tfr_multitaper</span><span class="p">(</span><span class="n">file_data_two</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cycles</span><span class="p">,</span>
+                                                              <span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method_tfr</span> <span class="o">==</span> <span class="s2">&quot;Stockwell&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">power_one</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">itc_one</span> <span class="o">=</span> <span class="n">tfr_stockwell</span><span class="p">(</span><span class="n">file_data_one</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cycles</span><span class="p">,</span>
+                                                             <span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">power_two</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">itc_two</span> <span class="o">=</span> <span class="n">tfr_stockwell</span><span class="p">(</span><span class="n">file_data_two</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cycles</span><span class="p">,</span>
+                                                             <span class="n">picks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error as occurred during the computation of the time frequency analysis.&quot;</span>
+            <span class="n">detailed_message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="p">)</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Utils</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="statisticsErspItcRunnable.create_mask_from_variable_to_keep"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsErspItcRunnable.create_mask_from_variable_to_keep">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_mask_from_variable_to_keep</span><span class="p">(</span><span class="n">file_data</span><span class="p">,</span> <span class="n">stats_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a mask to know which trial to keep and which one to remove for the computation.</span>
+<span class="sd">        :return mask: Mask of trials to remove. True means remove, and False means keep.</span>
+<span class="sd">        :rtype mask: list of boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">file_data</span><span class="o">.</span><span class="n">events</span><span class="p">))]</span>
+        <span class="n">event_ids</span> <span class="o">=</span> <span class="n">file_data</span><span class="o">.</span><span class="n">event_id</span>
+        <span class="n">event_id_to_keep</span> <span class="o">=</span> <span class="n">event_ids</span><span class="p">[</span><span class="n">stats_variable</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">event</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">file_data</span><span class="o">.</span><span class="n">events</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">event_id_to_keep</span><span class="p">:</span>        <span class="c1"># 2 is the event id in the events</span>
+                <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">mask</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Getters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="statisticsErspItcRunnable.get_channel_selected"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsErspItcRunnable.get_channel_selected">[docs]</a>    <span class="k">def</span> <span class="nf">get_channel_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the channel selected for the computation.</span>
+<span class="sd">        :return: The channel selected.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel_selected</span></div>
+
+<div class="viewcode-block" id="statisticsErspItcRunnable.get_power_one"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsErspItcRunnable.get_power_one">[docs]</a>    <span class="k">def</span> <span class="nf">get_power_one</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the &quot;power&quot; data of the time-frequency analysis computation for the first independent variable.</span>
+<span class="sd">        :return: &quot;power&quot; data of the time-frequency analysis computation.</span>
+<span class="sd">        :rtype: MNE.AverageTFR</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">power_one</span></div>
+
+<div class="viewcode-block" id="statisticsErspItcRunnable.get_power_two"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsErspItcRunnable.get_power_two">[docs]</a>    <span class="k">def</span> <span class="nf">get_power_two</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the &quot;power&quot; data of the time-frequency analysis computation for the second independent variable.</span>
+<span class="sd">        :return: &quot;power&quot; data of the time-frequency analysis computation.</span>
+<span class="sd">        :rtype: MNE.AverageTFR</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">power_two</span></div>
+
+<div class="viewcode-block" id="statisticsErspItcRunnable.get_itc_one"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsErspItcRunnable.get_itc_one">[docs]</a>    <span class="k">def</span> <span class="nf">get_itc_one</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the &quot;itc&quot; data of the time-frequency analysis computation for the first independent variable.</span>
+<span class="sd">        :return: &quot;itc&quot; data of the time-frequency analysis computation.</span>
+<span class="sd">        :rtype: MNE.AverageTFR</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">itc_one</span></div>
+
+<div class="viewcode-block" id="statisticsErspItcRunnable.get_itc_two"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsErspItcRunnable.get_itc_two">[docs]</a>    <span class="k">def</span> <span class="nf">get_itc_two</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the &quot;itc&quot; data of the time-frequency analysis computation for the second independent variable.</span>
+<span class="sd">        :return: &quot;itc&quot; data of the time-frequency analysis computation.</span>
+<span class="sd">        :rtype: MNE.AverageTFR</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">itc_two</span></div></div>
+
+
+<span class="c1"># Envelope Correlation</span>
+<div class="viewcode-block" id="statisticsConnectivityWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsConnectivityWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">statisticsConnectivityWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the envelope correlation runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<span class="c1"># noinspection PyUnresolvedReferences</span>
+<div class="viewcode-block" id="statisticsConnectivityRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsConnectivityRunnable">[docs]</a><span class="k">class</span> <span class="nc">statisticsConnectivityRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">,</span> <span class="n">connectivity_method</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="n">stats_first_variable</span><span class="p">,</span>
+                 <span class="n">stats_second_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for the computation of the envelope correlation of the dataset.</span>
+<span class="sd">        :param file_data: MNE data of the dataset.</span>
+<span class="sd">        :type file_data: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        :param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the</span>
+<span class="sd">        directionality of the connectivity.</span>
+<span class="sd">        :type psi: bool</span>
+<span class="sd">        :param fmin: Minimum frequency from which the envelope correlation will be computed.</span>
+<span class="sd">        :type fmin: float</span>
+<span class="sd">        :param fmax: Maximum frequency from which the envelope correlation will be computed.</span>
+<span class="sd">        :type fmax: float</span>
+<span class="sd">        :param connectivity_method: Method used for computing the source space connectivity.</span>
+<span class="sd">        :type connectivity_method: str</span>
+<span class="sd">        :param n_jobs: Number of processes used to compute the source estimation</span>
+<span class="sd">        :type n_jobs: int</span>
+<span class="sd">        :param export_path: Path where the envelope correlation data will be stored.</span>
+<span class="sd">        :type export_path: str</span>
+<span class="sd">        :param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)</span>
+<span class="sd">        :type stats_first_variable: str</span>
+<span class="sd">        :param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)</span>
+<span class="sd">        :type stats_second_variable: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">statisticsConnectivityWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">file_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psi</span> <span class="o">=</span> <span class="n">psi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fmin</span> <span class="o">=</span> <span class="n">fmin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fmax</span> <span class="o">=</span> <span class="n">fmax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_method</span> <span class="o">=</span> <span class="n">connectivity_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span> <span class="o">=</span> <span class="n">n_jobs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_path</span> <span class="o">=</span> <span class="n">export_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats_first_variable</span> <span class="o">=</span> <span class="n">stats_first_variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats_second_variable</span> <span class="o">=</span> <span class="n">stats_second_variable</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_data_one</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_data_two</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psi_data_one</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psi_data_two</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="statisticsConnectivityRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsConnectivityRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the computation of the envelope correlation on the given data.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">file_data_one</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mask_from_variable_to_keep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_first_variable</span><span class="p">)</span>
+            <span class="n">file_data_one</span> <span class="o">=</span> <span class="n">file_data_one</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+
+            <span class="n">file_data_two</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mask_from_variable_to_keep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_second_variable</span><span class="p">)</span>
+            <span class="n">file_data_two</span> <span class="o">=</span> <span class="n">file_data_two</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">compute_correlation_data</span><span class="p">(</span><span class="n">file_data_one</span><span class="p">,</span> <span class="n">file_data_two</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="p">:</span>
+                <span class="n">psi_data_one</span> <span class="o">=</span> <span class="n">phase_slope_index</span><span class="p">(</span><span class="n">file_data_one</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fmax</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psi_data_one</span> <span class="o">=</span> <span class="n">psi_data_one</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s2">&quot;dense&quot;</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+
+                <span class="n">psi_data_two</span> <span class="o">=</span> <span class="n">phase_slope_index</span><span class="p">(</span><span class="n">file_data_two</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fmax</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psi_data_two</span> <span class="o">=</span> <span class="n">psi_data_two</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s2">&quot;dense&quot;</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_data_export</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error as occurred during the computation of the envelope correlation.&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="statisticsConnectivityRunnable.compute_correlation_data"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsConnectivityRunnable.compute_correlation_data">[docs]</a>    <span class="k">def</span> <span class="nf">compute_correlation_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_data_one</span><span class="p">,</span> <span class="n">file_data_two</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the correct correlation data depending on the method chosen by the user.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_method</span> <span class="o">==</span> <span class="s2">&quot;envelope_correlation&quot;</span><span class="p">:</span>
+            <span class="n">connectivity_data_one</span> <span class="o">=</span> <span class="n">envelope_correlation</span><span class="p">(</span><span class="n">file_data_one</span><span class="p">)</span><span class="o">.</span><span class="n">combine</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_data_one</span> <span class="o">=</span> <span class="n">connectivity_data_one</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s2">&quot;dense&quot;</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">connectivity_data_two</span> <span class="o">=</span> <span class="n">envelope_correlation</span><span class="p">(</span><span class="n">file_data_two</span><span class="p">)</span><span class="o">.</span><span class="n">combine</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_data_two</span> <span class="o">=</span> <span class="n">connectivity_data_two</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s2">&quot;dense&quot;</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sfreq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;sfreq&quot;</span><span class="p">]</span>
+            <span class="n">connectivity_data_one</span> <span class="o">=</span> <span class="n">spectral_connectivity_epochs</span><span class="p">(</span><span class="n">file_data_one</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">connectivity_method</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;multitaper&quot;</span><span class="p">,</span>
+                                                                 <span class="n">sfreq</span><span class="o">=</span><span class="n">sfreq</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fmax</span><span class="p">,</span> <span class="n">faverage</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                                 <span class="n">mt_adaptive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_data_one</span> <span class="o">=</span> <span class="n">connectivity_data_one</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s2">&quot;dense&quot;</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">connectivity_data_two</span> <span class="o">=</span> <span class="n">spectral_connectivity_epochs</span><span class="p">(</span><span class="n">file_data_one</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">connectivity_method</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;multitaper&quot;</span><span class="p">,</span>
+                                                                 <span class="n">sfreq</span><span class="o">=</span><span class="n">sfreq</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fmax</span><span class="p">,</span> <span class="n">faverage</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                                 <span class="n">mt_adaptive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_data_two</span> <span class="o">=</span> <span class="n">connectivity_data_two</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s2">&quot;dense&quot;</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="statisticsConnectivityRunnable.check_data_export"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsConnectivityRunnable.check_data_export">[docs]</a>    <span class="k">def</span> <span class="nf">check_data_export</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if the envelope correlation data and the PSI must be exported.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">envelope_correlation_data</span>
+            <span class="n">channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">ch_names</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="s2">&quot;-connectivity&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_data</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="s2">&quot;-PSI&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="statisticsConnectivityRunnable.save_data"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsConnectivityRunnable.save_data">[docs]</a>    <span class="k">def</span> <span class="nf">save_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If it is the case, create the file and write the data in it.</span>
+<span class="sd">        :param data: The data to save, either the connectivity of PSI.</span>
+<span class="sd">        :type data: list of, list of float</span>
+<span class="sd">        :param channels: The channels names to save.</span>
+<span class="sd">        :type channels: list of str</span>
+<span class="sd">        :param file_name: The name of the data to save.</span>
+<span class="sd">        :type file_name: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_path</span> <span class="o">+</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+        <span class="c1"># Write header</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">channels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">channels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Write data</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>  <span class="c1"># Channels 1</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>  <span class="c1"># Channels 2</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]))</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="statisticsConnectivityRunnable.create_mask_from_variable_to_keep"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsConnectivityRunnable.create_mask_from_variable_to_keep">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_mask_from_variable_to_keep</span><span class="p">(</span><span class="n">file_data</span><span class="p">,</span> <span class="n">stats_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a mask to know which trial to keep and which one to remove for the computation.</span>
+<span class="sd">        :return mask: Mask of trials to remove. True means remove, and False means keep.</span>
+<span class="sd">        :rtype mask: list of boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">file_data</span><span class="o">.</span><span class="n">events</span><span class="p">))]</span>
+        <span class="n">event_ids</span> <span class="o">=</span> <span class="n">file_data</span><span class="o">.</span><span class="n">event_id</span>
+        <span class="n">event_id_to_keep</span> <span class="o">=</span> <span class="n">event_ids</span><span class="p">[</span><span class="n">stats_variable</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">event</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">file_data</span><span class="o">.</span><span class="n">events</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">event_id_to_keep</span><span class="p">:</span>        <span class="c1"># 2 is the event id in the events</span>
+                <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">mask</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Getters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="statisticsConnectivityRunnable.get_connectivity_data_one"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsConnectivityRunnable.get_connectivity_data_one">[docs]</a>    <span class="k">def</span> <span class="nf">get_connectivity_data_one</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the connectivity&#39;s data of the first independent variable.</span>
+<span class="sd">        :return: The connectivity&#39;s data.</span>
+<span class="sd">        :rtype: list of, list of float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_data_one</span></div>
+
+<div class="viewcode-block" id="statisticsConnectivityRunnable.get_connectivity_data_two"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsConnectivityRunnable.get_connectivity_data_two">[docs]</a>    <span class="k">def</span> <span class="nf">get_connectivity_data_two</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the connectivity&#39;s data of the second independent variable.</span>
+<span class="sd">        :return: The connectivity&#39;s data.</span>
+<span class="sd">        :rtype: list of, list of float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_data_two</span></div>
+
+<div class="viewcode-block" id="statisticsConnectivityRunnable.get_psi_data_one"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsConnectivityRunnable.get_psi_data_one">[docs]</a>    <span class="k">def</span> <span class="nf">get_psi_data_one</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the psi&#39;s data of the first independent variable.</span>
+<span class="sd">        :return: The psi&#39;s data. Or nothing if the psi&#39;s data has not been computed.</span>
+<span class="sd">        :rtype: list of, list of float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_data_one</span></div>
+
+<div class="viewcode-block" id="statisticsConnectivityRunnable.get_psi_data_two"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.statistics_runnable.statisticsConnectivityRunnable.get_psi_data_two">[docs]</a>    <span class="k">def</span> <span class="nf">get_psi_data_two</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the psi&#39;s data of the first independent variable.</span>
+<span class="sd">        :return: The psi&#39;s data. Or nothing if the psi&#39;s data has not been computed.</span>
+<span class="sd">        :rtype: list of, list of float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_data_two</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

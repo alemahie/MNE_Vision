@@ -1,0 +1,190 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.runnables.classification_runnable &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.runnables.classification_runnable</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Classification runnable</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">QRunnable</span><span class="p">,</span> <span class="n">pyqtSignal</span><span class="p">,</span> <span class="n">QObject</span>
+
+<span class="kn">from</span> <span class="nn">classification.applePy.classifier</span> <span class="kn">import</span> <span class="n">ApplePyClassifier</span>
+
+<span class="kn">from</span> <span class="nn">utils.view.error_window</span> <span class="kn">import</span> <span class="n">errorWindow</span>
+
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<div class="viewcode-block" id="classifyWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.classification_runnable.classifyWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">classifyWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the classification runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="classifyRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.classification_runnable.classifyRunnable">[docs]</a><span class="k">class</span> <span class="nc">classifyRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">directory_path</span><span class="p">,</span> <span class="n">pipeline_selected</span><span class="p">,</span> <span class="n">feature_selection</span><span class="p">,</span> <span class="n">number_of_channels_to_select</span><span class="p">,</span>
+                 <span class="n">hyper_tuning</span><span class="p">,</span> <span class="n">cross_val_number</span><span class="p">,</span> <span class="n">trials_selected</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for the computation of the classification of the dataset.</span>
+<span class="sd">        Create the pipelines were the classification will be performed and launch the classification depending on the</span>
+<span class="sd">        parameters.</span>
+<span class="sd">        :param file_data: MNE data of the dataset.</span>
+<span class="sd">        :type file_data: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        :param directory_path: Path to the directory of the file</span>
+<span class="sd">        :type directory_path:</span>
+<span class="sd">        :param pipeline_selected: The pipeline(s) used for the classification of the dataset.</span>
+<span class="sd">        :type pipeline_selected: list of str</span>
+<span class="sd">        :param feature_selection: Boolean telling if the computation of some feature selection techniques must be performed</span>
+<span class="sd">        on the dataset.</span>
+<span class="sd">        :type feature_selection: bool</span>
+<span class="sd">        :param number_of_channels_to_select: Number of channels to select for the feature selection.</span>
+<span class="sd">        :type number_of_channels_to_select: int</span>
+<span class="sd">        :param hyper_tuning: Boolean telling if the computation of the tuning of the hyper-parameters of the pipelines must</span>
+<span class="sd">        be performed on the dataset.</span>
+<span class="sd">        :type hyper_tuning: bool</span>
+<span class="sd">        :param cross_val_number: Number of cross-validation fold used by the pipelines on the dataset.</span>
+<span class="sd">        :type cross_val_number: int</span>
+<span class="sd">        :param trials_selected: The indexes of the trials selected for the computation</span>
+<span class="sd">        :type trials_selected: list of int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">classifyWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">file_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directory_path</span> <span class="o">=</span> <span class="n">directory_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_selected</span> <span class="o">=</span> <span class="n">pipeline_selected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_selection</span> <span class="o">=</span> <span class="n">feature_selection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_channels_to_select</span> <span class="o">=</span> <span class="n">number_of_channels_to_select</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hyper_tuning</span> <span class="o">=</span> <span class="n">hyper_tuning</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_val_number</span> <span class="o">=</span> <span class="n">cross_val_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trials_selected</span> <span class="o">=</span> <span class="n">trials_selected</span>
+
+<div class="viewcode-block" id="classifyRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.classification_runnable.classifyRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create the classifier and launch the computation of the classification.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transform_file_data_with_trials_selected</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span> <span class="o">=</span> <span class="n">ApplePyClassifier</span><span class="p">(</span><span class="n">used_pipelines</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_selected</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">,</span> <span class="n">dataset_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">directory_path</span><span class="p">,</span> <span class="n">classify_test</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">test_dataset_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                     <span class="n">independent_features_selection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_selection</span><span class="p">,</span> <span class="n">channels_to_select</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_channels_to_select</span><span class="p">,</span>
+                                     <span class="n">tune_hypers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hyper_tuning</span><span class="p">,</span> <span class="n">use_groups</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cv_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_val_number</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error as occurred during the computation of the classification.&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="classifyRunnable.transform_file_data_with_trials_selected"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.classification_runnable.classifyRunnable.transform_file_data_with_trials_selected">[docs]</a>    <span class="k">def</span> <span class="nf">transform_file_data_with_trials_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a mask to know which trial to keep and which one to remove for the computation.</span>
+<span class="sd">        Apply this mask on the data to keep only the trials/epochs selected by the user.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">events</span><span class="p">))]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trials_selected</span><span class="p">:</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="classifyRunnable.get_classifier"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.classification_runnable.classifyRunnable.get_classifier">[docs]</a>    <span class="k">def</span> <span class="nf">get_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the classifier/pipelines on which the classification is performed.</span>
+<span class="sd">        :return: The classifiers</span>
+<span class="sd">        :rtype: ApplePyClassifier</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,665 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.utils.model.study_model &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.utils.model.study_model</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Study Model</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">getsize</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">QThreadPool</span>
+<span class="kn">from</span> <span class="nn">mne</span> <span class="kn">import</span> <span class="n">concatenate_epochs</span>
+
+<span class="kn">from</span> <span class="nn">runnables.study_runnable</span> <span class="kn">import</span> <span class="n">studyTimeFrequencyRunnable</span>
+<span class="kn">from</span> <span class="nn">utils.view.error_window</span> <span class="kn">import</span> <span class="n">errorWindow</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<div class="viewcode-block" id="studyModel"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel">[docs]</a><span class="k">class</span> <span class="nc">studyModel</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">study_name</span><span class="p">,</span> <span class="n">task_name</span><span class="p">,</span> <span class="n">dataset_names</span><span class="p">,</span> <span class="n">dataset_indexes</span><span class="p">,</span> <span class="n">subjects</span><span class="p">,</span> <span class="n">sessions</span><span class="p">,</span> <span class="n">runs</span><span class="p">,</span> <span class="n">conditions</span><span class="p">,</span> <span class="n">groups</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Model for the study based on the dataset selected by the user</span>
+<span class="sd">        :param study_name: The name of the study</span>
+<span class="sd">        :type study_name: str</span>
+<span class="sd">        :param task_name: The name of the task linked to the study</span>
+<span class="sd">        :type task_name: str</span>
+<span class="sd">        :param dataset_names: The name of the datasets linked to the study</span>
+<span class="sd">        :type dataset_names: list of str</span>
+<span class="sd">        :param dataset_indexes: The indexes of the datasets selected to be in the study</span>
+<span class="sd">        :type dataset_indexes: list of int</span>
+<span class="sd">        :param subjects: The subjects assigned to each dataset in the study</span>
+<span class="sd">        :type subjects: list of str</span>
+<span class="sd">        :param sessions: The sessions assigned to each dataset in the study</span>
+<span class="sd">        :type sessions: list of str</span>
+<span class="sd">        :param runs: The runs assigned to each dataset in the study</span>
+<span class="sd">        :type runs: list of str</span>
+<span class="sd">        :param conditions: The conditions assigned to each dataset in the study</span>
+<span class="sd">        :type conditions: list of str</span>
+<span class="sd">        :param groups: The groups assigned to each dataset in the study</span>
+<span class="sd">        :type groups: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_listener</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_name</span> <span class="o">=</span> <span class="n">study_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_name</span> <span class="o">=</span> <span class="n">task_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_names</span> <span class="o">=</span> <span class="n">dataset_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_indexes</span> <span class="o">=</span> <span class="n">dataset_indexes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span> <span class="o">=</span> <span class="n">subjects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="o">=</span> <span class="n">sessions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runs</span> <span class="o">=</span> <span class="n">runs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span> <span class="o">=</span> <span class="n">conditions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_frequency_runnable</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig_psd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig_topo</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># PSD</span>
+<div class="viewcode-block" id="studyModel.plot_psd"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.plot_psd">[docs]</a>    <span class="k">def</span> <span class="nf">plot_psd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels_selected</span><span class="p">,</span> <span class="n">subjects_selected</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="p">,</span> <span class="n">minimum_time</span><span class="p">,</span>
+                 <span class="n">maximum_time</span><span class="p">,</span> <span class="n">topo_time_points</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the PSD for the dataset of the study with the channels and subjects selected.</span>
+<span class="sd">        :param channels_selected: Channels selected</span>
+<span class="sd">        :type channels_selected: str/list of str</span>
+<span class="sd">        :param subjects_selected: Subjects selected</span>
+<span class="sd">        :type subjects_selected: str/list of str</span>
+<span class="sd">        :param minimum_frequency: Minimum frequency from which the power spectral density will be computed.</span>
+<span class="sd">        :type minimum_frequency: float</span>
+<span class="sd">        :param maximum_frequency: Maximum frequency from which the power spectral density will be computed.</span>
+<span class="sd">        :type maximum_frequency: float</span>
+<span class="sd">        :param minimum_time: Minimum time of the epochs from which the power spectral density will be computed.</span>
+<span class="sd">        :type minimum_time: float</span>
+<span class="sd">        :param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.</span>
+<span class="sd">        :type maximum_time: float</span>
+<span class="sd">        :param topo_time_points: The time points for the topomaps.</span>
+<span class="sd">        :type topo_time_points: list of float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">all_file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_selected_file_data_with_subjects</span><span class="p">(</span><span class="n">subjects_selected</span><span class="p">)</span>
+            <span class="n">all_file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapt_events</span><span class="p">(</span><span class="n">all_file_data</span><span class="p">)</span>
+            <span class="n">file_data</span> <span class="o">=</span> <span class="n">concatenate_epochs</span><span class="p">(</span><span class="n">all_file_data</span><span class="p">)</span>
+            <span class="n">file_data</span> <span class="o">=</span> <span class="n">file_data</span><span class="o">.</span><span class="n">pick</span><span class="p">(</span><span class="n">channels_selected</span><span class="p">)</span>
+
+            <span class="n">bandwidth</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">maximum_time</span> <span class="o">-</span> <span class="n">minimum_time</span><span class="p">)</span>  <span class="c1"># To counter bandwidth normalization</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig_psd</span> <span class="o">=</span> <span class="n">file_data</span><span class="o">.</span><span class="n">plot_psd</span><span class="p">(</span><span class="n">fmin</span><span class="o">=</span><span class="n">minimum_frequency</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="n">maximum_frequency</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="n">minimum_time</span><span class="p">,</span>
+                                              <span class="n">tmax</span><span class="o">=</span><span class="n">maximum_time</span><span class="p">,</span> <span class="n">estimate</span><span class="o">=</span><span class="s2">&quot;power&quot;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="n">bandwidth</span><span class="p">,</span>
+                                              <span class="n">average</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">bands</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">topo_time_points</span><span class="p">:</span>
+                <span class="n">bands</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">time</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; Hz&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig_topo</span> <span class="o">=</span> <span class="n">file_data</span><span class="o">.</span><span class="n">plot_psd_topomap</span><span class="p">(</span><span class="n">bands</span><span class="o">=</span><span class="n">bands</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="n">minimum_time</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">maximum_time</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">power_spectral_density_computation_finished</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error has occurred during the computation of the PSD&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">power_spectral_density_computation_error</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="studyModel.power_spectral_density_computation_finished"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.power_spectral_density_computation_finished">[docs]</a>    <span class="k">def</span> <span class="nf">power_spectral_density_computation_finished</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Notifies the main controller that the computation is done.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_listener</span><span class="o">.</span><span class="n">plot_spectra_maps_computation_finished</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="studyModel.power_spectral_density_computation_error"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.power_spectral_density_computation_error">[docs]</a>    <span class="k">def</span> <span class="nf">power_spectral_density_computation_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Notifies the main controller that an error has occurred during the computation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_listener</span><span class="o">.</span><span class="n">plot_spectra_maps_computation_error</span><span class="p">()</span></div>
+
+    <span class="c1"># ERSP ITC</span>
+<div class="viewcode-block" id="studyModel.plot_ersp_itc"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.plot_ersp_itc">[docs]</a>    <span class="k">def</span> <span class="nf">plot_ersp_itc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels_selected</span><span class="p">,</span> <span class="n">subjects_selected</span><span class="p">,</span> <span class="n">method_tfr</span><span class="p">,</span> <span class="n">min_frequency</span><span class="p">,</span> <span class="n">max_frequency</span><span class="p">,</span> <span class="n">n_cycles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the ERSP and ITC for the dataset of the study with the channels and subjects selected.</span>
+<span class="sd">        :param channels_selected: Channels selected</span>
+<span class="sd">        :type channels_selected: str/list of str</span>
+<span class="sd">        :param subjects_selected: Subjects selected</span>
+<span class="sd">        :type subjects_selected: str/list of str</span>
+<span class="sd">        :param method_tfr: Method used for computing the time-frequency analysis.</span>
+<span class="sd">        :type method_tfr: str</span>
+<span class="sd">        :param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.</span>
+<span class="sd">        :type min_frequency: float</span>
+<span class="sd">        :param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.</span>
+<span class="sd">        :type max_frequency: float</span>
+<span class="sd">        :param n_cycles: Number of cycles used by the time-frequency analysis for his computation.</span>
+<span class="sd">        :type n_cycles: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">all_file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_selected_file_data_with_subjects</span><span class="p">(</span><span class="n">subjects_selected</span><span class="p">)</span>
+            <span class="n">all_file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapt_events</span><span class="p">(</span><span class="n">all_file_data</span><span class="p">)</span>
+            <span class="n">file_data</span> <span class="o">=</span> <span class="n">concatenate_epochs</span><span class="p">(</span><span class="n">all_file_data</span><span class="p">)</span>
+
+            <span class="n">pool</span> <span class="o">=</span> <span class="n">QThreadPool</span><span class="o">.</span><span class="n">globalInstance</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_frequency_runnable</span> <span class="o">=</span> <span class="n">studyTimeFrequencyRunnable</span><span class="p">(</span><span class="n">file_data</span><span class="p">,</span> <span class="n">method_tfr</span><span class="p">,</span> <span class="n">channels_selected</span><span class="p">,</span>
+                                                                      <span class="n">min_frequency</span><span class="p">,</span> <span class="n">max_frequency</span><span class="p">,</span> <span class="n">n_cycles</span><span class="p">)</span>
+            <span class="n">pool</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_frequency_runnable</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_frequency_runnable</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_frequency_computation_finished</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_frequency_runnable</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_frequency_computation_error</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error has occurred during the computation of the ERSP-ITC&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">power_spectral_density_computation_error</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="studyModel.time_frequency_computation_finished"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.time_frequency_computation_finished">[docs]</a>    <span class="k">def</span> <span class="nf">time_frequency_computation_finished</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Notifies the main controller that the computation is done.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_listener</span><span class="o">.</span><span class="n">plot_time_frequency_computation_finished</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="studyModel.time_frequency_computation_error"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.time_frequency_computation_error">[docs]</a>    <span class="k">def</span> <span class="nf">time_frequency_computation_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Notifies the main controller that the computation had an error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_listener</span><span class="o">.</span><span class="n">plot_time_frequency_computation_error</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Utils</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="studyModel.adapt_events"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.adapt_events">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">adapt_events</span><span class="p">(</span><span class="n">all_file_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adapts the events on all the epochs so that they are all common and the epochs can thus be concatenated.</span>
+<span class="sd">        :param all_file_data: The epochs on which the events must be adapted.</span>
+<span class="sd">        :type all_file_data: list of MNE Epochs</span>
+<span class="sd">        :return: The new epochs with the events adapted for concatenation</span>
+<span class="sd">        :rtype: list of MNE Epochs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_all_file_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_event_ids</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">event_ids_counter</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">file_data</span> <span class="ow">in</span> <span class="n">all_file_data</span><span class="p">:</span>     <span class="c1"># Search</span>
+            <span class="n">event_ids</span> <span class="o">=</span> <span class="n">file_data</span><span class="o">.</span><span class="n">event_id</span>
+            <span class="k">for</span> <span class="n">event_id</span> <span class="ow">in</span> <span class="n">event_ids</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">event_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_event_ids</span><span class="p">:</span>
+                    <span class="n">all_event_ids</span><span class="p">[</span><span class="n">event_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_ids_counter</span>
+                    <span class="n">event_ids_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">file_data</span> <span class="ow">in</span> <span class="n">all_file_data</span><span class="p">:</span>     <span class="c1"># Modify</span>
+            <span class="n">file_data</span><span class="o">.</span><span class="n">event_id</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">all_event_ids</span><span class="p">)</span>
+            <span class="n">new_all_file_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_all_file_data</span></div>
+
+<div class="viewcode-block" id="studyModel.check_file_type_all_epochs"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.check_file_type_all_epochs">[docs]</a>    <span class="k">def</span> <span class="nf">check_file_type_all_epochs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_file_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if all the file type in the study are epochs.</span>
+<span class="sd">        :param all_file_type: All the file type of each dataset loaded.</span>
+<span class="sd">        :type all_file_type: list of str</span>
+<span class="sd">        :return: True if all datasets are epoched, False otherwise.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_indexes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">all_file_type</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Raw&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>     <span class="c1"># All dataset are epochs if not raw, so ok.</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Getters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="studyModel.get_displayed_info"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_displayed_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_displayed_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">all_info</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">study_name</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_number_of_subjects</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_number_of_conditions</span><span class="p">(),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_number_of_sessions</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_number_of_groups</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_epochs_consistency</span><span class="p">(),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_number_of_channels</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_channel_locations</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_status</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_size</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="n">all_info</span></div>
+
+<div class="viewcode-block" id="studyModel.get_number_of_subjects"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_number_of_subjects">[docs]</a>    <span class="k">def</span> <span class="nf">get_number_of_subjects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the number of different subjects in the study</span>
+<span class="sd">        :return: The number of subjects</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unique_subjects</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">subject</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_subjects</span><span class="p">:</span>
+                <span class="n">unique_subjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_subjects</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="studyModel.get_number_of_conditions"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_number_of_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">get_number_of_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the number of different conditions in the study</span>
+<span class="sd">        :return: The number of conditions</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unique_conditions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">condition</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_conditions</span><span class="p">:</span>
+                <span class="n">unique_conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_conditions</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="studyModel.get_number_of_sessions"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_number_of_sessions">[docs]</a>    <span class="k">def</span> <span class="nf">get_number_of_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the number of different sessions in the study</span>
+<span class="sd">        :return: The number of sessions</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unique_sessions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">session</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_sessions</span><span class="p">:</span>
+                <span class="n">unique_sessions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_sessions</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="studyModel.get_number_of_groups"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_number_of_groups">[docs]</a>    <span class="k">def</span> <span class="nf">get_number_of_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the number of different groups in the study</span>
+<span class="sd">        :return: The number of groups</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unique_groups</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">group</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_groups</span><span class="p">:</span>
+                <span class="n">unique_groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_groups</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="studyModel.get_epochs_consistency"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_epochs_consistency">[docs]</a>    <span class="k">def</span> <span class="nf">get_epochs_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the epochs&#39; consistency, if one of the dataset has different epochs times, the consistency will be false.</span>
+<span class="sd">        :return: The epochs&#39; consistency.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">epochs_consistency</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_selected_file_data</span><span class="p">()</span>
+
+        <span class="n">epochs_start</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">file_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">epochs_end</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">file_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">file_data</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">epochs_start</span> <span class="o">!=</span> <span class="nb">round</span><span class="p">(</span><span class="n">file_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">):</span>
+                <span class="n">epochs_consistency</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="n">epochs_end</span> <span class="o">!=</span> <span class="nb">round</span><span class="p">(</span><span class="n">file_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">3</span><span class="p">):</span>
+                <span class="n">epochs_consistency</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">epochs_consistency</span></div>
+
+<div class="viewcode-block" id="studyModel.get_number_of_channels"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_number_of_channels">[docs]</a>    <span class="k">def</span> <span class="nf">get_number_of_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the number of channels that are present in the study.</span>
+<span class="sd">        :return: The number of channels</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_selected_file_data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">file_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ch_names</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="studyModel.get_channel_locations"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_channel_locations">[docs]</a>    <span class="k">def</span> <span class="nf">get_channel_locations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the channel location status that is present in the study.</span>
+<span class="sd">        :return: The status of the channel location</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_selected_file_data</span><span class="p">()</span>
+        <span class="n">channel_location_available</span> <span class="o">=</span> <span class="s2">&quot;No&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">file_data</span><span class="p">)):</span>
+            <span class="n">channel_location</span> <span class="o">=</span> <span class="n">file_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ch_names</span>
+            <span class="k">if</span> <span class="n">channel_location</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">channel_location_available</span> <span class="o">=</span> <span class="s2">&quot;Yes&quot;</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">channel_location_available</span></div>
+
+<div class="viewcode-block" id="studyModel.get_status"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the ICA status in the study.</span>
+<span class="sd">        :return: The status of the ICA</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_ica</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span><span class="o">.</span><span class="n">get_all_ica</span><span class="p">()</span>
+        <span class="n">yes_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">no_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_indexes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">all_ica</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Yes&quot;</span><span class="p">:</span>
+                <span class="n">yes_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">all_ica</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;No&quot;</span><span class="p">:</span>
+                <span class="n">no_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">yes_counter</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">no_counter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;ICA decomposition complete&quot;</span>
+        <span class="k">elif</span> <span class="n">yes_counter</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">no_counter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Some ICA decomposition missing&quot;</span>
+        <span class="k">elif</span> <span class="n">yes_counter</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">no_counter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;ICA decomposition missing&quot;</span></div>
+
+<div class="viewcode-block" id="studyModel.get_size"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the size in megabits of the study.</span>
+<span class="sd">        :return: The size of the study.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_file_path_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span><span class="o">.</span><span class="n">get_all_file_path_name</span><span class="p">()</span>
+        <span class="n">selected_file_path_name</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_indexes</span><span class="p">:</span>
+            <span class="n">selected_file_path_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">all_file_path_name</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+
+        <span class="n">total_size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">file_path_name</span> <span class="ow">in</span> <span class="n">selected_file_path_name</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">total_size</span> <span class="o">+=</span> <span class="nb">round</span><span class="p">(</span><span class="n">getsize</span><span class="p">(</span><span class="n">file_path_name</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;fdt&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">total_size</span> <span class="o">+=</span> <span class="nb">round</span><span class="p">(</span><span class="n">getsize</span><span class="p">(</span><span class="n">file_path_name</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">total_size</span></div>
+
+    <span class="c1"># Getters utils</span>
+<div class="viewcode-block" id="studyModel.get_selected_file_data"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_selected_file_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_selected_file_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the selected file data in the study</span>
+<span class="sd">        :return: The selected file data.</span>
+<span class="sd">        :rtype: list of MNE Epochs/Raw</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span><span class="o">.</span><span class="n">get_all_file_data</span><span class="p">()</span>
+        <span class="n">selected_file_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_indexes</span><span class="p">:</span>
+            <span class="n">selected_file_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">all_file_data</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">selected_file_data</span></div>
+
+<div class="viewcode-block" id="studyModel.get_selected_file_data_with_subjects"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_selected_file_data_with_subjects">[docs]</a>    <span class="k">def</span> <span class="nf">get_selected_file_data_with_subjects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subjects_selected</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the selected file data in the study in function of the subjects selected.</span>
+<span class="sd">        :return: The selected file data.</span>
+<span class="sd">        :rtype: list of MNE Epochs/Raw</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span><span class="o">.</span><span class="n">get_all_file_data</span><span class="p">()</span>
+        <span class="n">selected_file_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_indexes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="ow">in</span> <span class="n">subjects_selected</span><span class="p">:</span>       <span class="c1"># If the dataset subject is in the subject selected, ok.</span>
+                <span class="n">selected_file_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">all_file_data</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">selected_file_data</span></div>
+
+<div class="viewcode-block" id="studyModel.get_unique_subjects"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_unique_subjects">[docs]</a>    <span class="k">def</span> <span class="nf">get_unique_subjects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets only one copy of each subject.</span>
+<span class="sd">        :return: The subjects assigned to each dataset in the study</span>
+<span class="sd">        :rtype: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">subjects</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">subject</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">subjects</span><span class="p">:</span>
+                <span class="n">subjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">subjects</span></div>
+
+<div class="viewcode-block" id="studyModel.get_study_name"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_study_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_study_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the study name of the study.</span>
+<span class="sd">        :return: The study name</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">study_name</span></div>
+
+<div class="viewcode-block" id="studyModel.get_task_name"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_task_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_task_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the task name of the study.</span>
+<span class="sd">        :return: The task name</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_name</span></div>
+
+<div class="viewcode-block" id="studyModel.get_dataset_names"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_dataset_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_dataset_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the dataset names.</span>
+<span class="sd">        :return: The dataset names</span>
+<span class="sd">        :rtype: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_names</span></div>
+
+<div class="viewcode-block" id="studyModel.get_dataset_indexes"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_dataset_indexes">[docs]</a>    <span class="k">def</span> <span class="nf">get_dataset_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the dataset indexes</span>
+<span class="sd">        :return: The indexes of the datasets selected to be in the study</span>
+<span class="sd">        :rtype: list of int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_indexes</span></div>
+
+<div class="viewcode-block" id="studyModel.get_subjects"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_subjects">[docs]</a>    <span class="k">def</span> <span class="nf">get_subjects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the subjects</span>
+<span class="sd">        :return: The subjects assigned to each dataset in the study</span>
+<span class="sd">        :rtype: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span></div>
+
+<div class="viewcode-block" id="studyModel.get_sessions"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_sessions">[docs]</a>    <span class="k">def</span> <span class="nf">get_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the sessions</span>
+<span class="sd">        :return: The sessions assigned to each dataset in the study</span>
+<span class="sd">        :rtype: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span></div>
+
+<div class="viewcode-block" id="studyModel.get_runs"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_runs">[docs]</a>    <span class="k">def</span> <span class="nf">get_runs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the runs</span>
+<span class="sd">        :return: The runs assigned to each dataset in the study</span>
+<span class="sd">        :rtype: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">runs</span></div>
+
+<div class="viewcode-block" id="studyModel.get_conditions"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">get_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the conditions</span>
+<span class="sd">        :return: The conditions assigned to each dataset in the study</span>
+<span class="sd">        :rtype: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span></div>
+
+<div class="viewcode-block" id="studyModel.get_groups"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_groups">[docs]</a>    <span class="k">def</span> <span class="nf">get_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the groups</span>
+<span class="sd">        :return: The groups assigned to each dataset in the study</span>
+<span class="sd">        :rtype: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span></div>
+
+<div class="viewcode-block" id="studyModel.get_channel_names"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_channel_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_channel_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the channel names.</span>
+<span class="sd">        :return: The channel names of the datasets in the study.</span>
+<span class="sd">        :rtype: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_selected_file_data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">file_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ch_names</span></div>
+
+    <span class="c1"># Runnables</span>
+<div class="viewcode-block" id="studyModel.get_psd_fig"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_psd_fig">[docs]</a>    <span class="k">def</span> <span class="nf">get_psd_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the power spectral density&#39;s figure</span>
+<span class="sd">        :return: The figure of the actual power spectral density&#39;s data computed</span>
+<span class="sd">        :rtype: matplotlib.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig_topo</span></div>
+
+<div class="viewcode-block" id="studyModel.get_psd_topo_fig"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_psd_topo_fig">[docs]</a>    <span class="k">def</span> <span class="nf">get_psd_topo_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the power spectral density&#39;s figure fo the topographies</span>
+<span class="sd">        :return: The figure of the topographies of the actual power spectral density&#39;s data computed</span>
+<span class="sd">        :rtype: matplotlib.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig_psd</span></div>
+
+<div class="viewcode-block" id="studyModel.get_tfr_channel_selected"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_tfr_channel_selected">[docs]</a>    <span class="k">def</span> <span class="nf">get_tfr_channel_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the channel used for the computation of the time-frequency analysis performed on the dataset.</span>
+<span class="sd">        :return: The channel used for the time-frequency analysis computation.</span>
+<span class="sd">        :rtype: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_frequency_runnable</span><span class="o">.</span><span class="n">get_channel_selected</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="studyModel.get_power"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_power">[docs]</a>    <span class="k">def</span> <span class="nf">get_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the &quot;power&quot; data of the time-frequency analysis computation performed on the dataset.</span>
+<span class="sd">        :return: &quot;power&quot; data of the time-frequency analysis computation.</span>
+<span class="sd">        :rtype: MNE.AverageTFR</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_frequency_runnable</span><span class="o">.</span><span class="n">get_power</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="studyModel.get_itc"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.get_itc">[docs]</a>    <span class="k">def</span> <span class="nf">get_itc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the &quot;itc&quot; data of the time-frequency analysis computation performed on the dataset.</span>
+<span class="sd">        :return: &quot;itc&quot; data of the time-frequency analysis computation.</span>
+<span class="sd">        :rtype: MNE.AverageTFR</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_frequency_runnable</span><span class="o">.</span><span class="n">get_itc</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Setters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="studyModel.set_study_name"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.set_study_name">[docs]</a>    <span class="k">def</span> <span class="nf">set_study_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">study_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the name of the study.</span>
+<span class="sd">        :param study_name: The name of the study</span>
+<span class="sd">        :type study_name: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_name</span> <span class="o">=</span> <span class="n">study_name</span></div>
+
+<div class="viewcode-block" id="studyModel.set_task_name"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.set_task_name">[docs]</a>    <span class="k">def</span> <span class="nf">set_task_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the task name.</span>
+<span class="sd">        :param task_name: The name of the task linked to the study</span>
+<span class="sd">        :type task_name: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_name</span> <span class="o">=</span> <span class="n">task_name</span></div>
+
+<div class="viewcode-block" id="studyModel.set_subjects"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.set_subjects">[docs]</a>    <span class="k">def</span> <span class="nf">set_subjects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subjects</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the subjects for each dataset.</span>
+<span class="sd">        :param subjects: The subjects assigned to each dataset in the study</span>
+<span class="sd">        :type subjects: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span> <span class="o">=</span> <span class="n">subjects</span></div>
+
+<div class="viewcode-block" id="studyModel.set_sessions"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.set_sessions">[docs]</a>    <span class="k">def</span> <span class="nf">set_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sessions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the sessions for each dataset.</span>
+<span class="sd">        :param sessions: The sessions assigned to each dataset in the study</span>
+<span class="sd">        :type sessions: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="o">=</span> <span class="n">sessions</span></div>
+
+<div class="viewcode-block" id="studyModel.set_runs"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.set_runs">[docs]</a>    <span class="k">def</span> <span class="nf">set_runs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the runs for each dataset.</span>
+<span class="sd">        :param runs: The runs assigned to each dataset in the study</span>
+<span class="sd">        :type runs: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runs</span> <span class="o">=</span> <span class="n">runs</span></div>
+
+<div class="viewcode-block" id="studyModel.set_conditions"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.set_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">set_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conditions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the conditions for each dataset.</span>
+<span class="sd">        :param conditions: The conditions assigned to each dataset in the study</span>
+<span class="sd">        :type conditions: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span> <span class="o">=</span> <span class="n">conditions</span></div>
+
+<div class="viewcode-block" id="studyModel.set_groups"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.set_groups">[docs]</a>    <span class="k">def</span> <span class="nf">set_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the groups for each dataset.</span>
+<span class="sd">        :param groups: The groups assigned to each dataset in the study</span>
+<span class="sd">        :type groups: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span></div>
+
+<div class="viewcode-block" id="studyModel.set_listener"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.set_listener">[docs]</a>    <span class="k">def</span> <span class="nf">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the main listener so that the controller is able to communicate with the main controller.</span>
+<span class="sd">        :param listener: main listener</span>
+<span class="sd">        :type listener: mainModel</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span> <span class="o">=</span> <span class="n">listener</span></div>
+
+<div class="viewcode-block" id="studyModel.set_study_listener"><a class="viewcode-back" href="../../../../src.utils.model.html#src.utils.model.study_model.studyModel.set_study_listener">[docs]</a>    <span class="k">def</span> <span class="nf">set_study_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the study listener so that the model is able to communicate with the study controller.</span>
+<span class="sd">        :param listener: study plot listener</span>
+<span class="sd">        :type listener: studyPlotsListener</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_listener</span> <span class="o">=</span> <span class="n">listener</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

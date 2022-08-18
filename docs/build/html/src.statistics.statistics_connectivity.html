@@ -1,0 +1,391 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.statistics.statistics_connectivity package &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.statistics.statistics_erp package" href="src.statistics.statistics_erp.html" />
+    <link rel="prev" title="src.statistics package" href="src.statistics.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.statistics.statistics_erp.html" title="src.statistics.statistics_erp package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.statistics.html" title="src.statistics package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.statistics.html" accesskey="U">src.statistics package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="src-statistics-statistics-connectivity-package">
+<h1>src.statistics.statistics_connectivity package<a class="headerlink" href="#src-statistics-statistics-connectivity-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.statistics.statistics_connectivity.statistics_connectivity_controller">
+<span id="src-statistics-statistics-connectivity-statistics-connectivity-controller-module"></span><h2>src.statistics.statistics_connectivity.statistics_connectivity_controller module<a class="headerlink" href="#module-src.statistics.statistics_connectivity.statistics_connectivity_controller" title="Permalink to this headline">¶</a></h2>
+<p>Statistics Connectivity Controller</p>
+<dl class="class">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController">
+<em class="property">class </em><code class="descclassname">src.statistics.statistics_connectivity.statistics_connectivity_controller.</code><code class="descname">statisticsConnectivityController</code><span class="sig-paren">(</span><em>number_of_channels</em>, <em>file_data</em>, <em>event_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_controller.html#statisticsConnectivityController"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">statistics.statistics_connectivity.statistics_connectivity_listener.statisticsConnectivityListener</span></code></p>
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController.additional_parameters_clicked">
+<code class="descname">additional_parameters_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_controller.html#statisticsConnectivityController.additional_parameters_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController.additional_parameters_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new window for specifying the exportation path of the computation of the envelope correlation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController.additional_parameters_information">
+<code class="descname">additional_parameters_information</code><span class="sig-paren">(</span><em>export_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_controller.html#statisticsConnectivityController.additional_parameters_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController.additional_parameters_information" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the exportation path for the envelope correlation data computed.
+:param export_path: Path where the envelope correlation data will be stored.
+:type export_path: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController.cancel_button_clicked">
+<code class="descname">cancel_button_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_controller.html#statisticsConnectivityController.cancel_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController.confirm_button_clicked">
+<code class="descname">confirm_button_clicked</code><span class="sig-paren">(</span><em>psi</em>, <em>fmin</em>, <em>fmax</em>, <em>connectivity_method</em>, <em>n_jobs</em>, <em>stats_first_variable</em>, <em>stats_second_variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_controller.html#statisticsConnectivityController.confirm_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window and send the information to the main controller.
+:param psi: Check if the computation of the Phase Slope Index must be done. The PSI give an indication to the
+directionality of the connectivity.
+:type psi: bool
+:param fmin: Minimum frequency from which the envelope correlation will be computed.
+:type fmin: float
+:param fmax: Maximum frequency from which the envelope correlation will be computed.
+:type fmax: float
+:param connectivity_method: Method used for computing the source space connectivity.
+:type connectivity_method: str
+:param n_jobs: Number of processes used to compute the source estimation
+:type n_jobs: int
+:param stats_first_variable: The first independent variable on which the statistics must be computed (an event id)
+:type stats_first_variable: str
+:param stats_second_variable: The second independent variable on which the statistics must be computed (an event id)
+:type stats_second_variable: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController.plot_envelope_correlation">
+<code class="descname">plot_envelope_correlation</code><span class="sig-paren">(</span><em>connectivity_data_one</em>, <em>connectivity_data_two</em>, <em>psi_data_one</em>, <em>psi_data_two</em>, <em>channel_names</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_controller.html#statisticsConnectivityController.plot_envelope_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController.plot_envelope_correlation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the information to the view to plot the connectivity and the statistics computed on it.
+:param connectivity_data_one: The envelope correlation data of the first independent variable to plot.
+:type connectivity_data_one: list of, list of float
+:param connectivity_data_two: The envelope correlation data of the second independent variable to plot.
+:type connectivity_data_two: list of, list of float
+:param psi_data_one: Values of the computation of the PSI, if None then the computation has not been done.
+The PSI give an indication to the directionality of the connectivity of the first independent variable.
+:type psi_data_one: list of, list of float
+:param psi_data_two: Values of the computation of the PSI, if None then the computation has not been done.
+The PSI give an indication to the directionality of the connectivity of the second independent variable.
+:type psi_data_two: list of, list of float
+:param channel_names: Channels’ names
+:type channel_names: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController.set_listener">
+<code class="descname">set_listener</code><span class="sig-paren">(</span><em>listener</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_controller.html#statisticsConnectivityController.set_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_controller.statisticsConnectivityController.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the main listener so that the controller is able to communicate with the main controller.
+:param listener: main listener
+:type listener: mainController</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.statistics.statistics_connectivity.statistics_connectivity_listener">
+<span id="src-statistics-statistics-connectivity-statistics-connectivity-listener-module"></span><h2>src.statistics.statistics_connectivity.statistics_connectivity_listener module<a class="headerlink" href="#module-src.statistics.statistics_connectivity.statistics_connectivity_listener" title="Permalink to this headline">¶</a></h2>
+<p>Statistics Connectivity Listener</p>
+<dl class="class">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_listener.statisticsConnectivityListener">
+<em class="property">class </em><code class="descclassname">src.statistics.statistics_connectivity.statistics_connectivity_listener.</code><code class="descname">statisticsConnectivityListener</code><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_listener.html#statisticsConnectivityListener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_listener.statisticsConnectivityListener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Listener doing the connection between the controller and the view for computing the envelope correlation on the dataset.
+It retrieves the information from the view to send it to the controller.</p>
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_listener.statisticsConnectivityListener.additional_parameters_clicked">
+<code class="descname">additional_parameters_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_listener.html#statisticsConnectivityListener.additional_parameters_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_listener.statisticsConnectivityListener.additional_parameters_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_listener.statisticsConnectivityListener.additional_parameters_information">
+<code class="descname">additional_parameters_information</code><span class="sig-paren">(</span><em>export_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_listener.html#statisticsConnectivityListener.additional_parameters_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_listener.statisticsConnectivityListener.additional_parameters_information" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_listener.statisticsConnectivityListener.cancel_button_clicked">
+<code class="descname">cancel_button_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_listener.html#statisticsConnectivityListener.cancel_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_listener.statisticsConnectivityListener.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_listener.statisticsConnectivityListener.confirm_button_clicked">
+<code class="descname">confirm_button_clicked</code><span class="sig-paren">(</span><em>psi</em>, <em>fmin</em>, <em>fmax</em>, <em>connectivity_method</em>, <em>n_jobs</em>, <em>stats_first_variable</em>, <em>stats_second_variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_listener.html#statisticsConnectivityListener.confirm_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_listener.statisticsConnectivityListener.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.statistics.statistics_connectivity.statistics_connectivity_view">
+<span id="src-statistics-statistics-connectivity-statistics-connectivity-view-module"></span><h2>src.statistics.statistics_connectivity.statistics_connectivity_view module<a class="headerlink" href="#module-src.statistics.statistics_connectivity.statistics_connectivity_view" title="Permalink to this headline">¶</a></h2>
+<p>Statistics Connectivity View</p>
+<dl class="class">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.psiValuesWindow">
+<em class="property">class </em><code class="descclassname">src.statistics.statistics_connectivity.statistics_connectivity_view.</code><code class="descname">psiValuesWindow</code><span class="sig-paren">(</span><em>psi</em>, <em>channel_names</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#psiValuesWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.psiValuesWindow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QWidget</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView">
+<em class="property">class </em><code class="descclassname">src.statistics.statistics_connectivity.statistics_connectivity_view.</code><code class="descname">statisticsConnectivityView</code><span class="sig-paren">(</span><em>number_of_channels</em>, <em>file_data</em>, <em>event_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QWidget</span></code></p>
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.cancel_envelope_correlation_trigger">
+<code class="descname">cancel_envelope_correlation_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.cancel_envelope_correlation_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.cancel_envelope_correlation_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the information to the controller that the computation is cancelled.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.confirm_envelope_correlation_trigger">
+<code class="descname">confirm_envelope_correlation_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.confirm_envelope_correlation_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.confirm_envelope_correlation_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the parameters and send the information to the controller.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.create_first_independent_variable_check_boxes">
+<code class="descname">create_first_independent_variable_check_boxes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.create_first_independent_variable_check_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.create_first_independent_variable_check_boxes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.create_second_independent_variable_check_boxes">
+<code class="descname">create_second_independent_variable_check_boxes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.create_second_independent_variable_check_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.create_second_independent_variable_check_boxes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.data_exportation_trigger">
+<code class="descname">data_exportation_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.data_exportation_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.data_exportation_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open a new window asking for the path for the exportation of the envelope correlation data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.get_first_independent_variable_selected">
+<code class="descname">get_first_independent_variable_selected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.get_first_independent_variable_selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.get_first_independent_variable_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the first independent variable selected by the user.
+:return: First independent variable selected
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.get_second_independent_variable_selected">
+<code class="descname">get_second_independent_variable_selected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.get_second_independent_variable_selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.get_second_independent_variable_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the second independent variable selected by the user.
+:return: Second independent variable selected
+:rtype: str</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.keep_picks_PSI_data">
+<em class="property">static </em><code class="descname">keep_picks_PSI_data</code><span class="sig-paren">(</span><em>psi</em>, <em>channel_names</em>, <em>picks</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.keep_picks_PSI_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.keep_picks_PSI_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keep the PSI data from the channels that are in the picks.
+:param psi: Values of the computation of the PSI, if None then the computation has not been done.
+The PSI give an indication to the directionality of the connectivity.
+:type psi: list of, list of float
+:param channel_names: Channels’ names
+:type channel_names: list of str
+:param picks: The channels to keep
+:type picks: list of str
+:return: All the PSI data kept with the picks
+:rtype: list of, list of float</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.plot_envelope_correlation">
+<code class="descname">plot_envelope_correlation</code><span class="sig-paren">(</span><em>connectivity_data_one</em>, <em>connectivity_data_two</em>, <em>psi_data_one</em>, <em>psi_data_two</em>, <em>channel_names</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.plot_envelope_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.plot_envelope_correlation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the envelope correlation computed and the statistics linked to it.
+:param connectivity_data_one: The envelope correlation data of the first independent variable to plot.
+:type connectivity_data_one: list of, list of float
+:param connectivity_data_two: The envelope correlation data of the second independent variable to plot.
+:type connectivity_data_two: list of, list of float
+:param psi_data_one: Values of the computation of the PSI, if None then the computation has not been done.
+The PSI give an indication to the directionality of the connectivity of the first independent variable.
+:type psi_data_one: list of, list of float
+:param psi_data_two: Values of the computation of the PSI, if None then the computation has not been done.
+The PSI give an indication to the directionality of the connectivity of the second independent variable.
+:type psi_data_two: list of, list of float
+:param channel_names: Channels’ names
+:type channel_names: list of str</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.plot_psi">
+<em class="property">static </em><code class="descname">plot_psi</code><span class="sig-paren">(</span><em>psi</em>, <em>channel_names</em>, <em>title=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.plot_psi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.plot_psi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the Phase Slope Index computed.
+:param psi: Values of the computation of the PSI, if None then the computation has not been done.
+The PSI give an indication to the directionality of the connectivity.
+:type psi: list of, list of float
+:param channel_names: Channels’ names
+:type channel_names: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.plot_psi_topographies">
+<code class="descname">plot_psi_topographies</code><span class="sig-paren">(</span><em>psi</em>, <em>channel_names</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.plot_psi_topographies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.plot_psi_topographies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the PSI values as topographies on predefined points of the headset.
+:param psi: Values of the computation of the PSI, if None then the computation has not been done.
+The PSI give an indication to the directionality of the connectivity.
+:type psi: list of, list of float
+:param channel_names: Channels’ names
+:type channel_names: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.plot_psi_values">
+<code class="descname">plot_psi_values</code><span class="sig-paren">(</span><em>psi</em>, <em>channel_names</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.plot_psi_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.plot_psi_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the values of the Phase Slope Index computed.
+:param psi: Values of the computation of the PSI, if None then the computation has not been done.
+The PSI give an indication to the directionality of the connectivity.
+:type psi: list of, list of float
+:param channel_names: Channels’ names
+:type channel_names: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.plot_topographies_on_pick">
+<code class="descname">plot_topographies_on_pick</code><span class="sig-paren">(</span><em>ax</em>, <em>ch_idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.plot_topographies_on_pick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.plot_topographies_on_pick" title="Permalink to this definition">¶</a></dt>
+<dd><p>This block of code is executed once you click on one of the channel axes
+in the plot. To work with the viz internals, this function should only take
+two parameters, the axis and the channel or data index.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.set_listener">
+<code class="descname">set_listener</code><span class="sig-paren">(</span><em>listener</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.set_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the listener to the controller.
+:param listener: Listener to the controller.
+:type listener: envelopeCorrelationController</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.slider_value_changed_trigger">
+<code class="descname">slider_value_changed_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/statistics/statistics_connectivity/statistics_connectivity_view.html#statisticsConnectivityView.slider_value_changed_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.statistics.statistics_connectivity.statistics_connectivity_view.statisticsConnectivityView.slider_value_changed_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the value of the slider displayed on the window when the actual slider is moved.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.statistics.statistics_connectivity">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.statistics.statistics_connectivity" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">src.statistics.statistics_connectivity package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.statistics.statistics_connectivity.statistics_connectivity_controller">src.statistics.statistics_connectivity.statistics_connectivity_controller module</a></li>
+<li><a class="reference internal" href="#module-src.statistics.statistics_connectivity.statistics_connectivity_listener">src.statistics.statistics_connectivity.statistics_connectivity_listener module</a></li>
+<li><a class="reference internal" href="#module-src.statistics.statistics_connectivity.statistics_connectivity_view">src.statistics.statistics_connectivity.statistics_connectivity_view module</a></li>
+<li><a class="reference internal" href="#module-src.statistics.statistics_connectivity">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="src.statistics.html"
+                        title="previous chapter">src.statistics package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="src.statistics.statistics_erp.html"
+                        title="next chapter">src.statistics.statistics_erp package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.statistics.statistics_connectivity.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.statistics.statistics_erp.html" title="src.statistics.statistics_erp package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.statistics.html" title="src.statistics package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.statistics.html" >src.statistics package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

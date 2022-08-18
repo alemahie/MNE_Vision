@@ -1,0 +1,218 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.tools.filter.filter_view &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.tools.filter.filter_view</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Filter view</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5.QtGui</span> <span class="kn">import</span> <span class="n">QDoubleValidator</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QLineEdit</span><span class="p">,</span> <span class="n">QPushButton</span><span class="p">,</span> <span class="n">QGridLayout</span><span class="p">,</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QHBoxLayout</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QComboBox</span>
+
+<span class="kn">from</span> <span class="nn">utils.elements_selector.elements_selector_controller</span> <span class="kn">import</span> <span class="n">multipleSelectorController</span>
+<span class="kn">from</span> <span class="nn">utils.view.separator</span> <span class="kn">import</span> <span class="n">create_layout_separator</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<div class="viewcode-block" id="filterView"><a class="viewcode-back" href="../../../../src.tools.filter.html#src.tools.filter.filter_view.filterView">[docs]</a><span class="k">class</span> <span class="nc">filterView</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_channels_names</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Window displaying the parameters for computing the filtering on the dataset.</span>
+<span class="sd">        :param all_channels_names: All the channels&#39; names</span>
+<span class="sd">        :type all_channels_names: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_listener</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_channels_names</span> <span class="o">=</span> <span class="n">all_channels_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selector_controller</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selected</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;Filtering&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+
+        <span class="c1"># Channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_channels_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_channels_layout</span> <span class="o">=</span> <span class="n">QGridLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_box</span> <span class="o">=</span> <span class="n">QComboBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_box</span><span class="o">.</span><span class="n">addItems</span><span class="p">([</span><span class="s2">&quot;fir&quot;</span><span class="p">,</span> <span class="s2">&quot;iir&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selection_button</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;&amp;Channels ...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selection_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channels_selection_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_channels_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Filtering method :&quot;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_channels_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method_box</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_channels_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Channels :&quot;</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_channels_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channels_selection_button</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_channels_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method_channels_layout</span><span class="p">)</span>
+
+        <span class="c1"># Lines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_layout</span> <span class="o">=</span> <span class="n">QGridLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">low_frequency_line</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">(</span><span class="s2">&quot;0,1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">low_frequency_line</span><span class="o">.</span><span class="n">setValidator</span><span class="p">(</span><span class="n">QDoubleValidator</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">high_frequency_line</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">(</span><span class="s2">&quot;45,0&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">high_frequency_line</span><span class="o">.</span><span class="n">setValidator</span><span class="p">(</span><span class="n">QDoubleValidator</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Low Frequency (Hz) : &quot;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">low_frequency_line</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;High Frequency (Hz) : &quot;</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">high_frequency_line</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lines_layout</span><span class="p">)</span>
+
+        <span class="c1"># Cancel Confirm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;&amp;Cancel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_filtering_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confirm</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;&amp;Confirm&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confirm</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confirm_filtering_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confirm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span><span class="p">)</span>
+
+        <span class="c1"># Layout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method_channels_widget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">create_layout_separator</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lines_widget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">create_layout_separator</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_widget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">global_layout</span><span class="p">)</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Triggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="filterView.cancel_filtering_trigger"><a class="viewcode-back" href="../../../../src.tools.filter.html#src.tools.filter.filter_view.filterView.cancel_filtering_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">cancel_filtering_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send the information to the controller that the computation is cancelled.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_listener</span><span class="o">.</span><span class="n">cancel_button_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="filterView.confirm_filtering_trigger"><a class="viewcode-back" href="../../../../src.tools.filter.html#src.tools.filter.filter_view.filterView.confirm_filtering_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_filtering_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the parameters and send the information to the controller.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filter_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">method_box</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
+        <span class="n">low_frequency</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">high_frequency</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">low_frequency_line</span><span class="o">.</span><span class="n">hasAcceptableInput</span><span class="p">():</span>
+            <span class="n">low_frequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">low_frequency_line</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+            <span class="n">low_frequency</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">low_frequency</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">high_frequency_line</span><span class="o">.</span><span class="n">hasAcceptableInput</span><span class="p">():</span>
+            <span class="n">high_frequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">high_frequency_line</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+            <span class="n">high_frequency</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">high_frequency</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_listener</span><span class="o">.</span><span class="n">confirm_button_clicked</span><span class="p">(</span><span class="n">low_frequency</span><span class="p">,</span> <span class="n">high_frequency</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels_selected</span><span class="p">,</span> <span class="n">filter_method</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="filterView.channels_selection_trigger"><a class="viewcode-back" href="../../../../src.tools.filter.html#src.tools.filter.filter_view.filterView.channels_selection_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">channels_selection_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Open the multiple selector window.</span>
+<span class="sd">        The user can select multiple channels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Select the channels used for the filtering :&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selector_controller</span> <span class="o">=</span> <span class="n">multipleSelectorController</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_channels_names</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">box_checked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selector_controller</span><span class="o">.</span><span class="n">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_listener</span><span class="p">)</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Setters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="filterView.set_listener"><a class="viewcode-back" href="../../../../src.tools.filter.html#src.tools.filter.filter_view.filterView.set_listener">[docs]</a>    <span class="k">def</span> <span class="nf">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the listener to the controller.</span>
+<span class="sd">        :param listener: Listener to the controller.</span>
+<span class="sd">        :type listener: filterController</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_listener</span> <span class="o">=</span> <span class="n">listener</span></div>
+
+<div class="viewcode-block" id="filterView.set_channels_selected"><a class="viewcode-back" href="../../../../src.tools.filter.html#src.tools.filter.filter_view.filterView.set_channels_selected">[docs]</a>    <span class="k">def</span> <span class="nf">set_channels_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels_selected</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the channels selected in the multiple selector window.</span>
+<span class="sd">        :param channels_selected: Channels selected.</span>
+<span class="sd">        :type channels_selected: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selected</span> <span class="o">=</span> <span class="n">channels_selected</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,600 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.runnables.files_runnable &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.runnables.files_runnable</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Files runnable</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">QRunnable</span><span class="p">,</span> <span class="n">pyqtSignal</span><span class="p">,</span> <span class="n">QObject</span>
+
+<span class="kn">from</span> <span class="nn">mne</span> <span class="kn">import</span> <span class="n">read_epochs</span><span class="p">,</span> <span class="n">find_events</span><span class="p">,</span> <span class="n">events_from_annotations</span>
+<span class="kn">from</span> <span class="nn">mne.channels</span> <span class="kn">import</span> <span class="n">make_standard_montage</span>
+<span class="kn">from</span> <span class="nn">mne.io</span> <span class="kn">import</span> <span class="n">read_raw_fif</span><span class="p">,</span> <span class="n">read_raw_eeglab</span><span class="p">,</span> <span class="n">read_epochs_eeglab</span>
+
+<span class="kn">from</span> <span class="nn">utils.cnt_reader.cnt_file_reader</span> <span class="kn">import</span> <span class="n">get_raw_from_cnt</span>
+<span class="kn">from</span> <span class="nn">utils.view.error_window</span> <span class="kn">import</span> <span class="n">errorWindow</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<span class="c1"># Open FIF File</span>
+<div class="viewcode-block" id="openFifFileWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openFifFileWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">openFifFileWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the open FIF file runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="openFifFileRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openFifFileRunnable">[docs]</a><span class="k">class</span> <span class="nc">openFifFileRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_to_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for the opening of a FIF file, getting the dataset&#39;s data.</span>
+<span class="sd">        :param path_to_file: The path to the file.</span>
+<span class="sd">        :type path_to_file: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">openFifFileWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span> <span class="o">=</span> <span class="n">path_to_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="openFifFileRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openFifFileRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the reading of the FIF file.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span><span class="p">[</span><span class="o">-</span><span class="mi">7</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;raw&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="s2">&quot;Raw&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">read_raw_fif</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span><span class="p">,</span> <span class="n">preload</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="s2">&quot;Epochs&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">read_epochs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span><span class="p">,</span> <span class="n">preload</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error has occurred&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="openFifFileRunnable.get_file_data"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openFifFileRunnable.get_file_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the file data.</span>
+<span class="sd">        :return: MNE data of the dataset.</span>
+<span class="sd">        :rtype: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span></div>
+
+<div class="viewcode-block" id="openFifFileRunnable.get_file_type"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openFifFileRunnable.get_file_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the file type.</span>
+<span class="sd">        :return: The file type.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span></div>
+
+<div class="viewcode-block" id="openFifFileRunnable.get_path_to_file"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openFifFileRunnable.get_path_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_path_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the path to the file.</span>
+<span class="sd">        :return: The path to the file.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span></div></div>
+
+
+<span class="c1"># Open CNT File</span>
+<div class="viewcode-block" id="openCntFileWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openCntFileWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">openCntFileWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the open CNT file runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="openCntFileRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openCntFileRunnable">[docs]</a><span class="k">class</span> <span class="nc">openCntFileRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_to_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for the opening of an ANT eego CNT file, getting the dataset&#39;s data.</span>
+<span class="sd">        :param path_to_file: The path to the file.</span>
+<span class="sd">        :type path_to_file: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">openCntFileWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span> <span class="o">=</span> <span class="n">path_to_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="openCntFileRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openCntFileRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the reading of the ANT eego CNT file.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">get_raw_from_cnt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="s2">&quot;Raw&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error has occurred during the reading of the ANT eego CNT file.&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="openCntFileRunnable.get_file_data"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openCntFileRunnable.get_file_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the file data.</span>
+<span class="sd">        :return: MNE data of the dataset.</span>
+<span class="sd">        :rtype: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span></div>
+
+<div class="viewcode-block" id="openCntFileRunnable.get_file_type"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openCntFileRunnable.get_file_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the file type.</span>
+<span class="sd">        :return: The file type.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span></div>
+
+<div class="viewcode-block" id="openCntFileRunnable.get_path_to_file"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openCntFileRunnable.get_path_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_path_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the path to the file.</span>
+<span class="sd">        :return: The path to the file.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span></div></div>
+
+
+<span class="c1"># Open Set File</span>
+<div class="viewcode-block" id="openSetFileWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openSetFileWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">openSetFileWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the open SET file runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="openSetFileRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openSetFileRunnable">[docs]</a><span class="k">class</span> <span class="nc">openSetFileRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_to_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for the opening of a SET file, getting the dataset&#39;s data.</span>
+<span class="sd">        :param path_to_file: The path to the file.</span>
+<span class="sd">        :type path_to_file: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">openSetFileWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span> <span class="o">=</span> <span class="n">path_to_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_events</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_event_ids</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="openSetFileRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openSetFileRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the reading of the SET file.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">raw_read</span><span class="p">,</span> <span class="n">epochs_read</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+        <span class="n">detailed_error</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">read_raw_eeglab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span><span class="p">,</span> <span class="n">preload</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="s2">&quot;Raw&quot;</span>
+            <span class="n">raw_read</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">raw_read</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="n">detailed_error</span> <span class="o">=</span> <span class="n">error</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">raw_read</span><span class="p">:</span>    <span class="c1"># Raw reading failed, try epochs</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">read_epochs_eeglab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="s2">&quot;Epochs&quot;</span>
+                <span class="n">epochs_read</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="n">epochs_read</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">detailed_error</span> <span class="o">=</span> <span class="n">error</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">raw_read</span> <span class="ow">or</span> <span class="n">epochs_read</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error has occurred during the reading of the SET file.&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">detailed_error</span><span class="p">))</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="openSetFileRunnable.get_file_data"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openSetFileRunnable.get_file_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the file data.</span>
+<span class="sd">        :return: MNE data of the dataset.</span>
+<span class="sd">        :rtype: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span></div>
+
+<div class="viewcode-block" id="openSetFileRunnable.get_file_type"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openSetFileRunnable.get_file_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the file type.</span>
+<span class="sd">        :return: The file type.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span></div>
+
+<div class="viewcode-block" id="openSetFileRunnable.get_path_to_file"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.openSetFileRunnable.get_path_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_path_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the path to the file.</span>
+<span class="sd">        :return: The path to the file.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span></div></div>
+
+
+<span class="c1"># Load Data Info</span>
+<div class="viewcode-block" id="loadDataInfoWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.loadDataInfoWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">loadDataInfoWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the load data info runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="loadDataInfoRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.loadDataInfoRunnable">[docs]</a><span class="k">class</span> <span class="nc">loadDataInfoRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">montage</span><span class="p">,</span> <span class="n">channels_selected</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for the loading of the additional information of the dataset.</span>
+<span class="sd">        :param file_data: MNE data of the dataset.</span>
+<span class="sd">        :type file_data: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        :param montage: Montage of the headset</span>
+<span class="sd">        :type montage: str</span>
+<span class="sd">        :param channels_selected: Channels selected</span>
+<span class="sd">        :type channels_selected: list of str</span>
+<span class="sd">        :param tmin: Start time of the epoch or raw file to keep</span>
+<span class="sd">        :type tmin: float</span>
+<span class="sd">        :param tmax: End time of the epoch or raw file to keep</span>
+<span class="sd">        :type tmax: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">loadDataInfoWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">file_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">montage</span> <span class="o">=</span> <span class="n">montage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selected</span> <span class="o">=</span> <span class="n">channels_selected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmin</span> <span class="o">=</span> <span class="n">tmin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmax</span> <span class="o">=</span> <span class="n">tmax</span>
+
+<div class="viewcode-block" id="loadDataInfoRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.loadDataInfoRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the loading of the additional information of the dataset.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">montage</span> <span class="o">!=</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">montage</span> <span class="o">=</span> <span class="n">make_standard_montage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">montage</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">set_montage</span><span class="p">(</span><span class="n">montage</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;The provided montage does not work with the data in the dataset, the default montage will &quot;</span> \
+                                <span class="s2">&quot;be used.&quot;</span>
+                <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+                <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">pick_channels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channels_selected</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tmin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">tmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmax</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="loadDataInfoRunnable.get_file_data"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.loadDataInfoRunnable.get_file_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span></div></div>
+
+
+<span class="c1"># Find Events From Channel</span>
+<div class="viewcode-block" id="findEventsFromChannelWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.findEventsFromChannelWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">findEventsFromChannelWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the find events from channel runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="findEventsFromChannelRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.findEventsFromChannelRunnable">[docs]</a><span class="k">class</span> <span class="nc">findEventsFromChannelRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">stim_channel</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for finding the events from a stimulation channel of the dataset.</span>
+<span class="sd">        :param file_data: MNE data of the dataset.</span>
+<span class="sd">        :type file_data: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        :param stim_channel: The stimulation channel.</span>
+<span class="sd">        :type stim_channel: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">findEventsFromChannelWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">file_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stim_channel</span> <span class="o">=</span> <span class="n">stim_channel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_events</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_event_ids</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="findEventsFromChannelRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.findEventsFromChannelRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the reading of the events based on the stimulation channel of the given data.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        If no events can be found in the dataset or if the stimulation channel does not contain any information, an error</span>
+<span class="sd">        message is displayed describing the error.</span>
+<span class="sd">        Notifies the main model when an error occurs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_events</span> <span class="o">=</span> <span class="n">find_events</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">,</span> <span class="n">stim_channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_channel</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stim_channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error has occurred when trying to find the events on the given channel, please check the &quot;</span> \
+                                <span class="s2">&quot;channel used for the computation.&quot;</span>
+                <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+                <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>   <span class="c1"># No stim channel was precised and computation failed, so try another method.</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">events</span><span class="p">,</span> <span class="n">event_ids</span> <span class="o">=</span> <span class="n">events_from_annotations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">read_events</span> <span class="o">=</span> <span class="n">events</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">read_event_ids</span> <span class="o">=</span> <span class="n">event_ids</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                    <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error has occurred when trying to find the events.&quot;</span>
+                    <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+                    <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="findEventsFromChannelRunnable.get_read_events"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.findEventsFromChannelRunnable.get_read_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_read_events</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the read events.</span>
+<span class="sd">        :return: The events.</span>
+<span class="sd">        :rtype: list of int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_events</span></div>
+
+<div class="viewcode-block" id="findEventsFromChannelRunnable.get_read_event_ids"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.findEventsFromChannelRunnable.get_read_event_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_read_event_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the read event ids.</span>
+<span class="sd">        :return: The event ids.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_event_ids</span></div></div>
+
+
+<span class="c1"># Export Data to CSV file</span>
+<div class="viewcode-block" id="exportDataCSVWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.exportDataCSVWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">exportDataCSVWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the export data CSV runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="exportDataCSVRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.exportDataCSVRunnable">[docs]</a><span class="k">class</span> <span class="nc">exportDataCSVRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">path_to_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for exporting the data of the dataset into a CSV file.</span>
+<span class="sd">        :param file_data: MNE data of the dataset.</span>
+<span class="sd">        :type file_data: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        :param path_to_file: Path to the exportation file.</span>
+<span class="sd">        :type path_to_file: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">exportDataCSVWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">file_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span> <span class="o">=</span> <span class="n">path_to_file</span>
+
+<div class="viewcode-block" id="exportDataCSVRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.exportDataCSVRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the exportation of the data of the dataset into a CSV file.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+            <span class="n">time_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">times</span>
+
+            <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+            <span class="c1"># Write header</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Time&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">ch_names</span><span class="p">:</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="n">channel</span><span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Write data</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>  <span class="c1"># Epoch</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])):</span>   <span class="c1"># Time</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">time_points</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>    <span class="c1"># Channel</span>
+                        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]))</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error has occurred when exporting the data into a CSV file.&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div></div>
+
+
+<span class="c1"># Export Data to SET file</span>
+<div class="viewcode-block" id="exportDataSETWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.exportDataSETWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">exportDataSETWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the export data CSV runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="exportDataSETRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.exportDataSETRunnable">[docs]</a><span class="k">class</span> <span class="nc">exportDataSETRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">path_to_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for exporting the data of the dataset into a SET file.</span>
+<span class="sd">        :param file_data: MNE data of the dataset.</span>
+<span class="sd">        :type file_data: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        :param path_to_file: Path to the exportation file.</span>
+<span class="sd">        :type path_to_file: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">exportDataSETWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">file_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span> <span class="o">=</span> <span class="n">path_to_file</span>
+
+<div class="viewcode-block" id="exportDataSETRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.exportDataSETRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the exportation of the data of the dataset into a SET file.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span> <span class="o">+</span> <span class="s2">&quot;.set&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;eeglab&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error has occurred when exporting the data into a SET file.&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="o">=</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div></div>
+
+
+<span class="c1"># Export Events to TXT file</span>
+<div class="viewcode-block" id="exportEventsTXTWorkerSignals"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.exportEventsTXTWorkerSignals">[docs]</a><span class="k">class</span> <span class="nc">exportEventsTXTWorkerSignals</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain the signals used by the export events TXT runnable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="exportEventsTXTRunnable"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.exportEventsTXTRunnable">[docs]</a><span class="k">class</span> <span class="nc">exportEventsTXTRunnable</span><span class="p">(</span><span class="n">QRunnable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">path_to_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runnable for exporting the events of the dataset into a TXT file.</span>
+<span class="sd">        :param file_data: MNE data of the dataset.</span>
+<span class="sd">        :type file_data: MNE.Epochs/MNE.Raw</span>
+<span class="sd">        :param path_to_file: Path to the exportation file.</span>
+<span class="sd">        :type path_to_file: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">exportEventsTXTWorkerSignals</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span> <span class="o">=</span> <span class="n">file_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span> <span class="o">=</span> <span class="n">path_to_file</span>
+
+<div class="viewcode-block" id="exportEventsTXTRunnable.run"><a class="viewcode-back" href="../../../src.runnables.html#src.runnables.files_runnable.exportEventsTXTRunnable.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the exportation of the events of the dataset into a TXT file.</span>
+<span class="sd">        Notifies the main model that the computation is finished.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">event_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">events</span>
+            <span class="n">event_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_data</span><span class="o">.</span><span class="n">event_id</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_file</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Number, Type, Latency </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">event_values</span><span class="p">)):</span>
+                <span class="n">latency</span> <span class="o">=</span> <span class="n">event_values</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">event_id</span> <span class="o">=</span> <span class="n">event_values</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="p">)</span>   <span class="c1"># Event number</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">event_ids</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">event_ids</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="n">event_id</span><span class="p">:</span>  <span class="c1"># Find correct key / event name</span>
+                        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="p">)</span>
+                        <span class="k">break</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">latency</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;An error has occurred during the exportation of the events into a TXT file.&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="o">=</span><span class="n">error_message</span><span class="p">,</span> <span class="n">detailed_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

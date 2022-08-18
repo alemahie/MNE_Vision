@@ -1,0 +1,207 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.plots.topographies.topographies_view &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.plots.topographies.topographies_view</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Topographies view</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QPushButton</span><span class="p">,</span> <span class="n">QCheckBox</span><span class="p">,</span> <span class="n">QButtonGroup</span><span class="p">,</span> <span class="n">QHBoxLayout</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QLineEdit</span><span class="p">,</span> <span class="n">QLabel</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<div class="viewcode-block" id="topographiesView"><a class="viewcode-back" href="../../../../src.plots.topographies.html#src.plots.topographies.topographies_view.topographiesView">[docs]</a><span class="k">class</span> <span class="nc">topographiesView</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Window displaying the parameters for computing topographies on the dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topographies_listener</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;Topographies&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_points_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_points_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_points_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Time points to plot (sec) : &quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_points_line</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_points_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_points_line</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_points_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_points_layout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">topographies_mode_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topographies_mode_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topographies_mode_buttons</span> <span class="o">=</span> <span class="n">QButtonGroup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">separated_check_box</span> <span class="o">=</span> <span class="n">QCheckBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">separated_check_box</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">separated_check_box</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Separated topographies&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topographies_mode_buttons</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">separated_check_box</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>   <span class="c1"># Button with ID 1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">animated_check_box</span> <span class="o">=</span> <span class="n">QCheckBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">animated_check_box</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Animated topographies&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topographies_mode_buttons</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">animated_check_box</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># Button with ID 2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topographies_mode_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">separated_check_box</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topographies_mode_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">animated_check_box</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topographies_mode_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topographies_mode_layout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;&amp;Cancel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_topographies_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confirm</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;&amp;Confirm&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confirm</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confirm_topographies_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confirm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_points_widget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topographies_mode_widget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_widget</span><span class="p">)</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Triggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="topographiesView.cancel_topographies_trigger"><a class="viewcode-back" href="../../../../src.plots.topographies.html#src.plots.topographies.topographies_view.topographiesView.cancel_topographies_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">cancel_topographies_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send the information to the controller that the computation is cancelled.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topographies_listener</span><span class="o">.</span><span class="n">cancel_button_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="topographiesView.confirm_topographies_trigger"><a class="viewcode-back" href="../../../../src.plots.topographies.html#src.plots.topographies.topographies_view.topographiesView.confirm_topographies_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_topographies_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the parameters and send the information to the controller.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">checked_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topographies_mode_buttons</span><span class="o">.</span><span class="n">checkedButton</span><span class="p">()</span>
+        <span class="n">button_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topographies_mode_buttons</span><span class="o">.</span><span class="n">id</span><span class="p">(</span><span class="n">checked_button</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">button_id</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>      <span class="c1"># Separated topographies</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;separated&quot;</span>
+        <span class="k">elif</span> <span class="n">button_id</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>    <span class="c1"># Animated topographies</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;animated&quot;</span>
+        <span class="n">time_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_array_from_time_points</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">topographies_listener</span><span class="o">.</span><span class="n">confirm_button_clicked</span><span class="p">(</span><span class="n">time_points</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Others</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="topographiesView.create_array_from_time_points"><a class="viewcode-back" href="../../../../src.plots.topographies.html#src.plots.topographies.topographies_view.topographiesView.create_array_from_time_points">[docs]</a>    <span class="k">def</span> <span class="nf">create_array_from_time_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an array of time points depending on the time points given.</span>
+<span class="sd">        :param mode: Mode used for plotting the topographies.</span>
+<span class="sd">        :type mode: str</span>
+<span class="sd">        :return: &quot;auto&quot; if no time points are set. Will create an evenly dispersed time points to display.</span>
+<span class="sd">        :rtype: str/None/list of float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">time_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_points_line</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">time_points</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;separated&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;auto&quot;</span>
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;animated&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">splitted_time_points</span> <span class="o">=</span> <span class="n">time_points</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">float_time_points</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">time_point</span> <span class="ow">in</span> <span class="n">splitted_time_points</span><span class="p">:</span>
+                <span class="n">float_time_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">time_point</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="n">float_time_points</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Setters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="topographiesView.set_listener"><a class="viewcode-back" href="../../../../src.plots.topographies.html#src.plots.topographies.topographies_view.topographiesView.set_listener">[docs]</a>    <span class="k">def</span> <span class="nf">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the listener to the controller.</span>
+<span class="sd">        :param listener: Listener to the controller.</span>
+<span class="sd">        :type listener: topographiesController</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topographies_listener</span> <span class="o">=</span> <span class="n">listener</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

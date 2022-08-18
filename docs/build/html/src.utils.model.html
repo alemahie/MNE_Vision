@@ -1,0 +1,517 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.utils.model package &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.utils.view package" href="src.utils.view.html" />
+    <link rel="prev" title="src.utils.elements_selector package" href="src.utils.elements_selector.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.utils.view.html" title="src.utils.view package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.utils.elements_selector.html" title="src.utils.elements_selector package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.utils.html" accesskey="U">src.utils package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="src-utils-model-package">
+<h1>src.utils.model package<a class="headerlink" href="#src-utils-model-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.utils.model.study_model">
+<span id="src-utils-model-study-model-module"></span><h2>src.utils.model.study_model module<a class="headerlink" href="#module-src.utils.model.study_model" title="Permalink to this headline">¶</a></h2>
+<p>Study Model</p>
+<dl class="class">
+<dt id="src.utils.model.study_model.studyModel">
+<em class="property">class </em><code class="descclassname">src.utils.model.study_model.</code><code class="descname">studyModel</code><span class="sig-paren">(</span><em>study_name</em>, <em>task_name</em>, <em>dataset_names</em>, <em>dataset_indexes</em>, <em>subjects</em>, <em>sessions</em>, <em>runs</em>, <em>conditions</em>, <em>groups</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="src.utils.model.study_model.studyModel.adapt_events">
+<em class="property">static </em><code class="descname">adapt_events</code><span class="sig-paren">(</span><em>all_file_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.adapt_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.adapt_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adapts the events on all the epochs so that they are all common and the epochs can thus be concatenated.
+:param all_file_data: The epochs on which the events must be adapted.
+:type all_file_data: list of MNE Epochs
+:return: The new epochs with the events adapted for concatenation
+:rtype: list of MNE Epochs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.check_file_type_all_epochs">
+<code class="descname">check_file_type_all_epochs</code><span class="sig-paren">(</span><em>all_file_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.check_file_type_all_epochs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.check_file_type_all_epochs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if all the file type in the study are epochs.
+:param all_file_type: All the file type of each dataset loaded.
+:type all_file_type: list of str
+:return: True if all datasets are epoched, False otherwise.
+:rtype: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_channel_locations">
+<code class="descname">get_channel_locations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_channel_locations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_channel_locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the channel location status that is present in the study.
+:return: The status of the channel location
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_channel_names">
+<code class="descname">get_channel_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_channel_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_channel_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the channel names.
+:return: The channel names of the datasets in the study.
+:rtype: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_conditions">
+<code class="descname">get_conditions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the conditions
+:return: The conditions assigned to each dataset in the study
+:rtype: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_dataset_indexes">
+<code class="descname">get_dataset_indexes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_dataset_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_dataset_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the dataset indexes
+:return: The indexes of the datasets selected to be in the study
+:rtype: list of int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_dataset_names">
+<code class="descname">get_dataset_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_dataset_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_dataset_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the dataset names.
+:return: The dataset names
+:rtype: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_displayed_info">
+<code class="descname">get_displayed_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_displayed_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_displayed_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_epochs_consistency">
+<code class="descname">get_epochs_consistency</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_epochs_consistency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_epochs_consistency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the epochs’ consistency, if one of the dataset has different epochs times, the consistency will be false.
+:return: The epochs’ consistency.
+:rtype: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_groups">
+<code class="descname">get_groups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the groups
+:return: The groups assigned to each dataset in the study
+:rtype: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_itc">
+<code class="descname">get_itc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_itc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_itc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the “itc” data of the time-frequency analysis computation performed on the dataset.
+:return: “itc” data of the time-frequency analysis computation.
+:rtype: MNE.AverageTFR</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_number_of_channels">
+<code class="descname">get_number_of_channels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_number_of_channels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_number_of_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the number of channels that are present in the study.
+:return: The number of channels
+:rtype: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_number_of_conditions">
+<code class="descname">get_number_of_conditions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_number_of_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_number_of_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the number of different conditions in the study
+:return: The number of conditions
+:rtype: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_number_of_groups">
+<code class="descname">get_number_of_groups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_number_of_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_number_of_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the number of different groups in the study
+:return: The number of groups
+:rtype: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_number_of_sessions">
+<code class="descname">get_number_of_sessions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_number_of_sessions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_number_of_sessions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the number of different sessions in the study
+:return: The number of sessions
+:rtype: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_number_of_subjects">
+<code class="descname">get_number_of_subjects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_number_of_subjects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_number_of_subjects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the number of different subjects in the study
+:return: The number of subjects
+:rtype: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_power">
+<code class="descname">get_power</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_power"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the “power” data of the time-frequency analysis computation performed on the dataset.
+:return: “power” data of the time-frequency analysis computation.
+:rtype: MNE.AverageTFR</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_psd_fig">
+<code class="descname">get_psd_fig</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_psd_fig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_psd_fig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the power spectral density’s figure
+:return: The figure of the actual power spectral density’s data computed
+:rtype: matplotlib.Figure</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_psd_topo_fig">
+<code class="descname">get_psd_topo_fig</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_psd_topo_fig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_psd_topo_fig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the power spectral density’s figure fo the topographies
+:return: The figure of the topographies of the actual power spectral density’s data computed
+:rtype: matplotlib.Figure</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_runs">
+<code class="descname">get_runs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_runs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_runs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the runs
+:return: The runs assigned to each dataset in the study
+:rtype: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_selected_file_data">
+<code class="descname">get_selected_file_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_selected_file_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_selected_file_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the selected file data in the study
+:return: The selected file data.
+:rtype: list of MNE Epochs/Raw</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_selected_file_data_with_subjects">
+<code class="descname">get_selected_file_data_with_subjects</code><span class="sig-paren">(</span><em>subjects_selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_selected_file_data_with_subjects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_selected_file_data_with_subjects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the selected file data in the study in function of the subjects selected.
+:return: The selected file data.
+:rtype: list of MNE Epochs/Raw</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_sessions">
+<code class="descname">get_sessions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_sessions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_sessions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the sessions
+:return: The sessions assigned to each dataset in the study
+:rtype: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_size">
+<code class="descname">get_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the size in megabits of the study.
+:return: The size of the study.
+:rtype: float</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_status">
+<code class="descname">get_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the ICA status in the study.
+:return: The status of the ICA
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_study_name">
+<code class="descname">get_study_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_study_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_study_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the study name of the study.
+:return: The study name
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_subjects">
+<code class="descname">get_subjects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_subjects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_subjects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the subjects
+:return: The subjects assigned to each dataset in the study
+:rtype: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_task_name">
+<code class="descname">get_task_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_task_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_task_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the task name of the study.
+:return: The task name
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_tfr_channel_selected">
+<code class="descname">get_tfr_channel_selected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_tfr_channel_selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_tfr_channel_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the channel used for the computation of the time-frequency analysis performed on the dataset.
+:return: The channel used for the time-frequency analysis computation.
+:rtype: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.get_unique_subjects">
+<code class="descname">get_unique_subjects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.get_unique_subjects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.get_unique_subjects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets only one copy of each subject.
+:return: The subjects assigned to each dataset in the study
+:rtype: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.plot_ersp_itc">
+<code class="descname">plot_ersp_itc</code><span class="sig-paren">(</span><em>channels_selected</em>, <em>subjects_selected</em>, <em>method_tfr</em>, <em>min_frequency</em>, <em>max_frequency</em>, <em>n_cycles</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.plot_ersp_itc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.plot_ersp_itc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the ERSP and ITC for the dataset of the study with the channels and subjects selected.
+:param channels_selected: Channels selected
+:type channels_selected: str/list of str
+:param subjects_selected: Subjects selected
+:type subjects_selected: str/list of str
+:param method_tfr: Method used for computing the time-frequency analysis.
+:type method_tfr: str
+:param min_frequency: Minimum frequency from which the time-frequency analysis will be computed.
+:type min_frequency: float
+:param max_frequency: Maximum frequency from which the time-frequency analysis will be computed.
+:type max_frequency: float
+:param n_cycles: Number of cycles used by the time-frequency analysis for his computation.
+:type n_cycles: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.plot_psd">
+<code class="descname">plot_psd</code><span class="sig-paren">(</span><em>channels_selected</em>, <em>subjects_selected</em>, <em>minimum_frequency</em>, <em>maximum_frequency</em>, <em>minimum_time</em>, <em>maximum_time</em>, <em>topo_time_points</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.plot_psd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.plot_psd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the PSD for the dataset of the study with the channels and subjects selected.
+:param channels_selected: Channels selected
+:type channels_selected: str/list of str
+:param subjects_selected: Subjects selected
+:type subjects_selected: str/list of str
+:param minimum_frequency: Minimum frequency from which the power spectral density will be computed.
+:type minimum_frequency: float
+:param maximum_frequency: Maximum frequency from which the power spectral density will be computed.
+:type maximum_frequency: float
+:param minimum_time: Minimum time of the epochs from which the power spectral density will be computed.
+:type minimum_time: float
+:param maximum_time: Maximum time of the epochs from which the power spectral density will be computed.
+:type maximum_time: float
+:param topo_time_points: The time points for the topomaps.
+:type topo_time_points: list of float</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.power_spectral_density_computation_error">
+<code class="descname">power_spectral_density_computation_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.power_spectral_density_computation_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.power_spectral_density_computation_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notifies the main controller that an error has occurred during the computation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.power_spectral_density_computation_finished">
+<code class="descname">power_spectral_density_computation_finished</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.power_spectral_density_computation_finished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.power_spectral_density_computation_finished" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notifies the main controller that the computation is done.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.set_conditions">
+<code class="descname">set_conditions</code><span class="sig-paren">(</span><em>conditions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.set_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.set_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the conditions for each dataset.
+:param conditions: The conditions assigned to each dataset in the study
+:type conditions: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.set_groups">
+<code class="descname">set_groups</code><span class="sig-paren">(</span><em>groups</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.set_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.set_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the groups for each dataset.
+:param groups: The groups assigned to each dataset in the study
+:type groups: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.set_listener">
+<code class="descname">set_listener</code><span class="sig-paren">(</span><em>listener</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.set_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the main listener so that the controller is able to communicate with the main controller.
+:param listener: main listener
+:type listener: mainModel</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.set_runs">
+<code class="descname">set_runs</code><span class="sig-paren">(</span><em>runs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.set_runs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.set_runs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the runs for each dataset.
+:param runs: The runs assigned to each dataset in the study
+:type runs: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.set_sessions">
+<code class="descname">set_sessions</code><span class="sig-paren">(</span><em>sessions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.set_sessions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.set_sessions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the sessions for each dataset.
+:param sessions: The sessions assigned to each dataset in the study
+:type sessions: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.set_study_listener">
+<code class="descname">set_study_listener</code><span class="sig-paren">(</span><em>listener</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.set_study_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.set_study_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the study listener so that the model is able to communicate with the study controller.
+:param listener: study plot listener
+:type listener: studyPlotsListener</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.set_study_name">
+<code class="descname">set_study_name</code><span class="sig-paren">(</span><em>study_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.set_study_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.set_study_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the name of the study.
+:param study_name: The name of the study
+:type study_name: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.set_subjects">
+<code class="descname">set_subjects</code><span class="sig-paren">(</span><em>subjects</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.set_subjects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.set_subjects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the subjects for each dataset.
+:param subjects: The subjects assigned to each dataset in the study
+:type subjects: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.set_task_name">
+<code class="descname">set_task_name</code><span class="sig-paren">(</span><em>task_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.set_task_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.set_task_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the task name.
+:param task_name: The name of the task linked to the study
+:type task_name: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.time_frequency_computation_error">
+<code class="descname">time_frequency_computation_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.time_frequency_computation_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.time_frequency_computation_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notifies the main controller that the computation had an error.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.model.study_model.studyModel.time_frequency_computation_finished">
+<code class="descname">time_frequency_computation_finished</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/model/study_model.html#studyModel.time_frequency_computation_finished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.model.study_model.studyModel.time_frequency_computation_finished" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notifies the main controller that the computation is done.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.utils.model">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.utils.model" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">src.utils.model package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.utils.model.study_model">src.utils.model.study_model module</a></li>
+<li><a class="reference internal" href="#module-src.utils.model">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="src.utils.elements_selector.html"
+                        title="previous chapter">src.utils.elements_selector package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="src.utils.view.html"
+                        title="next chapter">src.utils.view package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.utils.model.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.utils.view.html" title="src.utils.view package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.utils.elements_selector.html" title="src.utils.elements_selector package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.utils.html" >src.utils package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

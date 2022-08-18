@@ -1,0 +1,357 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.edit.event_values.event_values_controller &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.edit.event_values.event_values_controller</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Event Values Controller</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+
+<span class="kn">from</span> <span class="nn">edit.event_values.event_values_listener</span> <span class="kn">import</span> <span class="n">eventValuesListener</span>
+<span class="kn">from</span> <span class="nn">edit.event_values.event_values_view</span> <span class="kn">import</span> <span class="n">eventValuesView</span>
+
+<span class="kn">from</span> <span class="nn">utils.view.error_window</span> <span class="kn">import</span> <span class="n">errorWindow</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<div class="viewcode-block" id="eventValuesController"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController">[docs]</a><span class="k">class</span> <span class="nc">eventValuesController</span><span class="p">(</span><span class="n">eventValuesListener</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_type</span><span class="p">,</span> <span class="n">event_values</span><span class="p">,</span> <span class="n">event_ids</span><span class="p">,</span> <span class="n">number_of_epochs</span><span class="p">,</span> <span class="n">number_of_frames</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Controller for editing the events&#39; information</span>
+<span class="sd">        Create a new window for displaying the events&#39; information.</span>
+<span class="sd">        :param file_type: The type of the file, either &quot;Epochs&quot; or &quot;Raw&quot;</span>
+<span class="sd">        :type file_type: str</span>
+<span class="sd">        :param event_values: Event values</span>
+<span class="sd">        :type event_values: list of, list of int</span>
+<span class="sd">        :param event_ids: Event ids</span>
+<span class="sd">        :type event_ids: dict</span>
+<span class="sd">        :param number_of_epochs: The number of epochs</span>
+<span class="sd">        :type number_of_epochs: int</span>
+<span class="sd">        :param number_of_frames: The number of frames</span>
+<span class="sd">        :type number_of_frames: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_values_view</span> <span class="o">=</span> <span class="n">eventValuesView</span><span class="p">(</span><span class="n">event_values</span><span class="p">,</span> <span class="n">event_ids</span><span class="p">,</span> <span class="n">number_of_epochs</span><span class="p">,</span> <span class="n">number_of_frames</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_values_view</span><span class="o">.</span><span class="n">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_values_view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="n">file_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">event_values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">event_ids</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_epochs</span> <span class="o">=</span> <span class="n">number_of_epochs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_frames</span> <span class="o">=</span> <span class="n">number_of_frames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_event_displayed</span><span class="p">()</span>
+
+<div class="viewcode-block" id="eventValuesController.cancel_button_clicked"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.cancel_button_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">cancel_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_values_view</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="eventValuesController.confirm_button_clicked"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.confirm_button_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_name</span><span class="p">,</span> <span class="n">latency</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the window and send the information to the main controller.</span>
+<span class="sd">        Display an error message if the number of events is different from the number of epochs, because there must be</span>
+<span class="sd">        a event for each epoch.</span>
+<span class="sd">        :param event_name: The event name.</span>
+<span class="sd">        :type event_name: str</span>
+<span class="sd">        :param latency: The latency of the event.</span>
+<span class="sd">        :type latency: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">==</span> <span class="s2">&quot;Raw&quot;</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_epochs</span><span class="p">:</span>
+            <span class="c1"># If file type is not &quot;Raw&quot;, then it is &quot;Epochs&quot; and number of event must be equal to number epochs.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_event_data</span><span class="p">(</span><span class="n">event_name</span><span class="p">,</span> <span class="n">latency</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span><span class="o">.</span><span class="n">event_values_finished</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_values_view</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;You must have a number of events that is equal to the number of epochs (1 event per &quot;</span> \
+                            <span class="sa">f</span><span class="s2">&quot;epoch).</span><span class="se">\n</span><span class="s2"> There are </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_epochs</span><span class="si">}</span><span class="s2"> in your dataset&quot;</span>
+            <span class="n">error_window_view</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+            <span class="n">error_window_view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="eventValuesController.previous_button_clicked"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.previous_button_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">previous_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_name</span><span class="p">,</span> <span class="n">latency</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the information of the last event displayed before displaying the information of the previous event.</span>
+<span class="sd">        :param event_name: The event name.</span>
+<span class="sd">        :type event_name: str</span>
+<span class="sd">        :param latency: The latency of the event.</span>
+<span class="sd">        :type latency: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_event_data</span><span class="p">(</span><span class="n">event_name</span><span class="p">,</span> <span class="n">latency</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_event_displayed</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="eventValuesController.next_button_clicked"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.next_button_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">next_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_name</span><span class="p">,</span> <span class="n">latency</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the information of the last event displayed before displaying the information of the next event.</span>
+<span class="sd">        :param event_name: The event name.</span>
+<span class="sd">        :type event_name: str</span>
+<span class="sd">        :param latency: The latency of the event.</span>
+<span class="sd">        :type latency: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_event_data</span><span class="p">(</span><span class="n">event_name</span><span class="p">,</span> <span class="n">latency</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_event_displayed</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="eventValuesController.delete_button_clicked"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.delete_button_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">delete_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete the information of the event displayed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_values_view</span><span class="o">.</span><span class="n">set_event_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_event_ids</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_event_displayed</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;You can not delete all the events.&quot;</span>
+            <span class="n">error_window_view</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+            <span class="n">error_window_view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="eventValuesController.insert_button_clicked"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.insert_button_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">insert_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_name</span><span class="p">,</span> <span class="n">latency</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the information of the last event displayed before inserting a new event.</span>
+<span class="sd">        :param event_name: The event name.</span>
+<span class="sd">        :type event_name: str</span>
+<span class="sd">        :param latency: The latency of the event.</span>
+<span class="sd">        :type latency: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_event_data</span><span class="p">(</span><span class="n">event_name</span><span class="p">,</span> <span class="n">latency</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;none&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">insert_new_event_id</span><span class="p">()</span>
+        <span class="n">event_to_insert</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">event_to_insert</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_values_view</span><span class="o">.</span><span class="n">set_event_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_event_displayed</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="eventValuesController.editing_finished_clicked"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.editing_finished_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">editing_finished_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the event&#39;s information based on the event number given.</span>
+<span class="sd">        :param event_number: The event number</span>
+<span class="sd">        :type event_number: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span> <span class="o">=</span> <span class="n">event_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_event_displayed</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="eventValuesController.update_event_displayed"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.update_event_displayed">[docs]</a>    <span class="k">def</span> <span class="nf">update_event_displayed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the information of the event displayed based on the current event number (could have change because of</span>
+<span class="sd">        the next, previous, etc. button pushed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">event_name</span><span class="p">,</span> <span class="n">latency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_event_info_from_number</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span><span class="p">)</span>
+        <span class="n">epoch_number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_epoch_number_from_latency</span><span class="p">(</span><span class="n">latency</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_values_view</span><span class="o">.</span><span class="n">update_event_displayed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span><span class="p">,</span> <span class="n">event_name</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">,</span> <span class="n">latency</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="eventValuesController.update_event_data"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.update_event_data">[docs]</a>    <span class="k">def</span> <span class="nf">update_event_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_name</span><span class="p">,</span> <span class="n">latency</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the information of an event.</span>
+<span class="sd">        :param event_name: The event name.</span>
+<span class="sd">        :type event_name: str</span>
+<span class="sd">        :param latency: The latency of the event.</span>
+<span class="sd">        :type latency: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">max_event_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_max_event_id</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="p">[</span><span class="n">event_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_event_id</span><span class="o">+</span><span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_event_id</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="p">[</span><span class="n">event_name</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_event_number</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">latency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_event_ids</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="eventValuesController.update_event_ids"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.update_event_ids">[docs]</a>    <span class="k">def</span> <span class="nf">update_event_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the event ids.</span>
+<span class="sd">        When a new event is inserted or a new event type is created by changing one, a new event id is associated to it.</span>
+<span class="sd">        If an event id has no event associated to it (e.g. because of the deletion of an event), the event id is removed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">events_to_delete</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="p">[</span><span class="n">event</span><span class="p">]</span>
+            <span class="n">present</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">element</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                    <span class="n">present</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">present</span><span class="p">:</span>
+                <span class="n">events_to_delete</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events_to_delete</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="p">[</span><span class="n">event</span><span class="p">]</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Others</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="eventValuesController.insert_new_event_id"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.insert_new_event_id">[docs]</a>    <span class="k">def</span> <span class="nf">insert_new_event_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert a new event id in the dictionary containing all the event ids.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">max_event_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_max_event_id</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_event_id</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Getters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="eventValuesController.get_event_info_from_number"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.get_event_info_from_number">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_info_from_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the information of an event based on an event number.</span>
+<span class="sd">        :param event_number: The event number</span>
+<span class="sd">        :type event_number: int</span>
+<span class="sd">        :return: current_event_name: The event name.</span>
+<span class="sd">        latency: The event latency.</span>
+<span class="sd">        :rtype: str, int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">[</span><span class="n">event_number</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">current_event_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_values</span><span class="p">[</span><span class="n">event_number</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">current_event_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">event_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="p">[</span><span class="n">event_name</span><span class="p">]</span> <span class="o">==</span> <span class="n">current_event_id</span><span class="p">:</span>
+                <span class="n">current_event_name</span> <span class="o">=</span> <span class="n">event_name</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">current_event_name</span><span class="p">,</span> <span class="n">latency</span></div>
+
+<div class="viewcode-block" id="eventValuesController.get_max_event_id"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.get_max_event_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_event_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the greatest event id in the event ids dictionary.</span>
+<span class="sd">        :return: max_event_id: The greatest event id</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">max_event_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">event_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">event_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="p">[</span><span class="n">event_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">event_id</span> <span class="o">&gt;</span> <span class="n">max_event_id</span><span class="p">:</span>
+                <span class="n">max_event_id</span> <span class="o">=</span> <span class="n">event_id</span>
+        <span class="k">return</span> <span class="n">max_event_id</span></div>
+
+<div class="viewcode-block" id="eventValuesController.get_epoch_number_from_latency"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.get_epoch_number_from_latency">[docs]</a>    <span class="k">def</span> <span class="nf">get_epoch_number_from_latency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latency</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the number of the epoch associated to the latency given.</span>
+<span class="sd">        :param latency: The latency</span>
+<span class="sd">        :type latency: int</span>
+<span class="sd">        :return: epoch_number: The epoch number</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">epoch_number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">total_latency</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_epochs</span><span class="p">):</span>
+            <span class="n">total_latency</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_frames</span>
+            <span class="k">if</span> <span class="n">total_latency</span> <span class="o">&gt;</span> <span class="n">latency</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">epoch_number</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">epoch_number</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Setters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="eventValuesController.set_listener"><a class="viewcode-back" href="../../../../src.edit.event_values.html#src.edit.event_values.event_values_controller.eventValuesController.set_listener">[docs]</a>    <span class="k">def</span> <span class="nf">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the main listener so that the controller is able to communicate with the main controller.</span>
+<span class="sd">        :param listener: main listener</span>
+<span class="sd">        :type listener: mainController</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span> <span class="o">=</span> <span class="n">listener</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

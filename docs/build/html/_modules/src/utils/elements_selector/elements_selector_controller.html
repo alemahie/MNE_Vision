@@ -1,0 +1,156 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.utils.elements_selector.elements_selector_controller &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.utils.elements_selector.elements_selector_controller</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Multiple selector controller</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">utils.elements_selector.elements_selector_view</span> <span class="kn">import</span> <span class="n">multipleSelectorView</span>
+<span class="kn">from</span> <span class="nn">utils.elements_selector.elements_selector_listener</span> <span class="kn">import</span> <span class="n">multipleSelectorListener</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<div class="viewcode-block" id="multipleSelectorController"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_controller.multipleSelectorController">[docs]</a><span class="k">class</span> <span class="nc">multipleSelectorController</span><span class="p">(</span><span class="n">multipleSelectorListener</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_elements_names</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">box_checked</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unique_box</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">element_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Controller for the multiple selector.</span>
+<span class="sd">        Create a new window where we can select some elements.</span>
+<span class="sd">        :param all_elements_names: All the elements&#39; names</span>
+<span class="sd">        :type all_elements_names: list of str</span>
+<span class="sd">        :param title: Title for the multiple selector window.</span>
+<span class="sd">        :type title: str</span>
+<span class="sd">        :param box_checked: All the elements are selected by default.</span>
+<span class="sd">        :type box_checked: bool</span>
+<span class="sd">        :param unique_box: Can only check a single element from all the elements.</span>
+<span class="sd">        :type unique_box: bool</span>
+<span class="sd">        :param element_type: Type of the element selected, used in case multiple element selector windows can be open in</span>
+<span class="sd">        a window. Can thus distinguish the returned elements.</span>
+<span class="sd">        :type element_type: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiple_selector_view</span> <span class="o">=</span> <span class="n">multipleSelectorView</span><span class="p">(</span><span class="n">all_elements_names</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">box_checked</span><span class="p">,</span> <span class="n">unique_box</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiple_selector_view</span><span class="o">.</span><span class="n">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">element_type</span> <span class="o">=</span> <span class="n">element_type</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiple_selector_view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<div class="viewcode-block" id="multipleSelectorController.cancel_button_clicked"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_controller.multipleSelectorController.cancel_button_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">cancel_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiple_selector_view</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="multipleSelectorController.confirm_button_clicked"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_controller.multipleSelectorController.confirm_button_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elements_selected</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the window and send the information to the controller that opened the multiple elements window.</span>
+<span class="sd">        :param elements_selected: All the elements selected.</span>
+<span class="sd">        :type elements_selected: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span><span class="o">.</span><span class="n">get_elements_selected</span><span class="p">(</span><span class="n">elements_selected</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span><span class="o">.</span><span class="n">get_elements_selected</span><span class="p">(</span><span class="n">elements_selected</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiple_selector_view</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Setters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="multipleSelectorController.set_listener"><a class="viewcode-back" href="../../../../src.utils.elements_selector.html#src.utils.elements_selector.elements_selector_controller.multipleSelectorController.set_listener">[docs]</a>    <span class="k">def</span> <span class="nf">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the listener so that the controller is able to communicate with the controller that opened the multiple</span>
+<span class="sd">        elements window.</span>
+<span class="sd">        :param listener: Listener linked to the view that opened the multiple elements window.</span>
+<span class="sd">        :type listener: listener</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_listener</span> <span class="o">=</span> <span class="n">listener</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

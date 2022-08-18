@@ -1,0 +1,234 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.file.study_creation package &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.menubar package" href="src.menubar.html" />
+    <link rel="prev" title="src.file.load_data_info package" href="src.file.load_data_info.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.menubar.html" title="src.menubar package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.file.load_data_info.html" title="src.file.load_data_info package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.file.html" accesskey="U">src.file package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="src-file-study-creation-package">
+<h1>src.file.study_creation package<a class="headerlink" href="#src-file-study-creation-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.file.study_creation.study_creation_controller">
+<span id="src-file-study-creation-study-creation-controller-module"></span><h2>src.file.study_creation.study_creation_controller module<a class="headerlink" href="#module-src.file.study_creation.study_creation_controller" title="Permalink to this headline">¶</a></h2>
+<p>Study Controller</p>
+<dl class="class">
+<dt id="src.file.study_creation.study_creation_controller.studyCreationController">
+<em class="property">class </em><code class="descclassname">src.file.study_creation.study_creation_controller.</code><code class="descname">studyCreationController</code><span class="sig-paren">(</span><em>dataset_names</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/file/study_creation/study_creation_controller.html#studyCreationController"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.file.study_creation.study_creation_controller.studyCreationController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">file.study_creation.study_creation_listener.studyCreationListener</span></code></p>
+<dl class="method">
+<dt id="src.file.study_creation.study_creation_controller.studyCreationController.cancel_button_clicked">
+<code class="descname">cancel_button_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/file/study_creation/study_creation_controller.html#studyCreationController.cancel_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.file.study_creation.study_creation_controller.studyCreationController.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.file.study_creation.study_creation_controller.studyCreationController.confirm_button_clicked">
+<code class="descname">confirm_button_clicked</code><span class="sig-paren">(</span><em>study_name</em>, <em>task_name</em>, <em>dataset_names</em>, <em>dataset_indexes</em>, <em>subjects</em>, <em>sessions</em>, <em>runs</em>, <em>conditions</em>, <em>groups</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/file/study_creation/study_creation_controller.html#studyCreationController.confirm_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.file.study_creation.study_creation_controller.studyCreationController.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the window and send the information to the main controller
+:param study_name: The name of the study_creation
+:type study_name: str
+:param task_name: The name of the task linked to the study_creation
+:type task_name: str
+:param dataset_names: The name of the datasets linked to the study_creation
+:type dataset_names: list of str
+:param dataset_indexes: The indexes of the datasets selected to be in the study_creation
+:type dataset_indexes: list of int
+:param subjects: The subjects assigned to each dataset in the study_creation
+:type subjects: list of str
+:param sessions: The sessions assigned to each dataset in the study_creation
+:type sessions: list of str
+:param runs: The runs assigned to each dataset in the study_creation
+:type runs: list of str
+:param conditions: The conditions assigned to each dataset in the study_creation
+:type conditions: list of str
+:param groups: The groups assigned to each dataset in the study_creation
+:type groups: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.file.study_creation.study_creation_controller.studyCreationController.set_listener">
+<code class="descname">set_listener</code><span class="sig-paren">(</span><em>listener</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/file/study_creation/study_creation_controller.html#studyCreationController.set_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.file.study_creation.study_creation_controller.studyCreationController.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the main listener so that the controller is able to communicate with the main controller.
+:param listener: main listener
+:type listener: mainController</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.file.study_creation.study_creation_listener">
+<span id="src-file-study-creation-study-creation-listener-module"></span><h2>src.file.study_creation.study_creation_listener module<a class="headerlink" href="#module-src.file.study_creation.study_creation_listener" title="Permalink to this headline">¶</a></h2>
+<p>Study Listener</p>
+<dl class="class">
+<dt id="src.file.study_creation.study_creation_listener.studyCreationListener">
+<em class="property">class </em><code class="descclassname">src.file.study_creation.study_creation_listener.</code><code class="descname">studyCreationListener</code><a class="reference internal" href="_modules/src/file/study_creation/study_creation_listener.html#studyCreationListener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.file.study_creation.study_creation_listener.studyCreationListener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Listener doing the connection between the controller and the view for creating the study
+It retrieves the information from the view to send it to the controller.</p>
+<dl class="method">
+<dt id="src.file.study_creation.study_creation_listener.studyCreationListener.cancel_button_clicked">
+<code class="descname">cancel_button_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/file/study_creation/study_creation_listener.html#studyCreationListener.cancel_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.file.study_creation.study_creation_listener.studyCreationListener.cancel_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.file.study_creation.study_creation_listener.studyCreationListener.confirm_button_clicked">
+<code class="descname">confirm_button_clicked</code><span class="sig-paren">(</span><em>study_name</em>, <em>task_name</em>, <em>dataset_names</em>, <em>dataset_indexes</em>, <em>subjects</em>, <em>sessions</em>, <em>runs</em>, <em>conditions</em>, <em>groups</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/file/study_creation/study_creation_listener.html#studyCreationListener.confirm_button_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.file.study_creation.study_creation_listener.studyCreationListener.confirm_button_clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.file.study_creation.study_creation_view">
+<span id="src-file-study-creation-study-creation-view-module"></span><h2>src.file.study_creation.study_creation_view module<a class="headerlink" href="#module-src.file.study_creation.study_creation_view" title="Permalink to this headline">¶</a></h2>
+<p>Study View</p>
+<dl class="class">
+<dt id="src.file.study_creation.study_creation_view.studyCreationView">
+<em class="property">class </em><code class="descclassname">src.file.study_creation.study_creation_view.</code><code class="descname">studyCreationView</code><span class="sig-paren">(</span><em>dataset_names</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/file/study_creation/study_creation_view.html#studyCreationView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.file.study_creation.study_creation_view.studyCreationView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QWidget</span></code></p>
+<dl class="method">
+<dt id="src.file.study_creation.study_creation_view.studyCreationView.cancel_study_trigger">
+<code class="descname">cancel_study_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/file/study_creation/study_creation_view.html#studyCreationView.cancel_study_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.file.study_creation.study_creation_view.studyCreationView.cancel_study_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the information to the controller that the computation is cancelled.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.file.study_creation.study_creation_view.studyCreationView.confirm_study_trigger">
+<code class="descname">confirm_study_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/file/study_creation/study_creation_view.html#studyCreationView.confirm_study_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.file.study_creation.study_creation_view.studyCreationView.confirm_study_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the all the additional information and send the information to the controller.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.file.study_creation.study_creation_view.studyCreationView.set_listener">
+<code class="descname">set_listener</code><span class="sig-paren">(</span><em>listener</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/file/study_creation/study_creation_view.html#studyCreationView.set_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.file.study_creation.study_creation_view.studyCreationView.set_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the listener to the controller.
+:param listener: Listener to the controller.
+:type listener: loadDataInfoController</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.file.study_creation">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.file.study_creation" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">src.file.study_creation package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.file.study_creation.study_creation_controller">src.file.study_creation.study_creation_controller module</a></li>
+<li><a class="reference internal" href="#module-src.file.study_creation.study_creation_listener">src.file.study_creation.study_creation_listener module</a></li>
+<li><a class="reference internal" href="#module-src.file.study_creation.study_creation_view">src.file.study_creation.study_creation_view module</a></li>
+<li><a class="reference internal" href="#module-src.file.study_creation">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="src.file.load_data_info.html"
+                        title="previous chapter">src.file.load_data_info package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="src.menubar.html"
+                        title="next chapter">src.menubar package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.file.study_creation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.menubar.html" title="src.menubar package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.file.load_data_info.html" title="src.file.load_data_info package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.file.html" >src.file package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,805 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.menubar.menubar_view &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.menubar.menubar_view</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Main controller</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QMenuBar</span><span class="p">,</span> <span class="n">QMenu</span><span class="p">,</span> <span class="n">QFileDialog</span><span class="p">,</span> <span class="n">QAction</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<div class="viewcode-block" id="menubarView"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView">[docs]</a><span class="k">class</span> <span class="nc">menubarView</span><span class="p">(</span><span class="n">QMenuBar</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays the menubar on the top of the main window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># File menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;File&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Open&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_open_menu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Import events info&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_events_menu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">events_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_menu</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Export&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_export_menu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_file_menu</span><span class="p">()</span>
+
+        <span class="c1"># Edit menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Edit&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edit_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_edit_menu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Tools menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Tools&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tools_menu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Plot menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Plot&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_plot_menu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Connectivity menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Connectivity&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connectivity_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_connectivity_menu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Classification menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classification_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Classification&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classification_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_classification_menu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classification_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Stats menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Statistics&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_statistics_menu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Separator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">separator_menu_1</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">separator_menu_1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">separator_menu_1</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Study menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Study&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">study_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_study_menu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Datasets menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Datasets&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Separator 2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">separator_menu_2</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">separator_menu_2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">separator_menu_2</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Help menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">help_menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Help&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">help_menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_help_menu</span><span class="p">()</span>
+
+        <span class="c1"># Other</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_exist</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Menu Creation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.create_open_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_open_menu">[docs]</a>    <span class="k">def</span> <span class="nf">create_open_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">open_fif_file_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;FIF File&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">open_fif_file_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_fif_file_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">open_fif_file_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">open_cnt_file_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;ANT eego CNT File&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">open_cnt_file_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_cnt_file_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">open_cnt_file_action</span><span class="p">)</span>
+        <span class="n">open_set_file_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;SET File&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">open_set_file_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_set_file_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">open_set_file_action</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.create_events_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_events_menu">[docs]</a>    <span class="k">def</span> <span class="nf">create_events_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">read_events_file_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Read events from file (.fif/.txt)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">read_events_file_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read_events_file_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">read_events_file_action</span><span class="p">)</span>
+        <span class="n">find_events_from_channel_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Read events from channel data&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">find_events_from_channel_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">find_events_from_channel_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">find_events_from_channel_action</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.create_export_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_export_menu">[docs]</a>    <span class="k">def</span> <span class="nf">create_export_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">export_data_to_csv_file_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Export data to CSV file&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">export_data_to_csv_file_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_data_to_csv_file_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">export_data_to_csv_file_action</span><span class="p">)</span>
+        <span class="n">export_data_to_set_file_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Export data to SET file&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">export_data_to_set_file_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_data_to_set_file_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">export_data_to_set_file_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">export_events_to_file_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Export events to TXT file&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">export_events_to_file_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_events_to_file_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">export_events_to_file_action</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.create_file_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_file_menu">[docs]</a>    <span class="k">def</span> <span class="nf">create_file_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Save</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">save_file_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Save&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">save_file_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_file_trigger</span><span class="p">)</span>
+        <span class="n">save_file_action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">save_file_action</span><span class="p">)</span>
+        <span class="n">save_file_as_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Save As&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">save_file_as_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_file_as_trigger</span><span class="p">)</span>
+        <span class="n">save_file_as_action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">save_file_as_action</span><span class="p">)</span>
+        <span class="c1"># Clear dataset</span>
+        <span class="n">clear_dataset_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Clear dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">clear_dataset_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clear_dataset_trigger</span><span class="p">)</span>
+        <span class="n">clear_dataset_action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">clear_dataset_action</span><span class="p">)</span>
+        <span class="c1"># Study</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">create_study_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Create study from loaded datasets&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">create_study_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">create_study_trigger</span><span class="p">)</span>
+        <span class="n">create_study_action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">create_study_action</span><span class="p">)</span>
+        <span class="n">clear_study_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Clear study&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">clear_study_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clear_study_trigger</span><span class="p">)</span>
+        <span class="n">clear_study_action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">clear_study_action</span><span class="p">)</span>
+        <span class="c1"># Other</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">exit_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Exit&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">exit_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exit_program_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">exit_action</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.create_edit_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_edit_menu">[docs]</a>    <span class="k">def</span> <span class="nf">create_edit_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dataset_info_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Dataset information&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">dataset_info_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_info_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">dataset_info_action</span><span class="p">)</span>
+        <span class="n">event_values_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Event values&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">event_values_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_values_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">event_values_action</span><span class="p">)</span>
+        <span class="n">channel_location_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Channel location&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">channel_location_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_location_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">channel_location_action</span><span class="p">)</span></div>
+        <span class="c1"># self.edit_menu.addSeparator()</span>
+        <span class="c1"># select_data_action = QAction(&quot;Select data&quot;, self)</span>
+        <span class="c1"># select_data_action.triggered.connect(self.select_data_trigger)</span>
+        <span class="c1"># select_data_action.setEnabled(False)</span>
+        <span class="c1"># self.edit_menu.addAction(select_data_action)</span>
+        <span class="c1"># select_data_events_action = QAction(&quot;Select data using events&quot;, self)</span>
+        <span class="c1"># select_data_events_action.triggered.connect(self.select_data_events_trigger)</span>
+        <span class="c1"># select_data_events_action.setEnabled(False)</span>
+        <span class="c1"># self.edit_menu.addAction(select_data_events_action)</span>
+
+<div class="viewcode-block" id="menubarView.create_tools_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_tools_menu">[docs]</a>    <span class="k">def</span> <span class="nf">create_tools_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">filter_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Filter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">filter_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">filter_action</span><span class="p">)</span>
+        <span class="n">resampling_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Resampling&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">resampling_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resampling_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">resampling_action</span><span class="p">)</span>
+        <span class="n">re_referencing_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Re-Referencing&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">re_referencing_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">re_referencing_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="c1"># inspect_reject_data_action = QAction(&quot;Inspect/Reject data by eyes&quot;, self)</span>
+        <span class="c1"># inspect_reject_data_action.triggered.connect(self.inspect_reject_data_trigger)</span>
+        <span class="c1"># inspect_reject_data_action.setEnabled(False)</span>
+        <span class="c1"># self.tools_menu.addAction(inspect_reject_data_action)</span>
+        <span class="c1"># self.tools_menu.addSeparator()</span>
+        <span class="n">decompose_ICA_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Decompose data with ICA&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">decompose_ICA_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ica_decomposition_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">decompose_ICA_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">extract_epochs_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Extract epochs&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">extract_epochs_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extract_epochs_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">extract_epochs_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">snr_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Signal-to-noise ratio&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">snr_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">snr_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">snr_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">source_estimation_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Source estimation&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">source_estimation_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_estimation_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">source_estimation_action</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.create_plot_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_plot_menu">[docs]</a>    <span class="k">def</span> <span class="nf">create_plot_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">plot_channel_locations_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Channel locations&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">plot_channel_locations_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_channel_locations</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">plot_channel_locations_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">plot_data_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Channel data&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">plot_data_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_data_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">plot_data_action</span><span class="p">)</span>
+        <span class="n">plot_topographies_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Channel topographies&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">plot_topographies_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_topographies_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">plot_topographies_action</span><span class="p">)</span>
+        <span class="n">plot_channel_spectra_maps_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Channel spectra (PSD)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">plot_channel_spectra_maps_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_spectra_maps_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">plot_channel_spectra_maps_action</span><span class="p">)</span>
+        <span class="n">plot_ERP_image_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Channel ERP image&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">plot_ERP_image_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_ERP_image_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">plot_ERP_image_action</span><span class="p">)</span>
+        <span class="n">plot_ERPs_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Channel ERPs&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">plot_ERPs_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_ERPs_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">plot_ERPs_action</span><span class="p">)</span>
+        <span class="n">plot_time_frequency_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Channel time-frequency (ERSP/ITC)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">plot_time_frequency_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_time_frequency_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">plot_time_frequency_action</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.create_connectivity_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_connectivity_menu">[docs]</a>    <span class="k">def</span> <span class="nf">create_connectivity_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">envelope_correlation_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Envelope Correlation&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">envelope_correlation_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">envelope_correlation_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">envelope_correlation_action</span><span class="p">)</span>
+        <span class="n">source_space_connectivity_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Source Space Connectivity&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">source_space_connectivity_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_space_connectivity_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">source_space_connectivity_action</span><span class="p">)</span>
+        <span class="n">sensor_space_connectivity_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;3D Sensor Space Connectivity&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">sensor_space_connectivity_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sensor_space_connectivity_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">sensor_space_connectivity_action</span><span class="p">)</span></div>
+        <span class="c1"># spectro_temporal_connectivity_action = QAction(&quot;Spectro-Temporal Connectivity&quot;, self)</span>
+        <span class="c1"># spectro_temporal_connectivity_action.triggered.connect(self.spectro_temporal_connectivity_trigger)</span>
+        <span class="c1"># spectro_temporal_connectivity_action.setEnabled(False)</span>
+        <span class="c1"># self.connectivity_menu.addAction(spectro_temporal_connectivity_action)</span>
+
+<div class="viewcode-block" id="menubarView.create_classification_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_classification_menu">[docs]</a>    <span class="k">def</span> <span class="nf">create_classification_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">classify_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Classify&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">classify_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classify_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classification_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">classify_action</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.create_statistics_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_statistics_menu">[docs]</a>    <span class="k">def</span> <span class="nf">create_statistics_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">statistics_snr_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Signal-to-Noise Ratio&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">statistics_snr_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics_snr_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">statistics_snr_action</span><span class="p">)</span>
+
+        <span class="n">statistics_erp_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;ERP&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">statistics_erp_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics_erp_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">statistics_erp_action</span><span class="p">)</span>
+
+        <span class="n">statistics_psd_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;PSD&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">statistics_psd_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics_psd_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">statistics_psd_action</span><span class="p">)</span>
+
+        <span class="n">statistics_ersp_itc_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;ERSP-ITC&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">statistics_ersp_itc_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics_ersp_itc_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">statistics_ersp_itc_action</span><span class="p">)</span>
+
+        <span class="n">statistics_connectivity_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Connectivity&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">statistics_connectivity_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics_connectivity_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">statistics_connectivity_action</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.create_study_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_study_menu">[docs]</a>    <span class="k">def</span> <span class="nf">create_study_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">edit_study_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Edit Study Info&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">edit_study_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edit_study_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">edit_study_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">plot_study_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Plots&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">plot_study_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_study_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">plot_study_action</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.create_help_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_help_menu">[docs]</a>    <span class="k">def</span> <span class="nf">create_help_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">help_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Help&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">help_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">help_trigger</span><span class="p">)</span>
+        <span class="n">help_action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">help_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">help_action</span><span class="p">)</span>
+        <span class="n">about_action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;About&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">about_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">about_trigger</span><span class="p">)</span>
+        <span class="n">about_action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">help_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">about_action</span><span class="p">)</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Menu Manipulation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.change_menu_status"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.change_menu_status">[docs]</a>    <span class="k">def</span> <span class="nf">change_menu_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_status</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Change the status of all the menus. Either all enabled of disabled.</span>
+<span class="sd">        :param new_status: The new status of the menus</span>
+<span class="sd">        :type new_status: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">menu_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">new_status</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">new_status</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">menu_actions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Save&quot;</span><span class="p">,</span> <span class="s2">&quot;Save As&quot;</span><span class="p">,</span> <span class="s2">&quot;Clear dataset&quot;</span><span class="p">,</span> <span class="s2">&quot;Create study from loaded datasets&quot;</span><span class="p">,</span> <span class="s2">&quot;Clear study&quot;</span><span class="p">]:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">new_status</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Exit&quot;</span><span class="p">:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">study_exist</span> <span class="ow">and</span> <span class="n">action</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Clear study&quot;</span><span class="p">:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">new_status</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">new_status</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">new_status</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">new_status</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classification_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">new_status</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">new_status</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">new_status</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.enable_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.enable_menu">[docs]</a>    <span class="k">def</span> <span class="nf">enable_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make the menus enabled when at least dataset is loaded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">change_menu_status</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.disable_menu"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.disable_menu">[docs]</a>    <span class="k">def</span> <span class="nf">disable_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make the menus disabled when no dataset is loaded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">change_menu_status</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.add_dataset"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.add_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">add_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_index</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">,</span> <span class="n">study_available</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a dataset in the dataset menu.</span>
+<span class="sd">        :param dataset_index: The index of new dataset.</span>
+<span class="sd">        :type dataset_index: int</span>
+<span class="sd">        :param dataset_name: The name of the new dataset.</span>
+<span class="sd">        :type dataset_name: str</span>
+<span class="sd">        :param study_available: Enable the menu for selecting the study if it is available.</span>
+<span class="sd">        :type study_available: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">menu_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+
+        <span class="c1"># Recreate all the menus.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">dataset_counter</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">menu_actions</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span>    <span class="c1"># -2 for the separator and the study</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">menu_actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">dataset_complete_name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+            <span class="n">dataset_name_to_insert</span> <span class="o">=</span> <span class="n">dataset_complete_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>     <span class="c1"># Get only the dataset name</span>
+            <span class="n">new_dataset_name</span> <span class="o">=</span> <span class="s2">&quot;Dataset &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataset_counter</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; : &quot;</span> <span class="o">+</span> <span class="n">dataset_name_to_insert</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">new_dataset_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="n">dataset_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Add new dataset</span>
+        <span class="n">dataset_menu_name</span> <span class="o">=</span> <span class="s2">&quot;Dataset &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataset_index</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; : &quot;</span> <span class="o">+</span> <span class="n">dataset_name</span>
+        <span class="n">new_dataset</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">dataset_menu_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">new_dataset</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_clicked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">new_dataset</span><span class="p">)</span>
+
+        <span class="c1"># Add study</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_exist</span> <span class="o">=</span> <span class="n">study_available</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">study</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Select study&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">study</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_clicked</span><span class="p">)</span>
+        <span class="n">study</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">study_exist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">study</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.remove_dataset"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.remove_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">remove_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_index</span><span class="p">,</span> <span class="n">study_available</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove a dataset from the dataset menu.</span>
+<span class="sd">        :param dataset_index: The index of dataset to remove</span>
+<span class="sd">        :type dataset_index: int</span>
+<span class="sd">        :param study_available: Enable the menu for selecting the study if it is available.</span>
+<span class="sd">        :type study_available: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">menu_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">menu_actions</span><span class="p">[</span><span class="n">dataset_index</span><span class="p">]</span>     <span class="c1"># Remove the dataset in the menus.</span>
+
+        <span class="c1"># Recreate all the menus.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">dataset_counter</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">menu_actions</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span>    <span class="c1"># -2 for separator and study</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">menu_actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">dataset_complete_name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+            <span class="n">dataset_name</span> <span class="o">=</span> <span class="n">dataset_complete_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>     <span class="c1"># Get only the dataset name</span>
+            <span class="n">new_dataset_name</span> <span class="o">=</span> <span class="s2">&quot;Dataset &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataset_counter</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; : &quot;</span> <span class="o">+</span> <span class="n">dataset_name</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">new_dataset_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="n">dataset_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Add study</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_exist</span> <span class="o">=</span> <span class="n">study_available</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">study</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Select study&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">study</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_clicked</span><span class="p">)</span>
+        <span class="n">study</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">study_exist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">study</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.dataset_selected_menu_activation"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.dataset_selected_menu_activation">[docs]</a>    <span class="k">def</span> <span class="nf">dataset_selected_menu_activation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">study_exist</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Activate the menus when a dataset is selected.</span>
+<span class="sd">        :param study_exist: True if the study exists, false otherwise</span>
+<span class="sd">        :type study_exist: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_exist</span> <span class="o">=</span> <span class="n">study_exist</span>
+
+        <span class="c1"># File menu</span>
+        <span class="n">menu_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">menu_actions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Open&quot;</span><span class="p">,</span> <span class="s2">&quot;Import events info&quot;</span><span class="p">,</span> <span class="s2">&quot;Export&quot;</span><span class="p">,</span> <span class="s2">&quot;Save&quot;</span><span class="p">,</span> <span class="s2">&quot;Save As&quot;</span><span class="p">,</span> <span class="s2">&quot;Clear dataset&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;Create study from loaded datasets&quot;</span><span class="p">,</span> <span class="s2">&quot;Exit&quot;</span><span class="p">]:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Clear study&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">study_exist</span><span class="p">:</span>
+                    <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Edit menu</span>
+        <span class="n">menu_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edit_menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">menu_actions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Dataset information&quot;</span><span class="p">,</span> <span class="s2">&quot;Event values&quot;</span><span class="p">,</span> <span class="s2">&quot;Channel location&quot;</span><span class="p">]:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Tools menu</span>
+        <span class="n">menu_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">menu_actions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Filter&quot;</span><span class="p">,</span> <span class="s2">&quot;Resampling&quot;</span><span class="p">,</span> <span class="s2">&quot;Re-Referencing&quot;</span><span class="p">,</span> <span class="s2">&quot;Decompose data with ICA&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;Extract epochs&quot;</span><span class="p">,</span> <span class="s2">&quot;Signal-to-noise ratio&quot;</span><span class="p">,</span> <span class="s2">&quot;Source estimation&quot;</span><span class="p">]:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Dataset menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">menu_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+        <span class="n">menu_actions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">study_exist</span><span class="p">)</span>  <span class="c1"># The last element of the menu is always the study</span>
+
+        <span class="c1"># Other menus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classification_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="menubarView.study_selected_menu_activation"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.study_selected_menu_activation">[docs]</a>    <span class="k">def</span> <span class="nf">study_selected_menu_activation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Activate the menus when the study is selected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_exist</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># File menu</span>
+        <span class="n">menu_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">menu_actions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Clear study&quot;</span><span class="p">,</span> <span class="s2">&quot;Exit&quot;</span><span class="p">]:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Edit menu</span>
+        <span class="n">menu_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edit_menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">menu_actions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Channel location&quot;</span><span class="p">]:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Tools menu</span>
+        <span class="n">menu_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools_menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">menu_actions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Filter&quot;</span><span class="p">,</span> <span class="s2">&quot;Resampling&quot;</span><span class="p">,</span> <span class="s2">&quot;Re-Referencing&quot;</span><span class="p">,</span> <span class="s2">&quot;Decompose data with ICA&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;Signal-to-noise ratio&quot;</span><span class="p">,</span> <span class="s2">&quot;Source estimation&quot;</span><span class="p">]:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Dataset menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">menu_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+        <span class="n">menu_actions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>               <span class="c1"># The last element of the menu is always the study</span>
+
+        <span class="c1"># Other menus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classification_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_menu</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Triggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    File menu triggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.open_fif_file_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.open_fif_file_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">open_fif_file_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">path_to_file</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="p">()</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Open file&quot;</span><span class="p">,</span> <span class="s2">&quot;*.fif&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">open_fif_file_clicked</span><span class="p">(</span><span class="n">path_to_file</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="menubarView.open_cnt_file_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.open_cnt_file_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">open_cnt_file_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">path_to_file</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="p">()</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Open file&quot;</span><span class="p">,</span> <span class="s2">&quot;*.cnt&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">open_cnt_file_clicked</span><span class="p">(</span><span class="n">path_to_file</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="menubarView.open_set_file_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.open_set_file_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">open_set_file_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">path_to_file</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="p">()</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Open file&quot;</span><span class="p">,</span> <span class="s2">&quot;*.set&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">open_set_file_clicked</span><span class="p">(</span><span class="n">path_to_file</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="menubarView.read_events_file_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.read_events_file_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">read_events_file_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">path_to_file</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="p">()</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Open file&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">read_events_file_clicked</span><span class="p">(</span><span class="n">path_to_file</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="menubarView.find_events_from_channel_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.find_events_from_channel_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">find_events_from_channel_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">find_events_from_channel_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.export_data_to_csv_file_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.export_data_to_csv_file_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">export_data_to_csv_file_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">path_to_file</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="p">()</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Export data to CSV file&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">export_data_to_csv_file_clicked</span><span class="p">(</span><span class="n">path_to_file</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="menubarView.export_data_to_set_file_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.export_data_to_set_file_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">export_data_to_set_file_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">path_to_file</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="p">()</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Export data to SET file&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">export_data_to_set_file_clicked</span><span class="p">(</span><span class="n">path_to_file</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="menubarView.export_events_to_file_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.export_events_to_file_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">export_events_to_file_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">export_events_to_file_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.save_file_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.save_file_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">save_file_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">save_file_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.save_file_as_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.save_file_as_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">save_file_as_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">save_file_as_clicked</span><span class="p">()</span></div>
+
+    <span class="c1"># Dataset</span>
+<div class="viewcode-block" id="menubarView.clear_dataset_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.clear_dataset_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">clear_dataset_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">clear_dataset_clicked</span><span class="p">()</span></div>
+
+    <span class="c1"># Study</span>
+<div class="viewcode-block" id="menubarView.create_study_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.create_study_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">create_study_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">create_study_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.clear_study_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.clear_study_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">clear_study_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">clear_study_clicked</span><span class="p">()</span></div>
+
+    <span class="c1"># Exit</span>
+<div class="viewcode-block" id="menubarView.exit_program_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.exit_program_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">exit_program_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">exit_program_clicked</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Edit menu trigger</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.dataset_info_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.dataset_info_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">dataset_info_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">dataset_info_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.event_values_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.event_values_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">event_values_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">event_values_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.channel_location_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.channel_location_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">channel_location_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">channel_location_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.select_data_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.select_data_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">select_data_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">select_data_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.select_data_events_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.select_data_events_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">select_data_events_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">select_data_events_clicked</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Tools menu triggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.filter_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.filter_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">filter_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">filter_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.resampling_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.resampling_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">resampling_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">resampling_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.re_referencing_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.re_referencing_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">re_referencing_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">re_referencing_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.inspect_reject_data_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.inspect_reject_data_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">inspect_reject_data_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">inspect_reject_data_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.ica_decomposition_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.ica_decomposition_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">ica_decomposition_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">ica_decomposition_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.extract_epochs_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.extract_epochs_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">extract_epochs_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">extract_epochs_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.snr_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.snr_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">snr_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">snr_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.source_estimation_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.source_estimation_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">source_estimation_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">source_estimation_clicked</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot menu triggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.plot_channel_locations"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.plot_channel_locations">[docs]</a>    <span class="k">def</span> <span class="nf">plot_channel_locations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">plot_channel_locations_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.plot_data_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.plot_data_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">plot_data_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">plot_data_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.plot_topographies_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.plot_topographies_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">plot_topographies_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">plot_topographies_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.plot_spectra_maps_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.plot_spectra_maps_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">plot_spectra_maps_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">plot_spectra_maps_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.plot_channel_properties_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.plot_channel_properties_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">plot_channel_properties_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">plot_channel_properties_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.plot_ERP_image_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.plot_ERP_image_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">plot_ERP_image_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">plot_ERP_image_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.plot_ERPs_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.plot_ERPs_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">plot_ERPs_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">plot_ERPs_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.plot_time_frequency_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.plot_time_frequency_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">plot_time_frequency_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">plot_time_frequency_clicked</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Connectivity menu triggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.envelope_correlation_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.envelope_correlation_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">envelope_correlation_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">envelope_correlation_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.source_space_connectivity_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.source_space_connectivity_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">source_space_connectivity_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">source_space_connectivity_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.sensor_space_connectivity_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.sensor_space_connectivity_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">sensor_space_connectivity_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">sensor_space_connectivity_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.spectro_temporal_connectivity_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.spectro_temporal_connectivity_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">spectro_temporal_connectivity_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">spectro_temporal_connectivity_clicked</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Statistics menu triggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.statistics_snr_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.statistics_snr_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">statistics_snr_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">statistics_snr_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.statistics_erp_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.statistics_erp_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">statistics_erp_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">statistics_erp_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.statistics_psd_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.statistics_psd_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">statistics_psd_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">statistics_psd_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.statistics_ersp_itc_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.statistics_ersp_itc_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">statistics_ersp_itc_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">statistics_ersp_itc_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.statistics_connectivity_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.statistics_connectivity_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">statistics_connectivity_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">statistics_connectivity_clicked</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Classification menu triggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.classify_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.classify_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">classify_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">classify_clicked</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Study menu trigger</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.edit_study_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.edit_study_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">edit_study_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">edit_study_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.plot_study_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.plot_study_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">plot_study_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">plot_study_clicked</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Datasets menu trigger</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.dataset_clicked"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.dataset_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">dataset_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">menu_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+        <span class="n">selected_action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sender</span><span class="p">()</span>
+
+        <span class="n">index_selected</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">selected_action</span> <span class="o">!=</span> <span class="n">menu_actions</span><span class="p">[</span><span class="n">index_selected</span><span class="p">]:</span>
+            <span class="n">index_selected</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">index_selected</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">menu_actions</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>       <span class="c1"># Study selected</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">study_selected</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">study_selected_menu_activation</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>                                           <span class="c1"># Dataset selected</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">change_dataset</span><span class="p">(</span><span class="n">index_selected</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset_selected_menu_activation</span><span class="p">(</span><span class="n">study_exist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">study_exist</span><span class="p">)</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Help menu triggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.help_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.help_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">help_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">help_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="menubarView.about_trigger"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.about_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">about_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span><span class="o">.</span><span class="n">about_clicked</span><span class="p">()</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Setters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="menubarView.set_listener"><a class="viewcode-back" href="../../../src.menubar.html#src.menubar.menubar_view.menubarView.set_listener">[docs]</a>    <span class="k">def</span> <span class="nf">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the listener to the controller.</span>
+<span class="sd">        :param listener: Listener to the controller.</span>
+<span class="sd">        :type listener: menubarController</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar_listener</span> <span class="o">=</span> <span class="n">listener</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

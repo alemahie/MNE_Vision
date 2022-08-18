@@ -5,66 +5,31 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
 
-   src.utils.elements_selector
-   src.utils.waiting_while_processing
+    src.utils.cnt_reader
+    src.utils.data_exportation
+    src.utils.download_fsaverage_mne_data
+    src.utils.elements_selector
+    src.utils.model
+    src.utils.view
+    src.utils.waiting_while_processing
 
 Submodules
 ----------
-
-src.utils.cnt\_file\_reader module
-----------------------------------
-
-.. automodule:: src.utils.cnt_file_reader
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-src.utils.error\_window module
-------------------------------
-
-.. automodule:: src.utils.error_window
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 src.utils.file\_path\_search module
 -----------------------------------
 
 .. automodule:: src.utils.file_path_search
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-src.utils.progress\_bar module
-------------------------------
-
-.. automodule:: src.utils.progress_bar
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-src.utils.splash\_screen module
--------------------------------
-
-.. automodule:: src.utils.splash_screen
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-src.utils.stylesheet module
----------------------------
-
-.. automodule:: src.utils.stylesheet
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: src.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:

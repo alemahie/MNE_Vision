@@ -1,0 +1,297 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.tools.re_referencing.re_referencing_view &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.tools.re_referencing.re_referencing_view</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Re-referencing View</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">cpu_count</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QButtonGroup</span><span class="p">,</span> <span class="n">QCheckBox</span><span class="p">,</span> <span class="n">QPushButton</span><span class="p">,</span> <span class="n">QGridLayout</span><span class="p">,</span> <span class="n">QHBoxLayout</span><span class="p">,</span> \
+    <span class="n">QLabel</span><span class="p">,</span> <span class="n">QSlider</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span>
+
+<span class="kn">from</span> <span class="nn">utils.elements_selector.elements_selector_controller</span> <span class="kn">import</span> <span class="n">multipleSelectorController</span>
+<span class="kn">from</span> <span class="nn">utils.view.error_window</span> <span class="kn">import</span> <span class="n">errorWindow</span>
+<span class="kn">from</span> <span class="nn">utils.view.separator</span> <span class="kn">import</span> <span class="n">create_layout_separator</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2022&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lemahieu Antoine&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GNU General Public License v3.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Lemahieu Antoine&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;Antoine.Lemahieu@ulb.be&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Dev&quot;</span>
+
+
+<div class="viewcode-block" id="reReferencingView"><a class="viewcode-back" href="../../../../src.tools.re_referencing.html#src.tools.re_referencing.re_referencing_view.reReferencingView">[docs]</a><span class="k">class</span> <span class="nc">reReferencingView</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">all_channels_names</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Window displaying the parameters for computing the re-referencing on the dataset.</span>
+<span class="sd">        :param reference: Current reference</span>
+<span class="sd">        :type reference: str/list of str</span>
+<span class="sd">        :param all_channels_names: All the channels names</span>
+<span class="sd">        :type all_channels_names: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_listener</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selector_controller</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_channels_names</span> <span class="o">=</span> <span class="n">all_channels_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selected</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;Re-referencing&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="p">)</span>
+
+        <span class="c1"># Average of all channels &amp; Select a specific channel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_mode_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_mode_buttons</span> <span class="o">=</span> <span class="n">QButtonGroup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">average_check_box</span> <span class="o">=</span> <span class="n">QCheckBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">average_check_box</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">average_check_box</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Compute average reference&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_mode_buttons</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">average_check_box</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>   <span class="c1"># Button with ID 1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel_check_box</span> <span class="o">=</span> <span class="n">QCheckBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel_check_box</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Re-reference data to channel(s) : &quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_mode_buttons</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_check_box</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># Button with ID 2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selection_button</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;&amp;Channels ...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selection_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channels_selection_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">infinity_check_box</span> <span class="o">=</span> <span class="n">QCheckBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">infinity_check_box</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Compute point at infinity reference&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_mode_buttons</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">infinity_check_box</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># Button with ID 3</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_layout</span> <span class="o">=</span> <span class="n">QGridLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">average_check_box</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_check_box</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channels_selection_button</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">infinity_check_box</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_mode_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_box_layout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_slider</span> <span class="o">=</span> <span class="n">QSlider</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">Orientation</span><span class="o">.</span><span class="n">Horizontal</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_slider</span><span class="o">.</span><span class="n">setMinimum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_slider</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="n">cpu_count</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_slider</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_slider</span><span class="o">.</span><span class="n">setSingleStep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_slider</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slider_value_changed_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Number of parallel jobs : &quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_slider</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_layout</span><span class="p">)</span>
+
+        <span class="c1"># How to compute the point at infinity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_load_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_load_buttons</span> <span class="o">=</span> <span class="n">QButtonGroup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_compute_from_scratch</span> <span class="o">=</span> <span class="n">QCheckBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_compute_from_scratch</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Compute point infinity from scratch and don&#39;t save the additional data&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_compute_from_scratch</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_load_buttons</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_box_compute_from_scratch</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>    <span class="c1"># Button with ID 4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_save</span> <span class="o">=</span> <span class="n">QCheckBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_save</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Save the additional source space data&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_load_buttons</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_box_save</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>   <span class="c1"># Button with ID 5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_load</span> <span class="o">=</span> <span class="n">QCheckBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_load</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Load the additional source space data (must be available)&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_load_buttons</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_box_load</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>  <span class="c1"># Button with ID 6</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_box_compute_from_scratch</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_box_save</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_box_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_box_load</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_load_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_box_layout</span><span class="p">)</span>
+
+        <span class="c1"># Cancel &amp; Confirm buttons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;&amp;Cancel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_re_referencing_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confirm</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;&amp;Confirm&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confirm</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confirm_re_referencing_trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confirm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_layout</span><span class="p">)</span>
+
+        <span class="c1"># Final layout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Current reference : &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">reference</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_mode_widget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">create_layout_separator</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_load_widget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">create_layout_separator</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_widget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">create_layout_separator</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_confirm_widget</span><span class="p">)</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Triggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="reReferencingView.cancel_re_referencing_trigger"><a class="viewcode-back" href="../../../../src.tools.re_referencing.html#src.tools.re_referencing.re_referencing_view.reReferencingView.cancel_re_referencing_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">cancel_re_referencing_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send the information to the controller that the computation is cancelled.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_listener</span><span class="o">.</span><span class="n">cancel_button_clicked</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="reReferencingView.confirm_re_referencing_trigger"><a class="viewcode-back" href="../../../../src.tools.re_referencing.html#src.tools.re_referencing.re_referencing_view.reReferencingView.confirm_re_referencing_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_re_referencing_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the parameters and send the information to the controller.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">checked_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_mode_buttons</span><span class="o">.</span><span class="n">checkedButton</span><span class="p">()</span>
+        <span class="n">button_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_mode_buttons</span><span class="o">.</span><span class="n">id</span><span class="p">(</span><span class="n">checked_button</span><span class="p">)</span>
+        <span class="n">save_data</span><span class="p">,</span> <span class="n">load_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_save_load_button_checked</span><span class="p">()</span>
+        <span class="n">references</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">button_id</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>      <span class="c1"># Average of all channels for reference</span>
+            <span class="n">references</span> <span class="o">=</span> <span class="s2">&quot;average&quot;</span>
+        <span class="k">elif</span> <span class="n">button_id</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>    <span class="c1"># Selected channel for reference</span>
+            <span class="n">references</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels_selected</span>
+        <span class="k">elif</span> <span class="n">button_id</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">references</span> <span class="o">=</span> <span class="s2">&quot;infinity&quot;</span>
+        <span class="k">if</span> <span class="n">references</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">n_jobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_slider</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_listener</span><span class="o">.</span><span class="n">confirm_button_clicked</span><span class="p">(</span><span class="n">references</span><span class="p">,</span> <span class="n">save_data</span><span class="p">,</span> <span class="n">load_data</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;Please select a channel in the &#39;channel selection&#39; menu before starting the computation &quot;</span> \
+                            <span class="s2">&quot;with specific channels as references.&quot;</span>
+            <span class="n">error_window</span> <span class="o">=</span> <span class="n">errorWindow</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+            <span class="n">error_window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="reReferencingView.channels_selection_trigger"><a class="viewcode-back" href="../../../../src.tools.re_referencing.html#src.tools.re_referencing.re_referencing_view.reReferencingView.channels_selection_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">channels_selection_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Open the multiple selector window.</span>
+<span class="sd">        The user can select multiple channels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Select the channels used for the re-referencing :&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selector_controller</span> <span class="o">=</span> <span class="n">multipleSelectorController</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_channels_names</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">box_checked</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selector_controller</span><span class="o">.</span><span class="n">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_listener</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="reReferencingView.slider_value_changed_trigger"><a class="viewcode-back" href="../../../../src.tools.re_referencing.html#src.tools.re_referencing.re_referencing_view.reReferencingView.slider_value_changed_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">slider_value_changed_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Change the value of the slider displayed on the window when the actual slider is moved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">slider_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_slider</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs_label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">slider_value</span><span class="p">))</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Setters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="reReferencingView.set_listener"><a class="viewcode-back" href="../../../../src.tools.re_referencing.html#src.tools.re_referencing.re_referencing_view.reReferencingView.set_listener">[docs]</a>    <span class="k">def</span> <span class="nf">set_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the listener to the controller.</span>
+<span class="sd">        :param listener: Listener to the controller.</span>
+<span class="sd">        :type listener: reReferencingController</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">re_referencing_listener</span> <span class="o">=</span> <span class="n">listener</span></div>
+
+<div class="viewcode-block" id="reReferencingView.set_channels_selected"><a class="viewcode-back" href="../../../../src.tools.re_referencing.html#src.tools.re_referencing.re_referencing_view.reReferencingView.set_channels_selected">[docs]</a>    <span class="k">def</span> <span class="nf">set_channels_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels_selected</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the channels selected in the multiple selector window.</span>
+<span class="sd">        :param channels_selected: Channels selected.</span>
+<span class="sd">        :type channels_selected: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_selected</span> <span class="o">=</span> <span class="n">channels_selected</span></div>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Getters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="reReferencingView.get_save_load_button_checked"><a class="viewcode-back" href="../../../../src.tools.re_referencing.html#src.tools.re_referencing.re_referencing_view.reReferencingView.get_save_load_button_checked">[docs]</a>    <span class="k">def</span> <span class="nf">get_save_load_button_checked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the values of the save and load buttons.</span>
+<span class="sd">        :return: save_data: True if the data must be saved. Otherwise, False.</span>
+<span class="sd">        load_data: True if the data must be loaded. Otherwise, False.</span>
+<span class="sd">        :rtype: boolean, boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">checked_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_load_buttons</span><span class="o">.</span><span class="n">checkedButton</span><span class="p">()</span>
+        <span class="n">button_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_load_buttons</span><span class="o">.</span><span class="n">id</span><span class="p">(</span><span class="n">checked_button</span><span class="p">)</span>
+        <span class="n">save_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">load_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">button_id</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">save_data</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">load_data</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">button_id</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">save_data</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">load_data</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">button_id</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">save_data</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">load_data</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">save_data</span><span class="p">,</span> <span class="n">load_data</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

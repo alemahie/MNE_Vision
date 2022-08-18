@@ -1,0 +1,305 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.utils.cnt_reader.libeep &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.utils.cnt_reader.libeep</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">utils.cnt_reader.libeep</span> <span class="kn">import</span> <span class="n">pyeep</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1">###############################################################################</span>
+<div class="viewcode-block" id="cnt_file"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_file">[docs]</a><span class="k">class</span> <span class="nc">cnt_file</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A cnt-file already  stored on your harddrive</span>
+<span class="sd">  </span>
+<span class="sd">    args</span>
+<span class="sd">    ----</span>
+<span class="sd">    fname:str</span>
+<span class="sd">        the path to the filename</span>
+<span class="sd">   </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="cnt_file.open"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_file.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;open the file for queries&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">handle</span> <span class="o">=</span> <span class="n">pyeep</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">handle</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received an invalid libeep file handle&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span> <span class="o">=</span> <span class="n">handle</span>
+            <span class="c1"># print(f&quot;Opening {self._fname} as {self._handle}&quot;)</span>
+            <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="cnt_file.close"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_file.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;close and release the file&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pyeep</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="c1"># print(f&quot;Closing {self._handle} for {self._fname}&quot;)</span>
+
+<div class="viewcode-block" id="cnt_file.get_channel_count"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_file.get_channel_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_channel_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="s2">&quot;get the number of channels stored in the file&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">channel_count</span> <span class="o">=</span> <span class="n">pyeep</span><span class="o">.</span><span class="n">get_channel_count</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">_handle</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">channel_count</span></div>
+
+<div class="viewcode-block" id="cnt_file.get_channel_info"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_file.get_channel_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_channel_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;get information about a specific channel</span>
+
+<span class="sd">        args</span>
+<span class="sd">        ----</span>
+<span class="sd">        index:int</span>
+<span class="sd">            the index number for the channel</span>
+
+<span class="sd">        returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Tuple[str, str, str]:</span>
+<span class="sd">            the information where tuples contains three strings:</span>
+<span class="sd">            channel label, channel reference and unit, i,e,:</span>
+<span class="sd">            (&#39;Cz&#39;, &#39;ref&#39;, &#39;uV&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">pyeep</span><span class="o">.</span><span class="n">get_channel_label</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">_handle</span><span class="p">,</span> <span class="n">index</span><span class="p">),</span>
+                <span class="n">pyeep</span><span class="o">.</span><span class="n">get_channel_reference</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">_handle</span><span class="p">,</span> <span class="n">index</span><span class="p">),</span>
+                <span class="s2">&quot;uV&quot;</span><span class="c1">#pyeep.get_channel_unit(f._handle, index),</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">info</span></div>
+
+<div class="viewcode-block" id="cnt_file.get_sample_frequency"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_file.get_sample_frequency">[docs]</a>    <span class="k">def</span> <span class="nf">get_sample_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="s2">&quot;returns the sample frequency of the data as int&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="n">pyeep</span><span class="o">.</span><span class="n">get_sample_frequency</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">_handle</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fs</span></div>
+
+<div class="viewcode-block" id="cnt_file.get_sample_count"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_file.get_sample_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_sample_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;returns the number of samples in the file as int&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">sample_count</span> <span class="o">=</span> <span class="n">pyeep</span><span class="o">.</span><span class="n">get_sample_count</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">_handle</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sample_count</span></div>
+
+<div class="viewcode-block" id="cnt_file.get_samples"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_file.get_samples">[docs]</a>    <span class="k">def</span> <span class="nf">get_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fro</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;load a range of samples from the file </span>
+<span class="sd">        </span>
+<span class="sd">        args</span>
+<span class="sd">        ----</span>
+<span class="sd">        fro:int</span>
+<span class="sd">          the first sample to load</span>
+<span class="sd">        to:int</span>
+<span class="sd">          the last sample to load</span>
+
+<span class="sd">        returns</span>
+<span class="sd">        ------</span>
+<span class="sd">        data: List[List[float]]</span>
+<span class="sd">            a list with length samples containing a list of values for each channel</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        data = cnt.get_samples(0,1)</span>
+<span class="sd">        # return the first sample for all channels</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sample_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sample_count</span><span class="p">()</span>
+        <span class="k">with</span> <span class="bp">self</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="n">to</span> <span class="o">-</span> <span class="n">fro</span>
+            <span class="k">if</span> <span class="n">steps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;No samples selected&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">steps</span> <span class="o">&gt;</span> <span class="n">sample_count</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;Not enough samples available&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
+                <span class="n">sample</span> <span class="o">=</span> <span class="n">pyeep</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">_handle</span><span class="p">,</span> <span class="n">fro</span> <span class="o">+</span> <span class="n">step</span><span class="p">,</span> <span class="n">fro</span> <span class="o">+</span> <span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="cnt_file.get_trigger_count"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_file.get_trigger_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_trigger_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="s2">&quot;return the number of triggers in the file as int&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">trigger_count</span> <span class="o">=</span> <span class="n">pyeep</span><span class="o">.</span><span class="n">get_trigger_count</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">_handle</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">trigger_count</span></div>
+
+<div class="viewcode-block" id="cnt_file.get_trigger"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_file.get_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">get_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;get information for a specific trigger</span>
+
+<span class="sd">        args</span>
+<span class="sd">        ----</span>
+<span class="sd">        index:int</span>
+<span class="sd">            the index number of the trigger of interest</span>
+
+<span class="sd">        returns</span>
+<span class="sd">        info: Tuple[str, int, int, Any, Any, Any]</span>
+<span class="sd">            information about this trigger in tehe following format</span>
+<span class="sd">            (markertype, sample_index, markervalue, Any, Any, Any)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_trigger_count</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> is smaller zero. Only positive indices are allowed&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="n">tc</span> <span class="ow">or</span> <span class="n">tc</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> larger than trigger count of </span><span class="si">{</span><span class="n">tc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">pyeep</span><span class="o">.</span><span class="n">get_trigger</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">_handle</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">info</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<div class="viewcode-block" id="cnt_out"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_out">[docs]</a><span class="k">class</span> <span class="nc">cnt_out</span><span class="p">(</span><span class="n">cnt_file</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">channels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">rf64</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A cnt-file for storing data on your harddrive</span>
+<span class="sd">  </span>
+<span class="sd">        args</span>
+<span class="sd">        ----</span>
+<span class="sd">        fname:str</span>
+<span class="sd">            the path to the filename</span>
+<span class="sd">        rate:</span>
+<span class="sd">            sampling rate in Herz</span>
+<span class="sd">        channels:</span>
+<span class="sd">            list of tuples, where tuples contains three strings:</span>
+<span class="sd">              channel label, channel reference and unit, i,e,:</span>
+<span class="sd">              [&#39;Cz&#39;, &#39;ref&#39;, &#39;uV&#39;)]</span>
+<span class="sd">        rf64:</span>
+<span class="sd">            if 0, create default 32-bit cnt data. otherwise 64 bit(for larger tan 2GB files)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fname</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.cnt&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;unsupported extension&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">fname</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+        <span class="n">fname</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="n">channels_handle</span> <span class="o">=</span> <span class="n">pyeep</span><span class="o">.</span><span class="n">create_channel_info</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+            <span class="n">pyeep</span><span class="o">.</span><span class="n">add_channel</span><span class="p">(</span><span class="n">channels_handle</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span> <span class="o">=</span> <span class="n">pyeep</span><span class="o">.</span><span class="n">write_cnt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fname</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">channels_handle</span><span class="p">,</span> <span class="n">rf64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;not a valid libeep handle&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_channel_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span>
+
+<div class="viewcode-block" id="cnt_out.add_samples"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_out.add_samples">[docs]</a>    <span class="k">def</span> <span class="nf">add_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pyeep</span><span class="o">.</span><span class="n">add_samples</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channel_count</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="cnt_out.add_trigger"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.cnt_out.add_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">add_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">marker</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pyeep</span><span class="o">.</span><span class="n">add_trigger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">marker</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="peek"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.peek">[docs]</a><span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Peeking into </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">cnt_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">channels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">get_channel_count</span><span class="p">()):</span>
+            <span class="n">channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">get_channel_info</span><span class="p">(</span><span class="n">c</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Channels:&quot;</span><span class="p">,</span> <span class="n">channels</span><span class="p">)</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">get_trigger_count</span><span class="p">()):</span>
+            <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">get_trigger</span><span class="p">(</span><span class="n">t</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unique event names:&quot;</span><span class="p">,</span> <span class="n">Counter</span><span class="p">(</span><span class="n">events</span><span class="p">),</span> <span class="s2">&quot;total is &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sampling Rate:&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">get_sample_frequency</span><span class="p">())</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">get_sample_count</span><span class="p">()</span> <span class="o">/</span> <span class="n">f</span><span class="o">.</span><span class="n">get_sample_frequency</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duration: </span><span class="si">{</span><span class="n">duration</span><span class="si">:</span><span class="s2">10.2f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../src.utils.cnt_reader.libeep.html#src.utils.cnt_reader.libeep.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">peek</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

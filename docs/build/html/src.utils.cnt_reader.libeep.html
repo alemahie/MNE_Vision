@@ -1,0 +1,273 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.utils.cnt_reader.libeep package &#8212; MNE Vision 0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.utils.data_exportation package" href="src.utils.data_exportation.html" />
+    <link rel="prev" title="src.utils.cnt_reader package" href="src.utils.cnt_reader.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.utils.data_exportation.html" title="src.utils.data_exportation package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="src.utils.cnt_reader.html" title="src.utils.cnt_reader package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.utils.html" >src.utils package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="src.utils.cnt_reader.html" accesskey="U">src.utils.cnt_reader package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="src-utils-cnt-reader-libeep-package">
+<h1>src.utils.cnt_reader.libeep package<a class="headerlink" href="#src-utils-cnt-reader-libeep-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-src.utils.cnt_reader.libeep">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.utils.cnt_reader.libeep" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.utils.cnt_reader.libeep.cnt_file">
+<em class="property">class </em><code class="descclassname">src.utils.cnt_reader.libeep.</code><code class="descname">cnt_file</code><span class="sig-paren">(</span><em>fname: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A cnt-file already  stored on your harddrive</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<em>str</em>) – the path to the filename</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="src.utils.cnt_reader.libeep.cnt_file.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_file.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_file.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>close and release the file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.cnt_reader.libeep.cnt_file.get_channel_count">
+<code class="descname">get_channel_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_file.get_channel_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_file.get_channel_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the number of channels stored in the file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.cnt_reader.libeep.cnt_file.get_channel_info">
+<code class="descname">get_channel_info</code><span class="sig-paren">(</span><em>index: int</em><span class="sig-paren">)</span> &#x2192; Tuple[str, str, str]<a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_file.get_channel_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_file.get_channel_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>get information about a specific channel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>int</em>) – the index number for the channel</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the information where tuples contains three strings:
+channel label, channel reference and unit, i,e,:
+(‘Cz’, ‘ref’, ‘uV’)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Tuple[str, str, str]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.cnt_reader.libeep.cnt_file.get_sample_count">
+<code class="descname">get_sample_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_file.get_sample_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_file.get_sample_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the number of samples in the file as int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.cnt_reader.libeep.cnt_file.get_sample_frequency">
+<code class="descname">get_sample_frequency</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_file.get_sample_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_file.get_sample_frequency" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the sample frequency of the data as int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.cnt_reader.libeep.cnt_file.get_samples">
+<code class="descname">get_samples</code><span class="sig-paren">(</span><em>fro: int</em>, <em>to: int</em><span class="sig-paren">)</span> &#x2192; List[List[float]]<a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_file.get_samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_file.get_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>load a range of samples from the file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fro</strong> (<em>int</em>) – the first sample to load</li>
+<li><strong>to</strong> (<em>int</em>) – the last sample to load</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>data</strong> – a list with length samples containing a list of values for each channel</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List[List[float]]</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<p>data = cnt.get_samples(0,1)
+# return the first sample for all channels</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.cnt_reader.libeep.cnt_file.get_trigger">
+<code class="descname">get_trigger</code><span class="sig-paren">(</span><em>index: int</em><span class="sig-paren">)</span> &#x2192; Tuple[str, int, int, Any, Any, Any]<a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_file.get_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_file.get_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>get information for a specific trigger</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>index</strong> (<em>int</em>) – the index number of the trigger of interest</li>
+<li><strong>returns</strong> – </li>
+<li><strong>info</strong> (<em>Tuple</em><em>[</em><em>str</em><em>, </em><em>int</em><em>, </em><em>int</em><em>, </em><em>Any</em><em>, </em><em>Any</em><em>, </em><em>Any</em><em>]</em>) – information about this trigger in tehe following format
+(markertype, sample_index, markervalue, Any, Any, Any)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.cnt_reader.libeep.cnt_file.get_trigger_count">
+<code class="descname">get_trigger_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_file.get_trigger_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_file.get_trigger_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the number of triggers in the file as int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.utils.cnt_reader.libeep.cnt_file.open">
+<code class="descname">open</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_file.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_file.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>open the file for queries</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.utils.cnt_reader.libeep.cnt_out">
+<em class="property">class </em><code class="descclassname">src.utils.cnt_reader.libeep.</code><code class="descname">cnt_out</code><span class="sig-paren">(</span><em>fname: str, rate: int, channels: List[str], rf64=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_out"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_out" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.utils.cnt_reader.libeep.cnt_file" title="src.utils.cnt_reader.libeep.cnt_file"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.utils.cnt_reader.libeep.cnt_file</span></code></a></p>
+<dl class="method">
+<dt id="src.utils.cnt_reader.libeep.cnt_out.add_samples">
+<code class="descname">add_samples</code><span class="sig-paren">(</span><em>samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_out.add_samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_out.add_samples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.utils.cnt_reader.libeep.cnt_out.add_trigger">
+<code class="descname">add_trigger</code><span class="sig-paren">(</span><em>sample: int</em>, <em>marker: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#cnt_out.add_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.cnt_out.add_trigger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="src.utils.cnt_reader.libeep.main">
+<code class="descclassname">src.utils.cnt_reader.libeep.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.utils.cnt_reader.libeep.peek">
+<code class="descclassname">src.utils.cnt_reader.libeep.</code><code class="descname">peek</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/cnt_reader/libeep.html#peek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utils.cnt_reader.libeep.peek" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">src.utils.cnt_reader.libeep package</a><ul>
+<li><a class="reference internal" href="#module-src.utils.cnt_reader.libeep">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="src.utils.cnt_reader.html"
+                        title="previous chapter">src.utils.cnt_reader package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="src.utils.data_exportation.html"
+                        title="next chapter">src.utils.data_exportation package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.utils.cnt_reader.libeep.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="src.utils.data_exportation.html" title="src.utils.data_exportation package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="src.utils.cnt_reader.html" title="src.utils.cnt_reader package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MNE Vision 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >MNE Vision API</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="src.html" >src package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="src.utils.html" >src.utils package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="src.utils.cnt_reader.html" >src.utils.cnt_reader package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Lemahieu Antoine.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>
