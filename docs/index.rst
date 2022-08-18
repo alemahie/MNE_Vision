@@ -11,6 +11,7 @@ Welcome to MNE_Vision's documentation!
    :caption: Contents:
 
    readme
+   tutorial
    api
 
 
