@@ -5,26 +5,46 @@
 MNE_Vision
 ==========
 
-MNE Vision is a open source software mainly based on MNE_Python_ We propose here a graphical interface for MNE, able to perform some of the most common tasks in EEG analysis and processing and available in MNE, while also proposing other tools.
+MNE Vision is a free and open source software based on MNE_Python_. 
+We propose here a graphical interface for MNE, able to perform some of the most common tasks in EEG analysis and processing. 
+While also proposing other tools such as the connectivity, and classification with machine learning.
 
 The main objective is to propose a free alternative to EEGLAB_ which requires a MATLAB_ license to fully work.
 
 Documentation
 ^^^^^^^^^^^^^
 
-`MNE_Vision documentation <docs/build/html/index.html>`_ is available inside the project files on this github.
+MNE_Vision documentation is available `here <https://alemahie.github.io/>`_.
 
 Installing and using MNE_Vision
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To use MNE_Vision, you will first need to install his dependencies.
+There are two ways to install MNE Vision. 
+
+First, you can download it by doing in a terminal :
+
+.. code-block:: console
+
+    $ pip install mne_vision
+    
+This requires Python to be installed, if you don't have python installed you can download it from `here <https://www.python.org/downloads/>`_.
+    
+Once MNE Vision is downloaded, you can launch it from a terminal by doing :
+
+.. code-block:: console
+
+    $ mne_vision
+    
+    
+
+The second way to download MNE Vision is through the GitHub page (`here <https://github.com/alemahie/MNE_Vision>`_.).
+
+You will first need to install his dependencies.
 To do so you can you can open a terminal in the directory where MNE_Vision is stored and type :
 
 .. code-block:: console
 
     $ pip install requirements.txt
-
-This requires Python to be installed, if you don't have python installed you can download it from `here <https://www.python.org/downloads/>`_.
 
 Then, MNE Vision can be launch in a terminal from the directory "path\to\MNE_VISION\" and type :
 
@@ -40,22 +60,22 @@ Dependencies
 The required dependencies to run MNE-Python are:
 
 - Python >= 3.9.13
-- eeglabio >= 0.0.1.post7
-- keras >= 2.9.0
-- matplotlib >= 3.5.2
+- eeglabio
+- keras
+- matplotlib
 - mne >= 1.0.3
 - mne_connectivity >= 0.3
-- numpy >= 1.22.4
-- pymatreader >= 0.0.30
-- PyQt5 >= 5.15.6
-- PyQt5-stubs >= 5.15.6.0
-- pyriemann >= 0.2.7
-- pyvista >= 0.34.1
-- pyvistaqt >= 0.9.0
-- scikit_learn >= 1.1.1
-- scipy >= 1.8.1
-- seaborn >= 0.11.2
-- tensorflow >= 2.9.1
+- numpy
+- pymatreader
+- PyQt5
+- PyQt5-stubs
+- pyriemann
+- pyvista
+- pyvistaqt
+- scikit_learn
+- scipy
+- seaborn
+- tensorflow
 
 Licensing
 ^^^^^^^^^
@@ -69,5 +89,7 @@ MNE_Vision is **GNU-licenced**, for more information please read the GNU General
 .. _MATLAB: https://fr.mathworks.com/products/matlab.html
 .. _MNE_Python: https://mne.tools/stable/index.html
 .. _Python: https://www.python.org/downloads/
+.. _MNE_Vision_GitHub: https://github.com/alemahie/MNE_Vision
+.. _MNE_Vision_Documentation: https://alemahie.github.io/
 
 .. |MNE_Vision| image:: image/mne_vision_logo.png
