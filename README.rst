@@ -11,6 +11,8 @@ While also proposing other tools such as the connectivity, and classification wi
 
 The main objective is to propose a free alternative to EEGLAB_ which requires a MATLAB_ license to fully work.
 
+A video of presentation of the software is available `here <https://www.youtube.com/watch?v=jj_FqbHIjVg>`_.
+
 Documentation
 ^^^^^^^^^^^^^
 
@@ -91,5 +93,6 @@ MNE_Vision is **GNU-licenced**, for more information please read the GNU General
 .. _Python: https://www.python.org/downloads/
 .. _MNE_Vision_GitHub: https://github.com/alemahie/MNE_Vision
 .. _MNE_Vision_Documentation: https://alemahie.github.io/
+.. _MNE_Vision_Video_Presentation: https://www.youtube.com/watch?v=jj_FqbHIjVg
 
 .. |MNE_Vision| image:: image/mne_vision_logo.png
